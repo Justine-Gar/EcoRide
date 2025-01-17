@@ -1,5 +1,0 @@
-# Fichiers et dossiers à ignorer lors du build Docker
-.git
-.gitignore
-var/
-vendor/

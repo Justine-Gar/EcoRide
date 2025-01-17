@@ -65,6 +65,15 @@ tmp/
 temp/
 ###< Fichier Temporaires ###
 
+###> Fichiers de configuration ###
+composer.json
+composer.lock
+symfony.lock
+.dockerignore
+.env.dev
+docker-compose.yml
+###< Fichiers de configuration ###
+
 ###> Dépendances et builds ###
 node_modules/
 vendor/
