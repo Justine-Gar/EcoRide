@@ -1,0 +1,48 @@
+
+services:
+  #Service PHP
+  php:
+    build:
+      context: .  #Répertoire racine
+      dockerfile: docker/php/Dockerfile #Chemin vers le dockerfil
+    volumes: #Montage du code source
+      - .:/var/www/symfony
+    depends_on: #Dépend du service database
+      - database
+    networks: #Resaux paratgé
+      - symfony
+
+  #Serveur Web Nginx
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"  #Port(conteneur local)
+    volumes:
+      - .:/var/www/symfony  #Montage CS
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf  #config Nginx
+    depends_on:
+      - php
+    networks:
+      - symfony
+
+  #Service base de donnée MYSQL
+  database:
+    image: mysql:8.0
+    environment: #Varable env MySQL
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecoride
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - symfony
+#Définision des réseaux
+networks:
+  symfony:  #réseau isolé pour les conteneurs
+  
+#Définition des volumes persistants
+volumes:
+  db-data:  #volume pour les données MySQL

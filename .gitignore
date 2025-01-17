@@ -5,6 +5,15 @@
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
+
+# Dossiers Symfony générés supplémentaires
+/bin/*
+!/bin/console
+/config/*
+!/config/packages/
+!/config/routes/
+!/config/services.yaml
+!/config/bundles.php
 ###< symfony/framework-bundle ###
 
 ###> Docker ###
@@ -22,6 +31,13 @@ data/
 mysql/
 postgres/
 mongodb/
+
+# Configuration Docker spécifique
+/docker/*
+!/docker/nginx/default.conf
+!/docker/php/Dockerfile
+/nginx/*
+/php/*
 ###< Docker ###
 
 ###> IDE ###
