@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">{{ title }}</h1>
+            
+            {# Carte #}
+            <div id="map" style="height: 500px; margin-bottom: 20px;" class="rounded shadow"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation de la carte
+        var map = L.map('map').setView([48.866667, 2.333333], 13);
+        
+        // Ajout des tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Ajout d'un marqueur exemple
+        L.marker([48.866667, 2.333333])
+            .addTo(map)
+            .bindPopup('Point de départ')
+            .openPopup();
+    });
+</script>
+{% endblock %}

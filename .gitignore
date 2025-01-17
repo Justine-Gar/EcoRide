@@ -1,0 +1,29 @@
+-- Active: 1719410639827@@127.0.0.1@3306
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> Docker ###
+docker-compose.override.yml
+###< Docker ###
+
+###> IDE ###
+.idea/
+.vscode/
+###< IDE ###
+
+###> Base de données ###
+/sql/*
+!/sql/.gitkeep
+###< Base de données ###
+
+###> Autres ###
+.DS_Store
+*.log
+###< Autres ###
