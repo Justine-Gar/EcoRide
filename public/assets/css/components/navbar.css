@@ -1,0 +1,32 @@
+/*-------------HEADER-------------*/
+.logoheader {
+  width: 5em;
+}
+.linegrp {
+  position: relative;
+}
+
+.line {
+  position: relative;
+  width: 100%;
+  height: 7px;
+  background-color: #4DBC84;
+  ;
+}
+
+/* Styles des liens de navigation */
+.nav-link {
+  color: #4a4a4a;
+  font-size: 14px;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #3f7b6a;
+}
+
+/* Espacement entre les éléments de navigation */
+.navbar-nav {
+  gap: 20px;
+}

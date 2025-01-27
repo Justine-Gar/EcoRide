@@ -1,0 +1,7 @@
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .navbar-nav {
+      gap: 10px;
+      padding-top: 15px;
+  }
+}

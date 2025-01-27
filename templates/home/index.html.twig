@@ -2,7 +2,14 @@
 
 {% block title %}Accueil - {{ parent() }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/home/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/home/responsive.css') }}">
+
+{% endblock %}
+
 {% block body %}
+/*
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">{{ title }}</h1>

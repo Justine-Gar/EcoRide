@@ -1,0 +1,15 @@
+/*-------------RESET-------------*/
+a{
+  text-decoration: none;
+  color: inherit;
+}
+ul, ol {
+  list-style: none;
+}
+em {
+  font-style: italic;
+}
+*, p{
+  margin:0;
+  padding: 0;
+}
