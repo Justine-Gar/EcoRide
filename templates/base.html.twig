@@ -18,15 +18,16 @@
 
         {% block stylesheets %}
         {% endblock %}
-        
+
     </head>
 
     <body>
+    
         <header class="fixed-top">
             <nav class="navbar navbar-expand-lg navbar-light bg-white">
                 <div class="container">
                     <a class="navbar-brand" href="{{ path('app_home') }}">
-                        <img src="{{ asset('assets/images/logos/Logo.png') }}" alt="ECORIDE" class="logoheader">*/
+                        <img src="{{ asset('assets/images/logos/Logo.png') }}" alt="ECORIDE" class="logoheader">
                     </a>
             
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -53,9 +54,9 @@
             </div>
         </header>
 
-        <div class="container">
+        <main>
             {% block body %}{% endblock %}
-        </div>
+        </main>
 
         <footer>
             <div class="container-fluide d-flex flex-column justify-content-center footerbg">

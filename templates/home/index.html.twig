@@ -1,41 +1,141 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - {{ parent() }}{% endblock %}
+{% block title %}Accueil -
+	{{ parent() }}
+{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('assets/css/pages/home/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/pages/home/responsive.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/style.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/responsive.css') }}">
 
 {% endblock %}
 
 {% block body %}
-/*
-    <div class="row">
-        <div class="col-12">
-            <h1 class="mb-4">{{ title }}</h1>
-            
-            {# Carte #}
-            <div id="map" style="height: 500px; margin-bottom: 20px;" class="rounded shadow"></div>
-        </div>
-    </div>
+	<section class="search">
+		<!-- Barre de recherche -->
+		<div class="container search-container">
+			<div class="search-bar">
+				<div
+					class="row g-0 d-flex align-items-center">
+					<!-- Champ Départs -->
+					<div class="col-md-3">
+						<div class="search-input">
+							<i class="fas fa-map-marker-alt"></i>
+							<input type="text" class="form-control" placeholder="Départs">
+						</div>
+					</div>
+
+					<!-- Champ Arrivée -->
+					<div class="col-md-3">
+						<div class="search-input">
+							<i class="fas fa-location-arrow"></i>
+							<input type="text" class="form-control" placeholder="Arrivée">
+						</div>
+					</div>
+
+					<!-- Champ Date -->
+					<div class="col-md-3">
+						<div class="search-input">
+							<i class="far fa-calendar"></i>
+							<input type="date" class="form-control" placeholder="Date">
+						</div>
+					</div>
+
+					<!-- Bouton Recherche -->
+					<div class="col-md-3">
+						<button class="btn btn-search">RECHERCHE</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="concept">
+		<!--Idée global de ecoride-->
+		<div class="container concept-container">
+			<div class="row">
+
+				<div class="col-sm-12 col-md-5 col-lg-3">
+
+					<div class="economy p-3">
+						<img src="../files/offer_discount_sales_economy_icon_227976.svg" class="concept-img-top" alt="...">
+						<div class="concept-body">
+							<p class="concept-text">
+								Réduisez significativement vos frais de transport ! 
+								En partageant les coûts du trajet entre covoitureurs, économisez jusqu'à 75% sur vos déplacements quotidiens. 
+								Essence, péages, entretien du véhicule... Divisez vos dépenses tout en optimisant l'utilisation de votre voiture.
+								Une solution maline pour votre portefeuille en ces temps d'inflation.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-12 col-md-5 col-lg-3">
+
+					<div class="ecology p-3">
+						<img src="../files/delivery_car_icon_221051.svg" class="concept-img-top" alt="...">
+						<div class="concept-body">
+							<p class="concept-text">
+								Chaque covoiturage est un geste pour la planète. 
+								En partageant votre trajet, vous réduisez votre empreinte carbone de 2,2 kg de CO2 en moyenne par trajet. 
+								Nos covoitureurs ont déjà permis d'éviter l'émission de plusieurs tonnes de CO2 cette année. 
+								Rejoignez notre communauté d'éco-conducteurs engagés pour une mobilité plus responsable.
+							</p>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col-sm-12 col-md-5 col-lg-3">
+
+					<div class="convivial p-3">
+						<img src="../files/kindness_social_care_human_philanthropic_humanitarian_icon_251215.svg" class="concept-img-top" alt="...">
+						<div class="concept-body">
+							<p class="concept-text">
+								Transformez vos trajets en moments de partage ! 
+								Rencontrez des personnes aux parcours enrichissants, échangez des anecdotes et rendez vos voyages plus animés. 
+								Notre communauté bienveillante et nos systèmes d'évaluation garantissent des trajets agréables dans une ambiance décontractée. 
+								Qui sait, votre prochain covoiturage sera peut-être le début d'une belle amitié !
+							</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<!--Leaf map-->
+	<!--
+	<div class="row">
+	    <div class="col-12">
+	            <h1 class="mb-4">{{ title }}</h1>
+	            
+	            {# Carte #}
+	            <div id="map" style="height: 500px; margin-bottom: 20px;" class="rounded shadow"></div>
+	        </div>
+	    </div>
+	-->
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialisation de la carte
-        var map = L.map('map').setView([48.866667, 2.333333], 13);
-        
-        // Ajout des tuiles OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-        
-        // Ajout d'un marqueur exemple
-        L.marker([48.866667, 2.333333])
-            .addTo(map)
-            .bindPopup('Point de départ')
-            .openPopup();
-    });
-</script>
+<!--
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        // Initialisation de la carte
+	        var map = L.map('map').setView([48.866667, 2.333333], 13);
+	        
+	        // Ajout des tuiles OpenStreetMap
+	        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: '© OpenStreetMap contributors'
+	        }).addTo(map);
+	        
+	        // Ajout d'un marqueur exemple
+	        L.marker([48.866667, 2.333333])
+	            .addTo(map)
+	            .bindPopup('Point de départ')
+	            .openPopup();
+	    });
+	</script>
+-->
 {% endblock %}
