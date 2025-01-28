@@ -78,20 +78,26 @@
 }
 
 .economy {
+  width: 100%;
+  min-height: 400px;
   background-color: #313A50;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #F3F3F3;
   margin-bottom: 50px;
 }
 .ecology {
+  width: 100%;
+  min-height: 400px;
   background-color: #4DBC84;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #F3F3F3;
   margin-bottom: 50px;
 }
 .convivial {
+  width: 100%;
+  min-height: 400px;
   background-color: #3f7b6a;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #F3F3F3;
   margin-bottom: 50px;
 }
