@@ -11,8 +11,8 @@ class Car
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(name: "id_cars")]
+    private ?int $id_cars = null;
 
     #[ORM\Column(length: 50)]
     private ?string $marque = null;
@@ -35,16 +35,13 @@ class Car
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $first_registration = null;
 
-    #[ORM\Column]
-    private ?int $id_user = null;
-
-    #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'cars')]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
-    public function getId(): ?int
+    public function getIdCar(): ?int
     {
-        return $this->id;
+        return $this->id_cars;
     }
 
     public function getMarque(): ?string
@@ -131,17 +128,6 @@ class Car
         return $this;
     }
 
-    public function getIdUser(): ?int
-    {
-        return $this->id_user;
-    }
-
-    public function setIdUser(int $id_user): static
-    {
-        $this->id_user = $id_user;
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {

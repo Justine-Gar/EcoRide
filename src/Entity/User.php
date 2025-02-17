@@ -13,8 +13,8 @@ class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(name: "id_user")]
+    private ?int $id_user = null;
 
     #[ORM\Column(length: 50)]
     private ?string $name = null;
@@ -34,19 +34,15 @@ class User
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $profil_picture = null;
 
-    #[ORM\Column]
-    private ?int $id_user_preferences = null;
-
-    #[ORM\Column]
-    private ?int $id_review = null;
-
-    #[ORM\Column]
-    private ?int $id_carpool = null;
 
     /**
      * @var Collection<int, Role>
      */
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_roles',
+        joinColumns: [new ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'id_role', referencedColumnName: 'id_role')]
+    )]
     private Collection $roles;
 
     /**
@@ -89,9 +85,9 @@ class User
         $this->carpoolParticipations = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getIdUser(): ?int
     {
-        return $this->id;
+        return $this->id_user;
     }
 
     public function getName(): ?string
@@ -166,41 +162,6 @@ class User
         return $this;
     }
 
-    public function getIdUserPreferences(): ?int
-    {
-        return $this->id_user_preferences;
-    }
-
-    public function setIdUserPreferences(int $id_user_preferences): static
-    {
-        $this->id_user_preferences = $id_user_preferences;
-
-        return $this;
-    }
-
-    public function getIdReview(): ?int
-    {
-        return $this->id_review;
-    }
-
-    public function setIdReview(int $id_review): static
-    {
-        $this->id_review = $id_review;
-
-        return $this;
-    }
-
-    public function getIdCarpool(): ?int
-    {
-        return $this->id_carpool;
-    }
-
-    public function setIdCarpool(int $id_carpool): static
-    {
-        $this->id_carpool = $id_carpool;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Role>

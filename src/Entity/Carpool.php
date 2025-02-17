@@ -14,7 +14,7 @@ class Carpool
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id_carpool = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_start = null;
@@ -56,13 +56,17 @@ class Carpool
     private ?string $lng_reach = null;
 
     #[ORM\ManyToOne(inversedBy: 'carpools')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'carpoolParticipations')]
+    #[ORM\JoinTable(name: 'carpool_users',
+        joinColumns: [new ORM\JoinColumn(name: 'id_carpool', referencedColumnName: 'id_carpool')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user')]
+    )]
     private Collection $passengers;
 
     public function __construct()
@@ -70,9 +74,9 @@ class Carpool
         $this->passengers = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getIdCarpool(): ?int
     {
-        return $this->id;
+        return $this->id_carpool;
     }
 
     public function getDateStart(): ?\DateTimeInterface

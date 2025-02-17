@@ -11,8 +11,8 @@ class Review
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(name: "id_review")]
+    private ?int $id_review = null;
 
     #[ORM\Column(length: 250)]
     private ?string $comment = null;
@@ -24,12 +24,12 @@ class Review
     private ?string $statut = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
-    public function getId(): ?int
+    public function getIdReview(): ?int
     {
-        return $this->id;
+        return $this->id_review;
     }
 
     public function getComment(): ?string

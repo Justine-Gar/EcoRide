@@ -11,38 +11,25 @@ class UserPreference
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id_user_preference = null;
 
-    #[ORM\Column]
-    private ?int $id_preference_type = null;
 
     #[ORM\Column(length: 50)]
     private ?string $choose_value = null;
 
     #[ORM\ManyToOne(inversedBy: 'userPreferences')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'userPreferences')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "id_preference_type", referencedColumnName: "id_preference_types", nullable: false)]
     private ?PreferenceType $preferenceType = null;
 
-    public function getId(): ?int
+    public function getIdUserPreference(): ?int
     {
-        return $this->id;
+        return $this->id_user_preference;
     }
 
-    public function getIdPreferenceType(): ?int
-    {
-        return $this->id_preference_type;
-    }
-
-    public function setIdPreferenceType(int $id_preference_type): static
-    {
-        $this->id_preference_type = $id_preference_type;
-
-        return $this;
-    }
 
     public function getChooseValue(): ?string
     {
