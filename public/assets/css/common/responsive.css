@@ -5,3 +5,29 @@
       padding-top: 15px;
   }
 }
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  
+  .search-bar .row > div {
+      margin-bottom: 10px;
+  }
+  .desktop-tabs {
+    display: none !important;
+  }
+  .tab-content > .tab-pane {
+      display: block !important;
+      opacity: 1 !important;
+  }
+  
+  
+}
+@media (min-width: 768px) {
+  .search {
+    padding-top: 280px;
+  }
+  .mobile-cards {
+    display: none !important;
+  }
+}

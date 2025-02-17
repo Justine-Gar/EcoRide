@@ -7,7 +7,6 @@
   background-color: #313A50;
   padding-top: 135px;
 }
-
 /* Container de la barre de recherche */
 .search-container {
   padding: 20px 20px;
@@ -59,40 +58,6 @@
 }
 
 .btn-search:hover {
-  background-color: #3f7b6a;
-  color: #F3F3F3;
-}
-
-
-
-/*Section Cards*/
-.concept{
-  width: 100%;
-  padding-top: 120px;
-}
-.concept-container {
-  padding: 20px 20px;
-  text-align: center;
-}
-.concept-img-top {
-  width: 8em;
-  margin-bottom: 20px;
-}
-.concept-body {
-  width: 100%;
-  min-height: 500px;
-  border-radius: 10px;
-  margin-bottom: 50px;
-}
-.economy {
-  background-color: #313A50;
-  color: #F3F3F3;
-}
-.ecology {
-  background-color: #4DBC84;
-  color: #F3F3F3;
-}
-.convivial {
   background-color: #3f7b6a;
   color: #F3F3F3;
 }

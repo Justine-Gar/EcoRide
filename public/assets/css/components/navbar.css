@@ -30,3 +30,16 @@
 .navbar-nav {
   gap: 20px;
 }
+
+.btn-connexion {
+  color: #F3F3F3;
+  background-color: #4DBC84;
+}
+.btn-connexion:hover {
+  color: #F3F3F3;
+  background-color: #3f7b6a;
+}
+.texte-vert {
+  color: #4DBC84;
+  text-decoration: underline;
+}

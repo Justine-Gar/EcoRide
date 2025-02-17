@@ -4,6 +4,15 @@
   .search-bar .row > div {
       margin-bottom: 10px;
   }
+  .concept-img-top {
+    width: 10em;
+
+  }
+  .concept-body {
+    width: 100%;
+    min-height: 410px;
+
+  }
   
   
 }
