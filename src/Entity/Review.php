@@ -23,6 +23,10 @@ class Review
     #[ORM\Column(length: 50)]
     private ?string $statut = null;
 
+    #[ORM\ManyToOne(inversedBy: 'reveiws')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $yes = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +64,18 @@ class Review
     public function setStatut(string $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getYes(): ?User
+    {
+        return $this->yes;
+    }
+
+    public function setYes(?User $yes): static
+    {
+        $this->yes = $yes;
 
         return $this;
     }

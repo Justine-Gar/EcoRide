@@ -19,6 +19,14 @@ class UserPreference
     #[ORM\Column(length: 50)]
     private ?string $choose_value = null;
 
+    #[ORM\ManyToOne(inversedBy: 'userPreferences')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'userPreferences')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?PreferenceType $preferenceType = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +52,30 @@ class UserPreference
     public function setChooseValue(string $choose_value): static
     {
         $this->choose_value = $choose_value;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPreferenceType(): ?PreferenceType
+    {
+        return $this->preferenceType;
+    }
+
+    public function setPreferenceType(?PreferenceType $preferenceType): static
+    {
+        $this->preferenceType = $preferenceType;
 
         return $this;
     }

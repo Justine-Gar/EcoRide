@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,6 +42,52 @@ class User
 
     #[ORM\Column]
     private ?int $id_carpool = null;
+
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
+    private Collection $roles;
+
+    /**
+     * @var Collection<int, Car>
+     */
+    #[ORM\OneToMany(targetEntity: Car::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $cars;
+
+    /**
+     * @var Collection<int, UserPreference>
+     */
+    #[ORM\OneToMany(targetEntity: UserPreference::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $userPreferences;
+
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'yes', orphanRemoval: true)]
+    private Collection $reveiws;
+
+    /**
+     * @var Collection<int, Carpool>
+     */
+    #[ORM\OneToMany(targetEntity: Carpool::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $carpools;
+
+    /**
+     * @var Collection<int, Carpool>
+     */
+    #[ORM\ManyToMany(targetEntity: Carpool::class, mappedBy: 'passengers')]
+    private Collection $carpoolParticipations;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+        $this->cars = new ArrayCollection();
+        $this->userPreferences = new ArrayCollection();
+        $this->reveiws = new ArrayCollection();
+        $this->carpools = new ArrayCollection();
+        $this->carpoolParticipations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -150,6 +198,177 @@ class User
     public function setIdCarpool(int $id_carpool): static
     {
         $this->id_carpool = $id_carpool;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function addRole(Role $role): static
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): static
+    {
+        $this->roles->removeElement($role);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Car>
+     */
+    public function getCars(): Collection
+    {
+        return $this->cars;
+    }
+
+    public function addCar(Car $car): static
+    {
+        if (!$this->cars->contains($car)) {
+            $this->cars->add($car);
+            $car->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCar(Car $car): static
+    {
+        if ($this->cars->removeElement($car)) {
+            // set the owning side to null (unless already changed)
+            if ($car->getUser() === $this) {
+                $car->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserPreference>
+     */
+    public function getUserPreferences(): Collection
+    {
+        return $this->userPreferences;
+    }
+
+    public function addUserPreference(UserPreference $userPreference): static
+    {
+        if (!$this->userPreferences->contains($userPreference)) {
+            $this->userPreferences->add($userPreference);
+            $userPreference->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserPreference(UserPreference $userPreference): static
+    {
+        if ($this->userPreferences->removeElement($userPreference)) {
+            // set the owning side to null (unless already changed)
+            if ($userPreference->getUser() === $this) {
+                $userPreference->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReveiws(): Collection
+    {
+        return $this->reveiws;
+    }
+
+    public function addReveiw(Review $reveiw): static
+    {
+        if (!$this->reveiws->contains($reveiw)) {
+            $this->reveiws->add($reveiw);
+            $reveiw->setYes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReveiw(Review $reveiw): static
+    {
+        if ($this->reveiws->removeElement($reveiw)) {
+            // set the owning side to null (unless already changed)
+            if ($reveiw->getYes() === $this) {
+                $reveiw->setYes(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Carpool>
+     */
+    public function getCarpools(): Collection
+    {
+        return $this->carpools;
+    }
+
+    public function addCarpool(Carpool $carpool): static
+    {
+        if (!$this->carpools->contains($carpool)) {
+            $this->carpools->add($carpool);
+            $carpool->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarpool(Carpool $carpool): static
+    {
+        if ($this->carpools->removeElement($carpool)) {
+            // set the owning side to null (unless already changed)
+            if ($carpool->getUser() === $this) {
+                $carpool->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Carpool>
+     */
+    public function getCarpoolParticipations(): Collection
+    {
+        return $this->carpoolParticipations;
+    }
+
+    public function addCarpoolParticipation(Carpool $carpoolParticipation): static
+    {
+        if (!$this->carpoolParticipations->contains($carpoolParticipation)) {
+            $this->carpoolParticipations->add($carpoolParticipation);
+            $carpoolParticipation->addPassenger($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarpoolParticipation(Carpool $carpoolParticipation): static
+    {
+        if ($this->carpoolParticipations->removeElement($carpoolParticipation)) {
+            $carpoolParticipation->removePassenger($this);
+        }
 
         return $this;
     }

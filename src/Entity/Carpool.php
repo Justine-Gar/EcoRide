@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CarpoolRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -52,6 +54,21 @@ class Carpool
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
     private ?string $lng_reach = null;
+
+    #[ORM\ManyToOne(inversedBy: 'carpools')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'carpoolParticipations')]
+    private Collection $passengers;
+
+    public function __construct()
+    {
+        $this->passengers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -210,6 +227,42 @@ class Carpool
     public function setLngReach(?string $lng_reach): static
     {
         $this->lng_reach = $lng_reach;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getPassengers(): Collection
+    {
+        return $this->passengers;
+    }
+
+    public function addPassenger(User $passenger): static
+    {
+        if (!$this->passengers->contains($passenger)) {
+            $this->passengers->add($passenger);
+        }
+
+        return $this;
+    }
+
+    public function removePassenger(User $passenger): static
+    {
+        $this->passengers->removeElement($passenger);
 
         return $this;
     }
