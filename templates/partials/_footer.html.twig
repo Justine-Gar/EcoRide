@@ -1,0 +1,24 @@
+
+<!--=============START FOOTER============-->
+
+<footer>
+	<div class="container-fluide d-flex flex-column justify-content-center footerbg">
+		<div class="d-flex justify-content-around pt-4">
+			<div>
+				<a class="navbar-brand" href="{{ path('app_home') }}">
+					<img src="{{ asset('assets/images/logos/Logo bg_noir.png') }}" alt="ECORIDE" class="logoheader">
+				</a>
+			</div>
+			<div class="d-flex flex-column">
+				<a href="mailto:contact@ecoride.fr">contact@ecoride.fr</a>
+				<a href="{{ path('app_home') }}">Mention Légal</a>
+			</div>
+		</div>
+		<div class="p-2">
+			<p>
+				-
+				{{ "now"|date("Y") }}
+				ecoride . tous droits réservés.</p>
+		</div>
+	</div>
+</footer>
