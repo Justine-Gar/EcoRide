@@ -64,8 +64,8 @@ class User
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'yes', orphanRemoval: true)]
-    private Collection $reveiws;
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $reviews;
 
     /**
      * @var Collection<int, Carpool>
@@ -84,7 +84,7 @@ class User
         $this->roles = new ArrayCollection();
         $this->cars = new ArrayCollection();
         $this->userPreferences = new ArrayCollection();
-        $this->reveiws = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
         $this->carpools = new ArrayCollection();
         $this->carpoolParticipations = new ArrayCollection();
     }
@@ -289,27 +289,27 @@ class User
     /**
      * @return Collection<int, Review>
      */
-    public function getReveiws(): Collection
+    public function getReview(): Collection
     {
-        return $this->reveiws;
+        return $this->reviews;
     }
 
-    public function addReveiw(Review $reveiw): static
+    public function addReview(Review $review): static
     {
-        if (!$this->reveiws->contains($reveiw)) {
-            $this->reveiws->add($reveiw);
-            $reveiw->setYes($this);
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeReveiw(Review $reveiw): static
+    public function removereview(Review $review): static
     {
-        if ($this->reveiws->removeElement($reveiw)) {
+        if ($this->reviews->removeElement($review)) {
             // set the owning side to null (unless already changed)
-            if ($reveiw->getYes() === $this) {
-                $reveiw->setYes(null);
+            if ($review->getUser() === $this) {
+                $review->setUser(null);
             }
         }
 
