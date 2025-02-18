@@ -11,6 +11,17 @@
 {% block body %}
   <!---------------En tete du profil-->
   <main class="container profil">
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success">
+          {{ message }}
+      </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
     
     <div class="row">
       <!--------Colonne de gauche - Informations principales -->
@@ -18,7 +29,15 @@
         <!-- Carte profil -->
         <div class="card mb-4">
           <div class="card-body text-center">
-            <img src="{% if user.profilPicture %}{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}{% else %}{{ asset('images/default-profile.png') }}{% endif %}" class="rounded-circle mb-3" alt="Photo de profil">
+            {% if user.profilPicture %}
+                <div>Chemin de l'image : {{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}</div>
+            {% else %}
+                <div>Pas d'image de profil</div>
+            {% endif %}
+            <img src="{% if user.profilPicture %}{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}{% else %}{{ asset('images/default-profile.png') }}{% endif %}" 
+              class="rounded-circle mb-3" 
+              style="width: 150px; height: 150px; object-fit: cover;"
+              alt="Photo de profil">
             <h5 class="mb-1">Sophie Martin</h5>
 
             <!-- Badge de rôles -->
@@ -75,7 +94,15 @@
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                          {{ form_start(form) }}
+                          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                              {% if user.profilPicture %}
+                                  <div class="mb-3 text-center">
+                                      <img src="{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}" 
+                                          class="rounded-circle mb-2" 
+                                          style="width: 100px; height: 100px; object-fit: cover;" 
+                                          alt="Photo de profil actuelle">
+                                  </div>
+                              {% endif %}
                               <div class="mb-3">
                                   {{ form_row(form.firstname) }}
                               </div>
@@ -87,6 +114,13 @@
                               </div>
                               <div class="mb-3">
                                   {{ form_row(form.phone_number) }}
+                              </div>
+                              <div class="mb-3">
+                                  {{ form_row(form.profilePicture) }}
+                                  <small class="text-muted">
+                                      <i class="fas fa-info-circle"></i> 
+                                      Taille maximale : 1 Mo - Formats acceptés : JPG, PNG
+                                  </small>
                               </div>
                               <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -183,7 +217,7 @@
                   <div class="border-bottom pb-3 mb-3">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                       <div class="d-flex align-items-center">
-                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                        <img src="#" class="rounded-circle me-2" alt="Avatar">
                         <div>
                           <h6 class="mb-0">Pierre Dubois</h6>
                           <small class="text-muted">Trajet Paris → Lyon, 15 jan. 2025</small>
@@ -206,7 +240,7 @@
                   <div class="border-bottom pb-3 mb-3">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                       <div class="d-flex align-items-center">
-                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                        <img src="#" class="rounded-circle me-2" alt="Avatar">
                         <div>
                           <h6 class="mb-0">Marie Lambert</h6>
                           <small class="text-muted">Trajet Lyon → Marseille, 5 jan. 2025</small>

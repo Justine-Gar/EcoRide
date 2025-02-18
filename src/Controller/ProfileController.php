@@ -45,43 +45,74 @@ class ProfileController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function edit(Request $request): Response
     {
-        // Récupère l'utilisateur connecté
-        $user = $this->userRepository->getUser($this->getUser());
-        
-        // Crée le formulaire de modification de profil
-        $form = $this->createForm(UserProfileType::class, $user);
-        // Traite les données soumises dans le formulaire
-        $form->handleRequest($request);
+        try {
 
-        // Si le formulaire est soumis et valide
-        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupère l'utilisateur connecté
+            $user = $this->userRepository->getUser($this->getUser());
+            // Crée le formulaire de modification de profil
+            $form = $this->createForm(UserProfileType::class, $user);
+            // Traite les données soumises dans le formulaire
+            $form->handleRequest($request);
+    
+            // Si le formulaire est soumis et valide
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            $profilePictureFile = $form->get('profilePicture')->getData();
-            
-            if ($profilePictureFile) {
-                // Supprime l'ancienne image si elle existe
-                if ($user->getProfilPicture()) {
-                    $oldFile = $this->fileUploader->getTargetDirectory().'/'.$user->getProfilPicture();
-                    if (file_exists($oldFile)) {
-                        unlink($oldFile);
+                $profilePictureFile = $form->get('profilePicture')->getData();
+                
+
+                if ($profilePictureFile) {
+                    try {
+                        // Vérifier si le dossier existe, sinon le créer
+                        $uploadDir = $this->fileUploader->getTargetDirectory();
+                        if (!file_exists($uploadDir)) {
+                            mkdir($uploadDir, 0777, true);
+                        }
+                        // Débug: afficher les informations du fichier
+                        //error_log('Fichier uploadé: ' . $profilePictureFile->getClientOriginalName());
+                        //error_log('Taille: ' . $profilePictureFile->getSize());
+                        //error_log('Type MIME: ' . $profilePictureFile->getMimeType());
+
+                        // Supprime l'ancienne image si elle existe
+                        if ($user->getProfilPicture()) {
+                            $oldFile = $uploadDir . '/' . $user->getProfilPicture();
+                            if (file_exists($oldFile)) {
+                                unlink($oldFile);
+                            }
+                        }
+                        // Upload la nouvelle image
+                        $fileName = $this->fileUploader->upload($profilePictureFile);
+                        //error_log('Nouveau nom de fichier: ' . $fileName);
+                        $user->setProfilPicture($fileName);
+                
+
+                    } catch (\Exception $e)
+                    {   // Ajout du dump de l'erreur
+                        //error_log('Erreur upload: ' . $e->getMessage());
+                        $this->addFlash('error', 'Erreur lors de l\'upload de l\'image : ' . $e->getMessage());
+                        return $this->redirectToRoute('app_profile');
                     }
-                }
-                // Upload la nouvelle image
-                $fileName = $this->fileUploader->upload($profilePictureFile);
-                $user->setProfilPicture($fileName);
-            }
+                    
+                } 
 
-            // Sauvegarde les modifications en base de données
-            $this->userRepository->save($user, true);
-            
-            // Ajoute un message flash de succès
-            $this->addFlash('success', 'Profil mis à jour avec succès !');
-            // Redirige vers la page de profil
+                // Mise à jour sans image
+                $this->userRepository->save($user, true);
+                // Ajoute un message flash de succès
+                $this->addFlash('success', 'Profil mis à jour avec succès !');
+                // Redirige vers la page de profil
+                return $this->redirectToRoute('app_profile');
+
+            }
+    
+            // Erreur retourn sur page profil
+            return $this->redirectToRoute('app_profile');
+
+        } catch (\Exception $e)
+        {   
+            //error_log('Exception générale: ' . $e->getMessage());
+            //error_log('Trace: ' . $e->getTraceAsString());
+            $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
             return $this->redirectToRoute('app_profile');
         }
-
-        // Erreur retourn sur page profil
-        return $this->redirectToRoute('app_profile');
     }
 
     // Route pour l'interface administrateur

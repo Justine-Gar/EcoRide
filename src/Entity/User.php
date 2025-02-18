@@ -35,10 +35,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $phone_number = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $profil_picture = null;
+    #[ORM\Column(name: "profil_picture", type: Types::TEXT, nullable: true)]
+    private ?string $profilePicture = null;
 
-    #[ORM\Column]
+    #[ORM\Column ]
     private ?int $credits = 0;
 
     /**
@@ -169,12 +169,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getProfilPicture(): ?string
     {
-        return $this->profil_picture;
+        return $this->profilePicture;
     }
 
-    public function setProfilPicture(?string $profil_picture): static
+    public function setProfilPicture(?string $profilePicture): static
     {
-        $this->profil_picture = $profil_picture;
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }

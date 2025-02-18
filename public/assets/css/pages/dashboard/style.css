@@ -9,3 +9,9 @@
 .sidebar {
   background-color: #4DBC84;
 }
+.rounded-circle {
+
+  border-radius: 3px solid #4DBC84;
+  width: 80px;
+  
+}
