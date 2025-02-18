@@ -2,9 +2,639 @@
 
 {% block title %}Mon Profil{% endblock %}
 
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/style.css') }}">
+
+
+{% endblock %}
+
 {% block body %}
-<div class="container mt-5">
-    <h1>Mon Profil</h1>
-    <p>Cette page est en cours de construction</p>
-</div>
+  <!---------------En tete du profil-->
+  <main class="container profil">
+    
+    <div class="row">
+      <!--------Colonne de gauche - Informations principales -->
+      <section class="col-lg-4">
+        <!-- Carte profil -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <img src="/api/placeholder/150/150" class="rounded-circle mb-3" alt="Photo de profil">
+            <h5 class="mb-1">Sophie Martin</h5>
+
+            <!-- Badge de rôles -->
+            <div class="mb-2">
+              <span class="badge bg-success me-1">Conducteur</span>
+              <span class="badge bg-info">Passager</span>
+            </div>
+
+            <!-- Affichage des crédits -->
+            <div class="border rounded p-3 mb-3 bg-light">
+              <h6 class="mb-1">Mes Crédits</h6>
+              <h3 class="mb-0 text-success">45 <small>crédits</small></h3>
+            </div>
+
+            <!--nouveau trajet-->
+            <div>
+              <button class="btn btn-outline-success">Recherche Covoiturage</button>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!---------Colonne de droite - Information Personelles-->
+      <section class="col-lg-4">
+
+        <div class="card mb-4">
+          <div class="card-header">
+            
+            <h5 class="mb-0"><i class="fas fa-user me-2"></i>Informations personnelles</h5>
+            
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="text-muted d-block">Email</label>
+              <div>sophie.martin@email.com</div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted d-block">Téléphone</label>
+              <div>06 12 34 56 78</div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted d-block">Membre depuis</label>
+              <div>Janvier 2024</div>
+            </div>
+            <button class="btn btn-outline-primary mt-3">Modifier le profil</button>
+          </div>
+
+          
+        </div>
+
+      </section>
+      <!---------------Statistiques-->
+      <section class="col-lg-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Statistique</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+
+              <!-- Note moyenne -->
+              <div class="col-md-8 col-lg-6">
+                <div class="card border-warning">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Note moyenne</h6>
+                        <div class="text-warning h2 mb-0">
+                            4.8
+                            <small class="text-muted">/5</small>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+              <!-- Distance totale-->
+              <div class="col-md-6 col-lg-6">
+                <div class="card border-primary">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Distance totale</h6>
+                        <h3 class="text-primary mb-0">1250 km</h3>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </section>
+
+      <!---------------ELEMENTS-->
+      <section class="col-lg-12">
+        
+        <!-- Système d'onglets pour Desktop -->
+        <div class="desktop-tabs">
+          <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab">Avis</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="vehicles-tab" data-bs-toggle="tab" href="#vehicles" role="tab">Véhicules</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="preferences-tab" data-bs-toggle="tab" href="#preferences"
+                role="tab">Préférences</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="trips-tab" data-bs-toggle="tab" href="#trips" role="tab">Trajets</a>
+            </li>
+            
+          </ul>
+
+          <div class="tab-content border-start border-end border-bottom p-2 mb-5" id="profileTabsContent">
+            <!-- Contenu Avis -->
+            <div class="tab-pane fade show active" id="reviews" role="tabpanel">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-star me-2"></i>Avis reçus</h5>
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                      data-bs-toggle="dropdown">
+                      Filtrer
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#">Tous les avis</a></li>
+                      <li><a class="dropdown-item" href="#">En tant que conducteur</a></li>
+                      <li><a class="dropdown-item" href="#">En tant que passager</a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Avis individuel -->
+                  <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="d-flex align-items-center">
+                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                        <div>
+                          <h6 class="mb-0">Pierre Dubois</h6>
+                          <small class="text-muted">Trajet Paris → Lyon, 15 jan. 2025</small>
+                        </div>
+                      </div>
+                      <div class="text-warning">
+                        ★★★★★
+                        <span class="text-dark ms-1">5.0</span>
+                      </div>
+                    </div>
+                    <p class="mb-1">Conductrice très ponctuelle et sympathique. Voiture propre et confortable.
+                      Discussion agréable pendant le trajet !</p>
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-success me-2">Conducteur</span>
+                      <small class="text-muted">Vérifié par la modération</small>
+                    </div>
+                  </div>
+
+                  <!-- Autre avis -->
+                  <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="d-flex align-items-center">
+                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                        <div>
+                          <h6 class="mb-0">Marie Lambert</h6>
+                          <small class="text-muted">Trajet Lyon → Marseille, 5 jan. 2025</small>
+                        </div>
+                      </div>
+                      <div class="text-warning">
+                        ★★★★☆
+                        <span class="text-dark ms-1">4.0</span>
+                      </div>
+                    </div>
+                    <p class="mb-1">Bonne communication et respect des horaires. Sophie est une passagère agréable.</p>
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-info me-2">Passager</span>
+                      <small class="text-muted">Vérifié par la modération</small>
+                    </div>
+                  </div>
+
+
+                </div>
+              </div>
+              <!-- Pagination -->
+              <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">Suivant</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+            <!-- Contenu Véhicules -->
+            <div class="tab-pane fade" id="vehicles" role="tabpanel">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-car me-2"></i>Mes véhicules</h5>
+                  <button class="btn btn-outline-success"><i class="fas fa-plus me-2"></i>Ajouter un véhicule</button>
+                </div>
+                <div class="card-body">
+                      <!-- Contenu des véhicules -->
+                  <div class="vehicle-cards p-3 border rounded mb-3">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <h6 class="mb-1">Peugeot 208</h6>
+                        <p class="text-muted mb-1">Gris métallisé • 5 places</p>
+                        <small class="text-muted">Immatriculation: AB-123-CD</small>
+                        <small class="text-muted">Première immatriculation: 15/03/2020</small>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge bg-success mb-2">Électrique</span>
+                        <div>
+                          <button class="btn btn-sm btn-outline-primary me-1">
+                              <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-danger">
+                              <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+
+              </div>
+            </div>
+
+            <!-- Contenu Préférences -->
+            <div class="tab-pane fade" id="preferences" role="tabpanel">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Mes préférences</h5>
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPreferenceModal">
+                    <i class="fas fa-plus me-2"></i>Ajouter
+                  </button>
+                </div>
+
+                <div class="card-body">
+                  <!-- Préférences système -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Préférences système</h6>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="smokingAllowed">
+                        <label class="form-check-label" for="smokingAllowed">
+                            Accepte les fumeurs (pauses)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="petsAllowed">
+                        <label class="form-check-label" for="petsAllowed">
+                            Accepte les animaux
+                        </label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              
+              
+            </div>
+
+            <!-- Contenu Trajets -->
+            <div class="tab-pane fade" id="trips" role="tabpanel">
+              <!-- Contenu des trajets -->
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-route me-2"></i>Mes trajets</h5>
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                      data-bs-toggle="dropdown">
+                      Filtrer
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#">Tous les trajets</a></li>
+                      <li><a class="dropdown-item" href="#">En tant que conducteur</a></li>
+                      <li><a class="dropdown-item" href="#">En tant que passager</a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!--TRAJET EN COURS-->
+                  <div class="mb-4">
+                    <h6 class="mb-3 text-muted">Trajets en cours</h6>
+                
+                    <div class="card mb-3 border-primary">
+                      <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-start">
+                              <div>
+                                  <span class="badge bg-success mb-2">Conducteur</span>
+                                  <h5 class="mb-1">Bordeaux → Toulouse</h5>
+                                  <p class="text-muted mb-2">
+                                      <i class="fas fa-calendar me-2"></i>Aujourd'hui
+                                      <i class="fas fa-clock ms-3 me-2"></i>En cours
+                                  </p>
+                                  <div class="progress mb-2" style="height: 5px;">
+                                      <div class="progress-bar" role="progressbar" style="width: 60%"></div>
+                                  </div>
+                              </div>
+                              <div class="text-end">
+                                  <button class="btn btn-success mb-2">
+                                      <i class="fas fa-flag-checkered me-2"></i>Arrivée à destination
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
+                  <!--TRAJET TERMINES-->
+                  <div>
+                    <h6 class="mb-3 text-muted">Trajets terminés</h6>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="badge bg-success mb-2">Conducteur</span>
+                                    <h5 class="mb-1">Nice → Cannes</h5>
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-calendar me-2"></i>10 février 2025
+                                        <i class="fas fa-check-circle ms-3 me-2"></i>Terminé
+                                    </p>
+                                    <div class="d-flex align-items-center">
+                                        <div class="text-warning me-2">
+                                            ★★★★★
+                                        </div>
+                                        <small class="text-muted">(4 avis)</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button class="btn btn-outline-primary">Voir les avis</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!--Cards pour mobile-->
+        <div class="mobile-cards">
+          <!-- Card Avis -->
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-star me-2"></i>Avis reçus</h5>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                  data-bs-toggle="dropdown">
+                  Filtrer
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Tous les avis</a></li>
+                  <li><a class="dropdown-item" href="#">En tant que conducteur</a></li>
+                  <li><a class="dropdown-item" href="#">En tant que passager</a></li>
+                </ul>
+                <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#avisCollapse">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+              </div>
+            </div>
+            <div class="collapse" id="avisCollapse">
+              <div class="card-body">
+                <!-- Avis individuel -->
+                <div class="border-bottom pb-3 mb-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center">
+                      <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                      <div>
+                        <h6 class="mb-0">Pierre Dubois</h6>
+                        <small class="text-muted">Trajet Paris → Lyon, 15 jan. 2025</small>
+                      </div>
+                    </div>
+                    <div class="text-warning">
+                      ★★★★★
+                      <span class="text-dark ms-1">5.0</span>
+                    </div>
+                  </div>
+                  <p class="mb-1">Conductrice très ponctuelle et sympathique. Voiture propre et confortable. Discussion
+                    agréable pendant le trajet !</p>
+                  <div class="d-flex align-items-center">
+                    <span class="badge bg-success me-2">Conducteur</span>
+                    <small class="text-muted">Vérifié par la modération</small>
+                  </div>
+                </div>
+  
+                <!-- Autre avis -->
+                <div class="border-bottom pb-3 mb-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center">
+                      <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Avatar">
+                      <div>
+                        <h6 class="mb-0">Marie Lambert</h6>
+                        <small class="text-muted">Trajet Lyon → Marseille, 5 jan. 2025</small>
+                      </div>
+                    </div>
+                    <div class="text-warning">
+                      ★★★★☆
+                      <span class="text-dark ms-1">4.0</span>
+                    </div>
+                  </div>
+                  <p class="mb-1">Bonne communication et respect des horaires. Sophie est une passagère agréable.</p>
+                  <div class="d-flex align-items-center">
+                    <span class="badge bg-info me-2">Passager</span>
+                    <small class="text-muted">Vérifié par la modération</small>
+                  </div>
+                </div>
+  
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                  <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                      <a class="page-link" href="#">Suivant</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Véhicules -->
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-car me-2"></i>Mes véhicules</h5>
+              <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#vehiclesCollapse">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="collapse" id="vehiclesCollapse">
+              <div class="card-body">
+                <!-- Contenu des véhicules -->
+                <div class="vehicle-card p-3 border rounded mb-3">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <h6 class="mb-1">Peugeot 208</h6>
+                      <p class="text-muted mb-1">Gris métallisé • 5 places</p>
+                      <small class="text-muted">Immatriculation: AB-123-CD</small>
+                    </div>
+                    <div>
+                      <span class="badge bg-success">Électrique</span>
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <div>
+                      <button class="btn btn-sm btn-outline-primary me-1">
+                          <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                          <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-success"><i class="fas fa-plus me-2"></i>Ajouter un véhicule</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Préférences -->
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Mes préférences</h5>
+              <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#preferencesCollapse">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="collapse" id="preferencesCollapse">
+              <div class="card-body">
+                <!-- Contenu des préférences -->
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label class="form-label">Musique pendant le trajet</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label">Accepte la musique</label>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Discussion</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label">Aime discuter pendant le trajet</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Trajets -->
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-route me-2"></i>Mes trajets</h5>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                  data-bs-toggle="dropdown">
+                  Filtrer
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Tous les trajets</a></li>
+                  <li><a class="dropdown-item" href="#">En tant que conducteur</a></li>
+                  <li><a class="dropdown-item" href="#">En tant que passager</a></li>
+                </ul>
+                <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#tripsCollapse">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+              </div>
+            </div>
+            <div class="collapse" id="tripsCollapse">
+              <div class="card-body ">
+              <!-- Contenu des trajets -->
+                <div class="accordion" id="tripsAccordion">
+                  <!--Trajet en cours-->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ongoingTrips">
+                            Trajets en cours (1)
+                        </button>
+                    </h2>
+                    <div id="ongoingTrips" class="accordion-collapse collapse">
+                        <div class="accordion-body p-2">
+                          <div class="mb-4">
+                            
+                            <div class="card mb-2 border-primary">
+                              <div class="card-body">
+                                  <div class="d-flex justify-content-between align-items-start">
+                                      <div>
+                                          <span class="badge bg-success mb-2">Conducteur</span>
+                                          <h5 class="mb-1">Bordeaux → Toulouse</h5>
+                                          <p class="text-muted mb-2">
+                                              <i class="fas fa-calendar me-2"></i>Aujourd'hui
+                                              <i class="fas fa-clock ms-3 me-2"></i>En cours
+                                          </p>
+                                          
+                                      </div>
+                                      <div class="text-end">
+                                          <button class="btn btn-success mb-2">
+                                              <i class="fas fa-flag-checkered me-2"></i>Arrivée
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+  
+                  <!--Trajet terminés-->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#completedTrips">
+                            Trajets terminés
+                        </button>
+                    </h2>
+                    <div id="completedTrips" class="accordion-collapse collapse">
+                        <div class="accordion-body p-2">
+                          <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="badge bg-success mb-2">Conducteur</span>
+                                        <h5 class="mb-1">Nice → Cannes</h5>
+                                        <p class="text-muted mb-2">
+                                            <i class="fas fa-calendar me-2"></i>10 février 2025
+                                            <i class="fas fa-check-circle ms-3 me-2"></i>Terminé
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-warning me-2">
+                                                ★★★★★
+                                            </div>
+                                            <small class="text-muted">(4 avis)</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <button class="btn btn-outline-primary">Voir les avis</button>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+
+      
+      </section>
+
+    </div>
+  </main>
+  
 {% endblock %}
