@@ -38,6 +38,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $profil_picture = null;
 
+    #[ORM\Column]
+    private ?int $credits = 0;
 
     /**
      * @var Collection<int, Role>
@@ -177,6 +179,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCredits(): ?int
+    {
+        return $this->credits;
+    }
+
+    public function setCredits(int $credits): static
+    {
+        $this->credits = $credits;
+        return $this;
+    }
 
 
 

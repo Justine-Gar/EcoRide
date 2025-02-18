@@ -4,9 +4,11 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;    
-use Symfony\Component\Form\Extension\Core\Type\TextType;     
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,15 +38,34 @@ class UserProfileType extends AbstractType
         'label' => 'Téléphone',
         'required' => false,
         'attr' => ['class' => 'form-control']
+      ])
+      ->add('profilePicture', FileType::class, [
+        'label' => 'Photo de profil',
+        'mapped' => false,
+        'required' => false,
+        'constraints' => [
+          new Assert\File([
+            'maxSize' => '1024k',
+            'mimeTypes' => [
+              'image/jpeg',
+              'image/png',
+            ],
+            'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG ou PNG)',
+          ])
+        ],
+        'attr' => [
+          'class' => 'form-control',
+          'accept' => 'image/jpeg,image/png'
+        ]
       ]);
   }
 
   // Configure les options du formulaire
   public function configureOptions(OptionsResolver $resolver)
   {
-      // Lie le formulaire à l'entité User
-      $resolver->setDefaults([
-          'data_class' => User::class,
-      ]);
+    // Lie le formulaire à l'entité User
+    $resolver->setDefaults([
+      'data_class' => User::class,
+    ]);
   }
 }
