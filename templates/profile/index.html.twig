@@ -18,7 +18,7 @@
         <!-- Carte profil -->
         <div class="card mb-4">
           <div class="card-body text-center">
-            <img src="/api/placeholder/150/150" class="rounded-circle mb-3" alt="Photo de profil">
+            <img src="{% if user.profilPicture %}{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}{% else %}{{ asset('images/default-profile.png') }}{% endif %}" class="rounded-circle mb-3" alt="Photo de profil">
             <h5 class="mb-1">Sophie Martin</h5>
 
             <!-- Badge de rôles -->

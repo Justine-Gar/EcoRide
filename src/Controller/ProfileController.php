@@ -5,6 +5,7 @@ namespace App\Controller;
 // Imports nécessaires pour le contrôleur
 use App\Form\UserProfileType;         // Type de formulaire pour le profil
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
+use App\Service\FileUploader;           // Recupere les images uploader
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,8 @@ class ProfileController extends AbstractController
 {
     // Injection de dépendance du UserRepository via le constructeur
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private FileUploader $fileUploader
     ) {}
 
     // Route pour afficher le profil utilisateur
@@ -53,6 +55,22 @@ class ProfileController extends AbstractController
 
         // Si le formulaire est soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $profilePictureFile = $form->get('profilePicture')->getData();
+            
+            if ($profilePictureFile) {
+                // Supprime l'ancienne image si elle existe
+                if ($user->getProfilPicture()) {
+                    $oldFile = $this->fileUploader->getTargetDirectory().'/'.$user->getProfilPicture();
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+                // Upload la nouvelle image
+                $fileName = $this->fileUploader->upload($profilePictureFile);
+                $user->setProfilPicture($fileName);
+            }
+
             // Sauvegarde les modifications en base de données
             $this->userRepository->save($user, true);
             

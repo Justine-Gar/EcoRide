@@ -53,6 +53,7 @@ security:
         - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }         # Route Admin nécessitent d'être connecté
         - { path: ^/profile, roles: ROLE_USER }        # Route User necessite d'etre connecté
         - { path: ^/staff, roles: ROLE_STAFF }         # Route Staff nécessitent d'être connecté
+        - { path: ^/uploads/profile_pictures/, roles: IS_AUTHENTICATED_FULLY } # Route images uploader si authentification réussis
 
 
 # Configuration spécifique pour l'environnement de test
