@@ -43,13 +43,14 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form id="loginForm" method="POST">
+				<form id="loginForm" method="POST" action="{{ path('app_login') }}">
 					<div class="mb-3">
-						<input type="email" class="form-control" id="email" required placeholder="Entrez votre email">
+						<input type="email" class="form-control" name="_username" required placeholder="Entrez votre email">
 					</div>
 					<div class="mb-3">
-						<input type="password" class="form-control" id="password" required placeholder="Entrez votre mot de passe">
+						<input type="password" class="form-control" name="_password" required placeholder="Entrez votre mot de passe">
 					</div>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 					<div class="alert alert-danger d-none" id="loginError"></div>
 				</form>
 			</div>

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PreferenceTypeRepository::class)]
+#[ORM\Table(name: 'preference_types')]
 class PreferenceType
 {
     #[ORM\Id]

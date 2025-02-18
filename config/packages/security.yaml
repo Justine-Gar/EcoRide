@@ -1,0 +1,71 @@
+# Configuration principale de la sécurité
+security:
+    # Configuration du hachage des mots de passe
+    # Utilise automatiquement le meilleur algorithme disponible
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    
+    # Configuration des fournisseurs d'utilisateurs
+    # Définit comment Symfony va chercher les utilisateurs
+    providers:
+        # Nom de notre provider personnalisé
+        app_user_provider:
+            # Utilise une entité Doctrine comme source d'utilisateurs
+            entity:
+                class: App\Entity\User     # Classe de l'entité User
+                property: email            # Propriété utilisée comme identifiant
+
+    # Configuration des pare-feu (firewalls)
+    # Définit comment protéger différentes parties de l'application
+    firewalls:
+        # Pare-feu pour les outils de développement
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/    # Routes pour les outils dev
+            security: false    # Désactive la sécurité pour ces routes
+
+        # Pare-feu principal pour l'application
+        main:
+            lazy: true        # Charge l'utilisateur uniquement si nécessaire
+            provider: app_user_provider    # Utilise notre provider défini plus haut
+
+            custom_authenticator: App\Security\LoginFormAuthenticator
+            
+            # Configuration de la connexion via JSON (pour modal AJAX)
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                username_parameter: _username
+                password_parameter: _password
+            
+            # Configuration de la déconnexion
+            logout:
+                path: app_logout      # Route pour se déconnecter
+                target: app_home      # Page de redirection après déconnexion
+
+            # Option "Se souvenir de moi"
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800    # 1 semaine
+
+    # Contrôle d'accès global
+    # Définit les restrictions d'accès aux différentes parties du site
+    access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }      # Route de login accessible à tous
+        - { path: ^/register, roles: PUBLIC_ACCESS }   # Route d'inscription accessible à tous
+        - { path: ^/admin, roles: ROLE_ADMIN }         # Route Admin nécessitent d'être connecté
+        - { path: ^/profile, roles: ROLE_USER }        # Route User necessite d'etre connecté
+        - { path: ^/staff, roles: ROLE_STAFF }         # Route Staff nécessitent d'être connecté
+
+
+# Configuration spécifique pour l'environnement de test
+when@test:
+    security:
+        # Configuration du hachage des mots de passe pour les tests
+        # Utilise des valeurs minimales pour améliorer la performance des tests
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto    # Algorithme automatique
+                cost: 4           # Coût minimal pour bcrypt
+                time_cost: 3      # Coût temporel minimal pour argon
+                memory_cost: 10   # Coût mémoire minimal pour argon
