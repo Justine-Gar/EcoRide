@@ -22,7 +22,7 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/admin', name: 'app_admin')]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMINISTRATEUR')]
     public function admin(): Response
     {
         $user = $this->getUser();

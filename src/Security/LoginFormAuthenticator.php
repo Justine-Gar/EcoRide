@@ -40,6 +40,11 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $password = $request->request->get('_password');
         $csrfToken = $request->request->get('_csrf_token');
 
+        // Débogage
+        if (!$csrfToken) {
+            throw new AuthenticationException('CSRF token manquant');
+        }
+
         return new Passport(
             new UserBadge($email),
             new PasswordCredentials($password),
@@ -75,7 +80,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $roles = $user->getRoles();
 
         // Définit la redirection selon le rôle le plus élevé
-        if (in_array('ROLE_ADMIN', $roles)) {
+        if (in_array('ROLE_ADMINISTRATEUR', $roles)) {
             return '/admin';
         } elseif (in_array('ROLE_STAFF', $roles)) {
             return '/staff';

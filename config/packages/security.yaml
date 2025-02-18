@@ -29,7 +29,8 @@ security:
             provider: app_user_provider    # Utilise notre provider défini plus haut
             #Configuration de la connexion via JSON (pour modal AJAX)
             custom_authenticator: App\Security\LoginFormAuthenticator
-            
+            form_login:
+                enable_csrf: true
             # Configuration de la déconnexion
             logout:
                 path: app_logout      # Route pour se déconnecter
@@ -49,7 +50,7 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }      # Route de login accessible à tous
         - { path: ^/register, roles: PUBLIC_ACCESS }   # Route d'inscription accessible à tous
-        - { path: ^/admin, roles: ROLE_ADMIN }         # Route Admin nécessitent d'être connecté
+        - { path: ^/admin, roles: ROLE_ADMINISTRATEUR }         # Route Admin nécessitent d'être connecté
         - { path: ^/profile, roles: ROLE_USER }        # Route User necessite d'etre connecté
         - { path: ^/staff, roles: ROLE_STAFF }         # Route Staff nécessitent d'être connecté
 

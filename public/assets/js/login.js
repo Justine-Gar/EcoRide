@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
         
         try {
             const formData = new FormData(loginForm);
+
+            // Déboguer les données envoyées
+            console.log('Données envoyées:', {
+                username: formData.get('_username'),
+                csrfToken: formData.get('_csrf_token')
+            });
             
             const response = await fetch('/login', {
                 method: 'POST',
@@ -43,8 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
+
+            // Déboguer la réponse
+            console.log('Status:', response.status);
             
             const data = await response.json();
+            console.log('Réponse:', data);
             
             if (data.success) {
                 window.location.href = data.redirect;

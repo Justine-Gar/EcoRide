@@ -15,33 +15,9 @@ class SecurityController extends AbstractController
     {}
 
     #[Route('/login', name: 'app_login', methods: ['POST'])]
-    public function login(Request $request): JsonResponse
+    public function login(): JsonResponse
     {
-        try {
-            // Récupère les données du formulaire
-            $email = $request->request->get('_username');
-            $password = $request->request->get('_password');
-
-            // Vérifie si l'utilisateur est déjà connecté en utilisant le nouveau service Security
-            $user = $this->security->getUser();
-
-            if ($user) {
-                // Si l'utilisateur est connecté, renvoie une réponse succès
-                return new JsonResponse([
-                    'success' => true,
-                    'redirect' => $this->generateUrl('app_home')
-                ]);
-            }
-
-            // Si l'utilisateur n'est pas connecté, lance une exception
-            throw new AuthenticationException('Identifiants invalides');
-        } catch (AuthenticationException $e) {
-            // En cas d'erreur, renvoie un message d'erreur
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Identifiants invalides. Veuillez réessayer.'
-            ], 401);
-        }
+        return new JsonResponse(['message' => 'Cette route est protégée par l\'authentificateur.']);
     }
 
     #[Route('/logout', name: 'app_logout')]

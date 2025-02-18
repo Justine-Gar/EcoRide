@@ -30,7 +30,7 @@
 								{{ app.user.firstname }}
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-								{% if is_granted('ROLE_ADMIN') %}
+								{% if is_granted('ROLE_ADMINISTRATEUR') %}
 									<li><a class="dropdown-item" href="{{ path('app_admin') }}">Administration</a></li>
 								{% elseif is_granted('ROLE_STAFF') %}
 									<li><a class="dropdown-item" href="{{ path('app_staff') }}">Espace Staff</a></li>
@@ -67,7 +67,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form id="loginForm" method="POST">
+				<form id="loginForm" method="POST" action="{{ path('app_login') }}">
 					<div class="mb-3">
 						<input type="email" class="form-control" name="_username" required placeholder="Entrez votre email">
 					</div>
