@@ -16,7 +16,7 @@ class SecurityController extends AbstractController
   }
 
   #[Route('/login', name: 'app_login', methods: ['POST'])]
-    public function login(Request $request, Security $security): JsonResponse
+    public function login(Request $request): JsonResponse
     {
         try {
             // Récupère les données du formulaire

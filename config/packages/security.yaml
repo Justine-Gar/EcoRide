@@ -27,16 +27,8 @@ security:
         main:
             lazy: true        # Charge l'utilisateur uniquement si nécessaire
             provider: app_user_provider    # Utilise notre provider défini plus haut
-
+            #Configuration de la connexion via JSON (pour modal AJAX)
             custom_authenticator: App\Security\LoginFormAuthenticator
-            
-            # Configuration de la connexion via JSON (pour modal AJAX)
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-                username_parameter: _username
-                password_parameter: _password
             
             # Configuration de la déconnexion
             logout:

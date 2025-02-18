@@ -13,6 +13,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 
 class LoginFormAuthenticator extends AbstractAuthenticator
 {
@@ -37,10 +38,14 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     {
         $email = $request->request->get('_username');
         $password = $request->request->get('_password');
+        $csrfToken = $request->request->get('_csrf_token');
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($password)
+            new PasswordCredentials($password),
+            [
+                new CsrfTokenBadge('authenticate', $csrfToken)
+            ]
         );
     }
 
@@ -49,12 +54,35 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        return new JsonResponse([
+        // Récupère l'utilisateur connecté
+        $user = $token->getUser();
+
+        // Prépare les données de redirection selon le rôle
+        $redirectData = [
             'success' => true,
-            'redirect' => '/'
-        ]);
+            'redirect' => $this->getRedirectPath($user)
+        ];
+
+        return new JsonResponse($redirectData);
     }
 
+    /**
+     * Détermine le chemin de redirection en fonction du rôle de l'utilisateur
+     */
+    private function getRedirectPath($user): string
+    {
+        // Récupère les rôles de l'utilisateur
+        $roles = $user->getRoles();
+
+        // Définit la redirection selon le rôle le plus élevé
+        if (in_array('ROLE_ADMIN', $roles)) {
+            return '/admin';
+        } elseif (in_array('ROLE_STAFF', $roles)) {
+            return '/staff';
+        } else {
+            return '/profile';  // Redirection par défaut pour ROLE_USER
+        }
+    }
     /**
      * Appelé en cas d'échec de l'authentification
      */
