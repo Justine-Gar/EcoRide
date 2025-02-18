@@ -60,3 +60,14 @@
 .nav-link.dropdown-toggle::after {
   margin-left: 0.5em;
 }
+
+.nav-link .rounded-circle {
+  object-fit: cover;
+  border: 4px solid #4DBC84;
+  width: 50px;
+  width: 50px;
+}
+
+.nav-link:hover .rounded-circle {
+  border-color: #3f7b6a;
+}

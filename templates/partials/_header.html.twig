@@ -12,7 +12,7 @@
 			</button>
 
 			<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-				<ul class="navbar-nav">
+				<ul class="navbar-nav align-items-center">
 					<li class="nav-item">
 						<a class="nav-link" href="{{ path('app_home') }}">Covoiturage</a>
 					</li>
@@ -21,8 +21,13 @@
 					</li>
 					{% if app.user %}
 						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								{{ app.user.firstname }} {# Affiche le prénom de l'utilisateur #}
+							<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								{% if app.user.profilPicture %}
+										<img src="{{ asset(app.user.profilPicture) }}" alt="Photo de profil" class="rounded-circle me-2" >
+								{% else %}
+										<img src="{{ asset('assets/images/default-profile.png') }}" alt="Photo de profil par défaut" class="rounded-circle me-2">
+								{% endif %}
+								{{ app.user.firstname }}
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								{% if is_granted('ROLE_ADMIN') %}
