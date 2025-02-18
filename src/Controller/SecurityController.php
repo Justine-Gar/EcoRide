@@ -11,11 +11,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class SecurityController extends AbstractController
 {
-  public function __construct(private Security $security) // Injection du service Security
-  {
-  }
+    public function __construct(private Security $security) // Injection du service Security
+    {}
 
-  #[Route('/login', name: 'app_login', methods: ['POST'])]
+    #[Route('/login', name: 'app_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
         try {
@@ -36,7 +35,6 @@ class SecurityController extends AbstractController
 
             // Si l'utilisateur n'est pas connecté, lance une exception
             throw new AuthenticationException('Identifiants invalides');
-
         } catch (AuthenticationException $e) {
             // En cas d'erreur, renvoie un message d'erreur
             return new JsonResponse([
@@ -46,7 +44,7 @@ class SecurityController extends AbstractController
         }
     }
 
-  #[Route('/logout', name: 'app_logout')]
+    #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
         // Cette méthode sera interceptée par le firewall
