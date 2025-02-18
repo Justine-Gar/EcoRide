@@ -7,10 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -165,13 +168,44 @@ class User
 
 
     /**
-     * @return Collection<int, Role>
+     * @see UserInterface
+     * @return array<string>
      */
-    public function getRoles(): Collection
+    public function getRoles(): array
     {
-        return $this->roles;
+        $userRoles = $this->roles->map(function($role) {
+            return 'ROLE_' . strtoupper($role->getNameRole());
+        })->toArray();
+        
+        // Garantit que chaque utilisateur a au moins ROLE_USER
+        $userRoles[] = 'ROLE_USER';
+        
+        return array_unique($userRoles);
+    }
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        //stockez des données temporaires sensibles
     }
 
+    /**
+     * Retourne l'identifiant utilisé pour l'authentification
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+
+    /**
+     * @return Collection<int, Role>
+     */
+    /**public function getUserRoles(): Collection
+    {
+        return $this->roles;
+    }**/
     public function addRole(Role $role): static
     {
         if (!$this->roles->contains($role)) {
