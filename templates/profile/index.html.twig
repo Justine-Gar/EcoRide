@@ -60,14 +60,43 @@
               <label class="text-muted d-block">Téléphone</label>
               <div>06 12 34 56 78</div>
             </div>
-            <div class="mb-3">
-              <label class="text-muted d-block">Membre depuis</label>
-              <div>Janvier 2024</div>
-            </div>
-            <button class="btn btn-outline-primary mt-3">Modifier le profil</button>
+            
+            <button type="button" class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+              <i class="fas fa-edit me-2"></i>Modifier le profil
+            </button>
           </div>
 
-          
+          {# Modal de modification #}
+          <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="editProfileModalLabel">Modifier mon profil</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          {{ form_start(form) }}
+                              <div class="mb-3">
+                                  {{ form_row(form.firstname) }}
+                              </div>
+                              <div class="mb-3">
+                                  {{ form_row(form.name) }}
+                              </div>
+                              <div class="mb-3">
+                                  {{ form_row(form.email) }}
+                              </div>
+                              <div class="mb-3">
+                                  {{ form_row(form.phone_number) }}
+                              </div>
+                              <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                  <button type="submit" class="btn btn-primary">Enregistrer</button>
+                              </div>
+                          {{ form_end(form) }}
+                      </div>
+                  </div>
+              </div>
+          </div>
         </div>
 
       </section>
@@ -637,4 +666,19 @@
     </div>
   </main>
   
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ferme la modal si la soumission est réussie
+    {% for message in app.flashes('success') %}
+        var modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+        if (modal) {
+            modal.hide();
+        }
+    {% endfor %}
+});
+</script>
 {% endblock %}

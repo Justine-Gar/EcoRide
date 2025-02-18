@@ -79,6 +79,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Carpool::class, mappedBy: 'passengers')]
     private Collection $carpoolParticipations;
 
+
+
+
+
+
     public function __construct()
     {
         $this->roles = new ArrayCollection();
@@ -92,6 +97,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getIdUser(): ?int
     {
         return $this->id_user;
+    }
+
+    public function setIdUser(int $id_user): self
+    {
+        $this->id_user = $id_user;
+        return $this;
     }
 
     public function getName(): ?string
@@ -165,6 +176,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+
+
+
+
+
+
+
+
 
 
     /**
