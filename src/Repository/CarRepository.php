@@ -38,7 +38,7 @@ class CarRepository extends ServiceEntityRepository
     }
 
     // Trouver une voiture par son ID
-    public function findOneById(int $id): ?Car
+    public function findCarOneById(int $id): ?Car
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.id_cars = id')
@@ -48,7 +48,7 @@ class CarRepository extends ServiceEntityRepository
     }
 
     // Trouver tout les voitures d'un user
-    public function findByUser(User $user): array
+    public function findCarsByUser(User $user): array
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.user = :user')
