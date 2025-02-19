@@ -77,8 +77,8 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
- * Récupère un utilisateur complet avec toutes ses données
- */
+     * Récupère un utilisateur complet avec toutes ses données
+     */
     public function getUser(UserInterface $user): ?User
     {
         return $this->createQueryBuilder('u')
