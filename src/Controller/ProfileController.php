@@ -8,6 +8,7 @@ use App\Form\CarType;                  ///Type forme pour voiture
 use App\Entity\Car;
 use App\Repository\CarRepository;                  
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
+use App\Repository\ReviewRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +24,8 @@ class ProfileController extends AbstractController
         private UserRepository $userRepository,
         private FileUploader $fileUploader,
         private EntityManagerInterface $entityManager,
-        private CarRepository $carRepository
+        private CarRepository $carRepository,
+        private ReviewRepository $reviewRepository
     ) {}
 
     // Route pour afficher le profil utilisateur
@@ -35,6 +37,7 @@ class ProfileController extends AbstractController
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
+
 
         //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [

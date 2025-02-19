@@ -144,4 +144,37 @@ class ReviewRepository extends ServiceEntityRepository
         return $review;
     }
     
+    /**
+     * Compter le nombre d'avis d'un utilisateur
+     */
+    public function countReviews(User $user): int
+    {
+        return $this->createQueryBuilder('r')
+            ->select('COUNT(r.id_review)')
+            ->andWhere('r.user = :user')
+            ->andWhere('r.statut = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', 'approved')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Obtenir la note moyenne d'un utilisateur
+     */
+    public function getAverageRating(User $user): ?float
+    {
+        try {
+            return $this->createQueryBuilder('r')
+                ->select('AVG(r.note) as average')
+                ->andWhere('r.user = :user')
+                ->andWhere('r.statut = :status')
+                ->setParameter('user', $user)
+                ->setParameter('status', 'approved')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            return 0.0;
+        }
+    }
 }
