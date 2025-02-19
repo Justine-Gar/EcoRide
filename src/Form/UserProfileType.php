@@ -44,20 +44,18 @@ class UserProfileType extends AbstractType
         'mapped' => false,
         'required' => false,
         'constraints' => [
-          new Assert\File([
-            'maxSize' => '1024k',
-            'mimeTypes' => [
-              'image/jpeg',
-              'image/png',
-            ],
-            'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG ou PNG)',
-          ])
+            new Assert\Image([
+                'maxSize' => '1M',
+                'mimeTypes' => ['image/jpeg', 'image/png', 'image/bmp', 'image/x-ms-bmp', 'image/webp'],
+                'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG ou PNG)',
+                'maxSizeMessage' => 'L\'image est trop grande ({{ size }} {{ suffix }}). Maximum autorisé : {{ limit }} {{ suffix }}.',
+            ])
         ],
         'attr' => [
-          'class' => 'form-control',
-          'accept' => 'image/jpeg,image/png'
+            'class' => 'form-control',
+            'accept' => 'image/jpeg,image/png'
         ]
-      ]);
+        ]);
   }
 
   // Configure les options du formulaire

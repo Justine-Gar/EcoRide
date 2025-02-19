@@ -14,41 +14,43 @@ class FileUploader
   ){}
 
   public function upload(UploadedFile $file): string
-  {
-    try {
-      //Genere un nom de fichier unique
-      //Exemple : "Ma photo été.jpg
-      $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-      //$originalFilename = "Ma photo été"
+    {
+        try {
+            // Log des informations du fichier
+            error_log('Début upload fichier');
+            error_log('Fichier reçu : ' . $file->getClientOriginalName());
+            error_log('Type MIME : ' . $file->getMimeType());
+            error_log('Taille : ' . $file->getSize());
 
-      //le slugger va transformer ce nom en version sécurisée
-      $safeFilename = $this->slugger->slug($originalFilename);
-      //$safeFilename = "ma-photo-ete"
+            // Récupérer et sécuriser le nom du fichier
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $this->slugger->slug($originalFilename);
+            $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
-      //rajoute un identifient unique 
-      $fileName = $safeFilename.'_'.uniqid().'.'.$file->guessExtension();
-      //Final = "ma-photo-ete-64f3d21b8c3e9.jpg"
+            error_log('Nom sécurisé : ' . $fileName);
+            error_log('Dossier cible : ' . $this->getTargetDirectory());
 
-      error_log('Tentative d\'upload vers: ' . $this->getTargetDirectory());
-      error_log('Nom du fichier final: ' . $fileName);
-      
-      // Vérifie les permissions
-      error_log('Permissions du dossier: ' . substr(sprintf('%o', fileperms($this->getTargetDirectory())), -4));
-      // Déplace le fichier de manière sécurisée
-      $file->move($this->getTargetDirectory(), $fileName);
-      error_log('Upload réussi');
+            // Vérifier si le dossier existe
+            if (!file_exists($this->getTargetDirectory())) {
+                error_log('Création du dossier cible');
+                mkdir($this->getTargetDirectory(), 0777, true);
+            }
 
-      return $fileName;
-      
-    } catch (\Exception $e) {
+            // Déplacer le fichier
+            $file->move($this->getTargetDirectory(), $fileName);
+            error_log('Fichier déplacé avec succès');
 
-      error_log('Erreur dans FileUploader: ' . $e->getMessage());
-      throw $e;
+            return $fileName;
+
+        } catch (\Exception $e) {
+            error_log('Erreur dans FileUploader: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
-    
-  }
 
+
+  // Getter pour récupérer le dossier cible
   public function getTargetDirectory(): string
   {
     return $this->targetDirectory;

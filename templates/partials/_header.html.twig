@@ -23,7 +23,7 @@
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								{% if app.user.profilPicture %}
-										<img src="{{ asset(app.user.profilPicture) }}" alt="Photo de profil" class="rounded-circle me-2" >
+										<img src="{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}" alt="Photo de profil" class="rounded-circle me-2" >
 								{% else %}
 										<img src="{{ asset('assets/images/default-profile.png') }}" alt="Photo de profil par défaut" class="rounded-circle me-2">
 								{% endif %}
