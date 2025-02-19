@@ -90,28 +90,45 @@ class RoleRepository extends ServiceEntityRepository
         // Vérifie si l'utilisateur a déjà l'autre rôle de base
         $hasOtherBasicRole = false;
         foreach (self::BASIC_ROLES as $basicRole) {
-            if ($basicRole !== $roleName && $user->hasRole($this->findByName($basicRole))) {
+            if ($basicRole !== $roleName && $this->userHasRole($user, $basicRole)) {
                 $hasOtherBasicRole = true;
                 break;
             }
         }
 
         // Ajoute le nouveau rôle s'il ne l'a pas déjà
-        if (!$user->hasRole($role)) {
-            $user->addRole($role);
+        if (!$this->userHasRole($user, $roleName)) {
+            $this->addRoleToUser($user, $role);
         }
 
         // Si l'utilisateur a les deux rôles de base, ajoute le rôle Passeur
         if ($hasOtherBasicRole) {
             $passeurRole = $this->findByName('Passeur');
-            if ($passeurRole && !$user->hasRole($passeurRole)) {
-                $user->addRole($passeurRole);
+            if ($passeurRole && !$this->userHasRole($user, 'Passeur')) {
+                $this->addRoleToUser($user, $passeurRole);
             }
         }
+    }
 
-        // Sauvegarde les changements
-        $this->_em->persist($user);
-        $this->_em->flush();
+    //Vérifie si un user à un role spécifique
+    private function userHasRole(User $user, string $roleName): bool
+    {
+        $role = $this->findByName($roleName);
+        if (!$role) {
+            return false;
+        }
+        
+        return $user->hasRole($role);
+    }
+
+    //Ajoute un role a user
+    private function addRoleToUser(User $user, Role $role): void
+    {
+        if (!$this->userHasRole($user, $role->getNameRole())) {
+            $user->addRole($role);
+            $this->getEntityManager()->persist($user);
+            $this->getEntityManager()->flush();
+        }
     }
 
     //Vérifie si role et role administratif
@@ -123,14 +140,11 @@ class RoleRepository extends ServiceEntityRepository
     //Vérifie si role est un passeur
     public function isPasseur(User $user): bool
     {
-        $hasAllBasicRoles = true;
         foreach (self::BASIC_ROLES as $roleName) {
-            $role = $this->findByName($roleName);
-            if (!$role || !$user->hasRole($role)) {
-                $hasAllBasicRoles = false;
-                break;
+            if (!$this->userHasRole($user, $roleName)) {
+                return false;
             }
         }
-        return $hasAllBasicRoles;
+        return true;
     }
 }

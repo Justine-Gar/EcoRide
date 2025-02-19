@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\Role;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -86,6 +88,43 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('email', $user->getUserIdentifier())
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+
+    /**
+     * Calcule la note moyenne d'un User
+     */
+    private function calculateRating(User $user): float
+    {
+        $reviews = $user->getReview();
+        if ($reviews->isEmpty()) {
+            return 0.0;
+        }
+
+        $total = 0;
+        $count = 0;
+        foreach ($reviews as $review) {
+            if ($review->getStatut() === 'approved') {
+                $total += $review->getNote();
+                $count++;
+            }
+        }
+
+        return $count > 0 ? round($total / $count, 1) : 0.0;
+    }
+
+    /**
+     * Calcule le total des crédits d'un user
+     */
+    private function calculateTotalCredits(User $user): int
+    {
+        $total = 0;
+        foreach ($user->getCarpools() as $carpool) {
+            if ($carpool->getStatut() === 'completed') {
+                $total += $carpool->getCredits();
+            }
+        }
+        return $total;
     }
 
 }

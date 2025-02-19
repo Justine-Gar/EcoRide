@@ -400,4 +400,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+
+    public function hasRole(Role $role): bool
+    {
+        return $this->roles->contains($role);
+    }
+
+    public function hasRoleByName(string $roleName): bool
+    {
+        foreach ($this->roles as $role) {
+            if ($role->getNameRole() === $roleName) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
