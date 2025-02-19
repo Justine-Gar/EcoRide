@@ -32,11 +32,17 @@ class PreferenceType
     #[ORM\OneToMany(targetEntity: UserPreference::class, mappedBy: 'preferenceType')]
     private Collection $userPreferences;
 
+
+
     public function __construct()
     {
         $this->userPreferences = new ArrayCollection();
     }
 
+
+
+
+    
     public function getIdPreferenceType(): ?int
     {
         return $this->id_preference_types;
