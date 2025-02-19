@@ -298,54 +298,9 @@
 							</nav>
 						</div>
 
-
-
-
-
-
 						<!-- Contenu Véhicules -->
 						<div class="tab-pane fade" id="vehicles" role="tabpanel">
 							<div class="card">
-                <!-- Modal Ajouter Véhicule -->
-                <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h5 class="modal-title" id="addVehicleModalLabel">Ajouter un véhicule</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                              {{ form_start(carForm) }}
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.marque) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.modele) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.color) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.energie) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.nbr_places) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.license_plate) }}
-                                  </div>
-                                  <div class="mb-3">
-                                      {{ form_row(carForm.first_registration) }}
-                                  </div>
-                                  <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                      <button type="submit" class="btn btn-primary">Ajouter</button>
-                                  </div>
-                              {{ form_end(carForm) }}
-                          </div>
-                      </div>
-                  </div>
-                </div>
                 <!-- CARD CAR-->
 								<div class="card-header d-flex justify-content-between align-items-center">
 									<h5 class="mb-0">
@@ -366,10 +321,7 @@
                         </div>
                         <div class="text-end">
                           <span class="badge bg-success mb-2">{{ car.energie }}</span>
-                          <div class="d-flex">
-                            <button class="btn btn-sm btn-outline-primary me-1">
-                              <i class="fas fa-edit"></i>
-                            </button>
+                          <div>
                             <form action="{{ path('app_profile_delete_car', { 'id': car.id }) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -384,11 +336,6 @@
 								</div>
 							</div>
 						</div>
-
-
-
-
-
 
 						<!-- Contenu Préférences -->
 						<div class="tab-pane fade" id="preferences" role="tabpanel">
@@ -518,8 +465,7 @@
 
 
 				<!--Cards pour mobile-->
-				<div
-					class="mobile-cards">
+				<div class="mobile-cards">
 					<!-- Card Avis -->
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
@@ -618,44 +564,57 @@
 
 					<!-- Card Véhicules -->
 					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<h5 class="mb-0">
-								<i class="fas fa-car me-2"></i>Mes véhicules</h5>
-							<button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#vehiclesCollapse">
-								<i class="fas fa-chevron-down"></i>
-							</button>
-						</div>
-						<div class="collapse" id="vehiclesCollapse">
-							<div
-								class="card-body">
-								<!-- Contenu des véhicules -->
-								<div class="vehicle-card p-3 border rounded mb-3">
-									<div class="d-flex justify-content-between">
-										<div>
-											<h6 class="mb-1">Peugeot 208</h6>
-											<p class="text-muted mb-1">Gris métallisé • 5 places</p>
-											<small class="text-muted">Immatriculation: AB-123-CD</small>
-										</div>
-										<div>
-											<span class="badge bg-success">Électrique</span>
-										</div>
-									</div>
-									<div class="text-end">
-										<div>
-											<button class="btn btn-sm btn-outline-primary me-1">
-												<i class="fas fa-edit"></i>
-											</button>
-											<button class="btn btn-sm btn-outline-danger">
-												<i class="fas fa-trash"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-								<button class="btn btn-outline-success">
-									<i class="fas fa-plus me-2"></i>Ajouter un véhicule</button>
-							</div>
-						</div>
-					</div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-car me-2"></i>Mes véhicules
+                </h5>
+                <div class="d-flex align-items-center">
+                    <!-- Bouton pour ajouter un véhicule -->
+                    <button class="btn btn-sm btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <!-- Bouton pour afficher/masquer la section -->
+                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#vehiclesCollapse">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="collapse" id="vehiclesCollapse">
+                <div class="card-body">
+                    <!-- Contenu des véhicules -->
+                    {% if cars is empty %}
+                        <p class="text-muted text-center">Aucun véhicule enregistré</p>
+                    {% else %}
+                        {% for car in cars %}
+                            <div class="vehicle-card p-3 border rounded mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">{{ car.marque }} {{ car.modele }}</h6>
+                                        <p class="text-muted mb-1">{{ car.color }} • {{ car.nbrPlaces }} places</p>
+                                        <small class="text-muted d-block">Immatriculation: {{ car.licensePlate }}</small>
+                                        <small class="text-muted d-block">Première immatriculation: {{ car.firstRegistration|date('d/m/Y') }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success mb-2">{{ car.energie }}</span>
+                                        <div>
+                                            <form action="{{ path('app_profile_delete_car', { 'id': car.id }) }}" 
+                                                  method="post" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');"
+                                                  class="d-inline">
+                                                <input type="hidden" name="_method" value="DELETE">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+          </div>
 
 					<!-- Card Préférences -->
 					<div class="card mb-4">
@@ -806,6 +765,49 @@
 			</section>
 
 		</div>
+
+
+    <!--Modal ajouter une voiture-->
+    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addVehicleModalLabel">Ajouter un véhicule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(carForm) }}
+                        <div class="mb-3">
+                            {{ form_row(carForm.marque) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.modele) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.color) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.energie) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.nbr_places) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.license_plate) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_row(carForm.first_registration) }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    {{ form_end(carForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
 	</main>
 
 {% endblock %}

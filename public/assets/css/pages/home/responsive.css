@@ -11,9 +11,21 @@
   .concept-body {
     width: 100%;
     min-height: 410px;
-
   }
-  
+
+  .vehicle-card {
+    font-size: 0.9rem;
+  }
+
+  .vehicle-card .badge {
+      font-size: 0.8rem;
+  }
+
+  .vehicle-card .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+  }
+    
   
 }
 @media (min-width: 768px) {
