@@ -4,8 +4,12 @@ namespace App\Controller;
 
 // Imports nécessaires pour le contrôleur
 use App\Form\UserProfileType;         // Type de formulaire pour le profil
+use App\Form\CarType;                  ///Type forme pour voiture
+use App\Entity\Car;
+use App\Repository\CarRepository;                  
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
 use App\Service\FileUploader;           // Recupere les images uploader
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +21,9 @@ class ProfileController extends AbstractController
     // Injection de dépendance du UserRepository via le constructeur
     public function __construct(
         private UserRepository $userRepository,
-        private FileUploader $fileUploader
+        private FileUploader $fileUploader,
+        private EntityManagerInterface $entityManager,
+        private CarRepository $carRepository
     ) {}
 
     // Route pour afficher le profil utilisateur
@@ -26,17 +32,29 @@ class ProfileController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function index(): Response
     {
-        // Récupère l'utilisateur connecté 
+        // Récupère
         $user = $this->userRepository->getUser($this->getUser());
-        //creation formulaire
+        $usersCars = $this->carRepository->findByUser($user);
+
+        //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [
             'action' => $this->generateUrl('app_profile_edit'),
             'method' => 'POST'
         ]);
+
+        //creation formulaire voiture
+        $car = new Car();
+        $carForm = $this->createForm(CarType::class, $car, [
+            'action' => $this->generateUrl('app_profile_add_car'),
+            'method' => 'POST'
+        ]);
+
         // Rend la vue avec les données de l'utilisateur
         return $this->render('profile/index.html.twig', [
             'user' => $user,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'cars' => $usersCars,
+            'carForm' => $carForm->createView()
         ]);
     }
 
@@ -81,10 +99,50 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
     
         } catch (\Exception $e) {
-            
+
             $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
             return $this->redirectToRoute('app_profile');
         }
+    }
+
+    //Route pour ajouter une voiture sur le profil utilisateur
+    #[Route('/profile/add-car', name: 'app_profile_add_car')]
+    #[IsGranted('ROLE_USER')]
+    public function addCar(Request $request): Response
+    {
+        $car = new Car();
+        $form = $this->createForm(CarType::class, $car);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $car->setUser($this->getUser());
+            $this->carRepository->save($car, true);
+
+            $this->addFlash('succes', 'Véhicule ajouté avec succès !');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        return $this->redirectToRoute('app_profile');
+    }
+
+    //Route pour supprimer une voiture sur profil user
+    #[Route('/profile/car/delete/{id}', name: 'app_profile_delete_car')]
+    #[IsGranted('ROLE_USER')]
+    public function deleteCar(int $id, CarRepository $carRepository, EntityManagerInterface $entityManager): Response
+    {
+        $car = $carRepository->find($id);
+
+        if (!$car) {
+            $this->addFlash('error', 'Véhicule non trouvé.');
+            return $this->redirectToRoute('app_profile'); // Redirection vers la page de profil
+        }
+
+        $entityManager->remove($car);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Véhicule supprimé avec succès.');
+
+        return $this->redirectToRoute('app_profile'); // Change si nécessaire
     }
 
     // Route pour l'interface administrateur

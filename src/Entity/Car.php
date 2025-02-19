@@ -40,7 +40,7 @@ class Car
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
-    public function getIdCar(): ?int
+    public function getId(): ?int
     {
         return $this->id_cars;
     }

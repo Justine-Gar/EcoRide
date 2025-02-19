@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Car;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,44 @@ class CarRepository extends ServiceEntityRepository
         parent::__construct($registry, Car::class);
     }
 
-    //    /**
-    //     * @return Car[] Returns an array of Car objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    // Create et Update
+    public function save(Car $car, bool $flush = false) : void
+    {
+        $this->getEntityManager()->persist($car);
 
-    //    public function findOneBySomeField($value): ?Car
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    // Delete
+    public function remove(Car $car, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($car);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    // Trouver une voiture par son ID
+    public function findOneById(int $id): ?Car
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id_cars = id')
+            ->setParameter('id',$id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    // Trouver tout les voitures d'un user
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.id_cars', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
