@@ -81,7 +81,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Carpool::class, mappedBy: 'passengers')]
     private Collection $carpoolParticipations;
 
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Review::class)]
+    private Collection $senderReviews;
 
+    #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Review::class)]
+    private Collection $recipientReviews;
 
 
 
@@ -94,6 +98,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reviews = new ArrayCollection();
         $this->carpools = new ArrayCollection();
         $this->carpoolParticipations = new ArrayCollection();
+        $this->senderReviews = new ArrayCollection();
+        $this->recipientReviews = new ArrayCollection();
     }
 
     public function getIdUser(): ?int
@@ -190,12 +196,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getSenderReviews(): Collection
+    {
+        return $this->senderReviews;
+    }
+
+    public function addGivenReview(Review $review): static
+    {
+        if (!$this->senderReviews->contains($review)) {
+            $this->senderReviews->add($review);
+            $review->setSender($this);
+        }
+        return $this;
+    }
+
+    public function removeGivenReview(Review $review): static
+    {
+        if ($this->senderReviews->removeElement($review)) {
+            if ($review->getSender() === $this) {
+                $review->setSender(null);
+            }
+        }
+        return $this;
+    }
 
 
+    public function getRecipientReviews(): Collection
+    {
+        return $this->recipientReviews;
+    }
 
+    public function addReceivedReview(Review $review): static
+    {
+        if (!$this->recipientReviews->contains($review)) {
+            $this->recipientReviews->add($review);
+            $review->setRecipient($this);
+        }
+        return $this;
+    }
 
-
-
+    public function removeReceivedReview(Review $review): static
+    {
+        if ($this->recipientReviews->removeElement($review)) {
+            if ($review->getRecipient() === $this) {
+                $review->setRecipient(null);
+            }
+        }
+        return $this;
+    }
 
 
 
