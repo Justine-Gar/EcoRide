@@ -61,14 +61,19 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     {
         // Récupère l'utilisateur connecté
         $user = $token->getUser();
+        $roles = $user->getRoles();
 
         // Prépare les données de redirection selon le rôle
-        $redirectData = [
-            'success' => true,
-            'redirect' => $this->getRedirectPath($user)
-        ];
+        // Debug log
+        error_log('User roles: ' . implode(', ', $roles));
+        
+        $redirectPath = $this->getRedirectPath($user);
+        error_log('Redirect path: ' . $redirectPath);
 
-        return new JsonResponse($redirectData);
+        return new JsonResponse([
+            'success' => true,
+            'redirect' => $redirectPath
+        ]);
     }
 
     /**
