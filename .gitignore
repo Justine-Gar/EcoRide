@@ -72,6 +72,8 @@ symfony.lock
 .dockerignore
 .env.dev
 docker-compose.yml
+.env.prod
+docker-compose.prod.yml
 ###< Fichiers de configuration ###
 
 ###> Dépendances et builds ###
