@@ -6,9 +6,57 @@
 
 {% block stylesheets %}
   <link rel="stylesheet" href="{{ asset('assets/css/pages/contact/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/pages/contact/responsive.css') }}">
 {% endblock %}
 
 {% block body %}
+  <main class="d-flex justify-content-center align-items-center">
+    <div class="container contact">
+      <div class="row justify-content-center">
+        <div class="col-sm-6 ">
+          <div class="card shadow">
+            <div class="card-body">
+              <h1 class="card-title text-center mb-4">Contactez-nous</h1>
 
+              <form>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="nom" class="form-label">Nom</label>
+                      <input type="text" class="form-control" id="nom" name="nom" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="sujet" class="form-label">Sujet</label>
+                  <input type="text" class="form-control" id="sujet" name="sujet" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="message" class="form-label">Message</label>
+                  <textarea class="form-control" id="message" name="message" rows="6" required></textarea>
+                </div>
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-success px-5">Envoyer</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <img class="carecoride" src="{{ asset('assets/images/logos/carecoride.png') }}" alt="Petite voiture ecoride">
+        </div>
+      </div>
+    </div>
+  </main>
 
 {% endblock %}
