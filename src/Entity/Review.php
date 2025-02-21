@@ -28,6 +28,20 @@ class Review
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'senderReviews')]
+    #[ORM\JoinColumn(name: 'id_sender', referencedColumnName: 'id_user', nullable: false)]
+    private ?User $sender = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'recipientReviews')]
+    #[ORM\JoinColumn(name: 'id_recipient', referencedColumnName: 'id_user', nullable: false)]
+    private ?User $recipient = null;
+
+    #[ORM\ManyToOne(targetEntity: Carpool::class)]
+    #[ORM\JoinColumn(name: 'id_carpool', referencedColumnName: 'id_carpool', nullable: false)]
+    private ?Carpool $carpool = null;
+
+
+
     public function getIdReview(): ?int
     {
         return $this->id_review;
@@ -78,6 +92,39 @@ class Review
     {
         $this->user = $user;
 
+        return $this;
+    }
+
+    public function getSender(): ?User
+    {
+        return $this->sender;
+    }
+
+    public function setSender(?User $sender): static
+    {
+        $this->sender = $sender;
+        return $this;
+    }
+
+    public function getRecipient(): ?User
+    {
+        return $this->recipient;
+    }
+
+    public function setRecipient(?User $recipient): static
+    {
+        $this->recipient = $recipient;
+        return $this;
+    }
+
+    public function getCarpool(): ?Carpool
+    {
+        return $this->carpool;
+    }
+
+    public function setCarpool(?Carpool $carpool): static
+    {
+        $this->carpool = $carpool;
         return $this;
     }
 }

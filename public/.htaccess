@@ -1,0 +1,8 @@
+<IfModule mod_rewrite.c>
+   RewriteCond %{HTTP_HOST} !^www\. [NC]
+   RewriteRule .* %{REQUEST_SCHEME}://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+   RewriteEngine on
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteCond %{REQUEST_FILENAME} !-d
+   RewriteRule ^.*$ /index.php [L,QSA]
+</IfModule>
