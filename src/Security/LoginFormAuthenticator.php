@@ -10,9 +10,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 
 class LoginFormAuthenticator extends AbstractAuthenticator
@@ -63,17 +66,24 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $user = $token->getUser();
         $roles = $user->getRoles();
 
-        // Prépare les données de redirection selon le rôle
-        // Debug log
-        error_log('User roles: ' . implode(', ', $roles));
-        
-        $redirectPath = $this->getRedirectPath($user);
-        error_log('Redirect path: ' . $redirectPath);
+        // Determine redirect path
+        $redirectPath = '/profile'; // Default path
+        if (in_array('ROLE_ADMINISTRATEUR', $roles)) {
+            $redirectPath = '/admin';
+        } elseif (in_array('ROLE_STAFF', $roles)) {
+            $redirectPath = '/staff';
+        }
 
-        return new JsonResponse([
-            'success' => true,
-            'redirect' => $redirectPath
-        ]);
+        // Si c'est une requête AJAX, retourner du JSON
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'success' => true,
+                'redirect' => $redirectPath
+            ]);
+        }
+
+        // Sinon, faire une redirection normale
+        return new RedirectResponse($redirectPath);
     }
 
     /**
@@ -98,9 +108,18 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        $message = 'Identifiant ou mot de passe incorrect';
+
+        //messages plus spécifique selon type erreur
+        if ($exception instanceof InvalidCsrfTokenException) {
+            $message = 'Session expirée, veuillez réessayer.';
+        } elseif ($exception instanceof UserNotFoundException) {
+            $message = 'Identifiant ou mot de passe incorrect';
+        }
+
         return new JsonResponse([
-            'success' => false,
-            'message' => 'Identifiants invalides. Veuillez réessayer.'
+            'succes' => false,
+            'message' =>$message
         ], Response::HTTP_UNAUTHORIZED);
     }
 }

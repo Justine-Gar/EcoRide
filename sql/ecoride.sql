@@ -101,8 +101,22 @@ ALTER TABLE `reviews`
   ADD CONSTRAINT fk_recipient_user FOREIGN KEY (id_recipient) REFERENCES users (id_user);
 
 -- Insertion des données de base
-INSERT INTO roles (name_role) VALUES 
+INSERT INTO `roles` (`name_role`) VALUES 
 ('Administrateur'),
 ('Staff'),
 ('Conducteur'),
 ('Passager'),
+
+INSERT INTO `users` (`id_user`, `name`, `firstname`, `email`, `password`, `phone_number`, `profil_picture`, `credits`) VALUES
+(1, 'Admin', 'System', 'admin@ecoride.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0600000000', NULL, 100),
+(2, 'Support', 'Team', 'staff@ecoride.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0600000001', NULL, 100),
+(3, 'Dupont', 'Jean', 'jean.dupont@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0611111111', NULL, 45),
+(4, 'Martin', 'Sophie', 'sophie.martin@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0622222218', 'telechargement-67b569ed96a36.bmp', 40),
+(5, 'Garcia', 'Lucas', 'lucas.garcia@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0633333333', NULL, 20),
+
+INSERT INTO `user_roles` (`id_user`, `ìd_role`) VALUES
+(1,1),
+(2,2),
+(3,3),
+(4,4),
+(5,4);

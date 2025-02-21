@@ -26,20 +26,23 @@ document.addEventListener('DOMContentLoaded', function () {
     async function handleSubmit(e) {
         e.preventDefault();
         
-        const errorDiv = document.getElementById('loginError');
-        errorDiv.classList.add('d-none');
-        
+        hideError();
         submitButton.disabled = true;
         submitButton.textContent = 'Connexion en cours...';
-        
-        try {
-            const formData = new FormData(loginForm);
 
-            // Déboguer les données envoyées
-            console.log('Données envoyées:', {
-                username: formData.get('_username'),
-                csrfToken: formData.get('_csrf_token')
-            });
+        const formData = new FormData(loginForm);
+        const email = formData.get('_username');
+        const password = formData.get('_password');
+        const csrf = formData.get('_csrf_token');
+        
+        // Vérification des données
+        console.log('Données du formulaire :', {
+            email: email,
+            password: password ? '[PRÉSENT]' : '[MANQUANT]',
+            csrf: csrf
+        });
+
+        try {
             
             const response = await fetch('/login', {
                 method: 'POST',
@@ -50,22 +53,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // Déboguer la réponse
-            console.log('Status:', response.status);
+            console.log('Status de la réponse:', response.status);
             
-            const data = await response.json();
-            console.log('Réponse:', data);
+            // Log de la réponse complète
+            const responseText = await response.text();
+            console.log('Réponse brute:', responseText);
             
+            // Essai de parsing JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+                console.log('Données parsées:', data);
+            } catch (e) {
+                console.error('Erreur de parsing JSON:', e);
+                showError('Erreur de format de réponse');
+                return;
+            }
+
             if (data.success) {
+                console.log('Redirection vers:', data.redirect);
                 window.location.href = data.redirect;
             } else {
-                errorDiv.textContent = data.message;
-                errorDiv.classList.remove('d-none');
+                showError(data.message || 'Erreur de connexion');
             }
         } catch (error) {
-            console.error('Erreur:', error);
-            errorDiv.textContent = 'Une erreur est survenue. Veuillez réessayer.';
-            errorDiv.classList.remove('d-none');
+            console.error('Erreur complète:', error);
+            showError('Une erreur est survenue. Veuillez réessayer.');
         } finally {
             submitButton.disabled = false;
             submitButton.textContent = 'Se connecter';
@@ -78,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginModal = document.getElementById('loginModal');
     loginModal.addEventListener('hidden.bs.modal', function () {
         loginForm.reset();
-        const errorDiv = document.getElementById('loginError');
-        errorDiv.classList.add('d-none');
+        hideError();
     });
 });

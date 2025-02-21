@@ -247,14 +247,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
 
-    /**
-     * @see UserInterface
-     * @return array<string>
-     */
     public function getRoles(): array
     {
         $userRoles = $this->roles->map(function($role) {
-            return 'ROLE_' . strtoupper($role->getNameRole());
+            $roleName = 'ROLE_' . strtoupper($this->removeAccents($role->getNameRole()));
+            return $roleName;
         })->toArray();
         
         // Garantit que chaque utilisateur a au moins ROLE_USER
@@ -262,6 +259,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         
         return array_unique($userRoles);
     }
+
+    private function removeAccents(string $string): string
+    {
+        $unwanted_array = array(
+            'é'=>'e', 'è'=>'e', 'ê'=>'e', 'ë'=>'e',
+            'É'=>'E', 'È'=>'E', 'Ê'=>'E', 'Ë'=>'E'
+        );
+        return strtr($string, $unwanted_array);
+    }
+    
+
     /**
      * @see UserInterface
      */
