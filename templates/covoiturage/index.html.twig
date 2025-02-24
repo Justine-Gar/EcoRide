@@ -7,6 +7,7 @@
 {% block stylesheets %}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturage.css') }}">
+  <link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturageResponsive.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -36,23 +37,15 @@
                 </div>
 
                 <!-- Champ Date -->
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="search-input">
                         <i class="far fa-calendar"></i>
                         <input type="date" class="form-control" placeholder="Date">
                     </div>
                 </div>
 
-                <!-- Champ nombre de places-->
-                <div class="col-md-2">
-                  <div class="search-input">
-                    <i class="fas fa-users"></i>
-                    <input type="number" min="1" max="5" class="form-control" placeholder="Nombre de places">
-                  </div>
-                </div>
-
                 <!-- Bouton Recherche -->
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <button class="btn btn-search">RECHERCHE</button>
                 </div>
             </div>
@@ -141,7 +134,7 @@
     </section>
 
   <!--Le résultat de la recherche-->
-    <section class=" container card-result">
+    <section class="container card-result">
       <div class="card-search d-flex flex-wrap justify-content-center">
 
       <!--Apparission des card-covoit pour la recherche-->

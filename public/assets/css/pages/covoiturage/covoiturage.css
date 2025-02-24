@@ -4,6 +4,7 @@
 
 .search {
   width: 100%;
+  height: 415px;
   background-color: #313A50;
   padding-top: 135px;
 }
@@ -90,6 +91,7 @@
 .card-result{
   margin-top: 30px;
   margin-bottom: 30px;
+  padding-top: 120px;
 }
 .card-search{
   gap: 25px;
