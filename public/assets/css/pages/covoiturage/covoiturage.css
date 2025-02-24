@@ -1,0 +1,230 @@
+/*-------------Sections-------------*/
+
+/*Section ------ Search ------ */
+
+.search {
+  width: 100%;
+  background-color: #313A50;
+  padding-top: 135px;
+}
+
+/* Container de la barre de recherche */
+.search-container {
+  padding: 20px 20px;
+}
+
+.search-bar {
+  background: #F3F3F3;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Style des inputs */
+.search-input {
+  position: relative;
+  padding: 8px;
+}
+
+.search-input i {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4DBC84;
+  z-index: 1;
+}
+
+.search-input .form-control {
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #F3F3F3;
+  border-radius: 4px;
+}
+
+.search-input .form-control:focus {
+  box-shadow: none;
+  border-color: #4DBC84;
+}
+
+/* Style du bouton de recherche */
+.btn-search {
+  background-color: #4DBC84;
+  color: #F3F3F3;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-search:hover {
+  background-color: #3f7b6a;
+  color: #F3F3F3;
+}
+
+.btn-filter {
+  background-color: #4DBC84;
+  color: #F3F3F3;
+  font-size: 16px;
+}
+
+.btn-filter:hover {
+  background-color: #3f7b6a;
+  color: #F3F3F3;
+  font-size: 16px;
+}
+.btn-filter img {
+  width: 20px;
+  height: 20px;
+}
+
+/*Section ----- Crard ----- */
+
+.card-result{
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.card-search{
+  gap: 25px;
+}
+
+/*--Tete card--*/
+/*tete*/
+.card {
+  background-color: none;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 325px;
+}
+
+.card-body {
+  padding: 10px;
+}
+
+.card-header {
+  padding: 10px;
+}
+
+.card-covoit {
+  width: 100%;
+  max-width: 325px;
+}
+
+.custom-header, .custom-footer {
+  --bs-card-cap-bg: transparent;
+  background: transparent;
+}
+
+.nom-pseudo {
+  font-size: 16px;
+  color: #313A50;
+}
+
+.role-note {
+  color: #313A50;
+  font-size: 14px;
+}
+
+.etoile {
+  color: #4DBC84;
+  margin-left: 4px;
+}
+
+.avatar img {
+  border: 3px solid #4DBC84;
+  max-width: 50px; 
+  max-height: 50px;
+  border-radius: 50%;
+}
+
+
+/*-- corps card--*/
+.timeline-container {
+  position: relative;
+  padding-left: 0px;
+  height: 80px; /* a ajustez  */
+}
+
+.timeline-line {
+  position: absolute;
+  left: 4px; /* pour centrer avec les points */
+  top: 10px; /* ajustez selon la taille de vos points */
+  bottom: 10px;
+  width: 2px;
+  background: #4DBC84;
+}
+
+.time-point {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  background: #4DBC84;
+  border-radius: 50%;
+  z-index: 1; 
+}
+
+.horaire {
+  color: #313A50;
+  font-size: 14px;
+}
+
+.places-info {
+  color: #313A50;
+  font-size: 14px;
+}
+
+.trajet-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+/*-- pied card --*/
+.card-footer {
+  padding: 10px;
+}
+.btn-details, .btn-participer {
+  background: #4DBC84;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #F3F3F3;
+  font-size: 14px;
+}
+.btn-details:hover, .btn-participer:hover {
+  background: #3f7b6a;
+  color: #F3F3F3;
+}
+
+.card-footer span, .detail-participer span{
+  color: #4a4a4a;
+  font-size: 14px;
+}
+
+/* -- détail card --*/
+.detail-voiture h6, .detail-preferences h6, .detail-avis h6 {
+  color: #3f7b6a;
+  font-size: 16px;
+}
+
+.detailsContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.detailsContent.visible {
+  max-height: 2000px; /* Ajustez selon vos besoins */
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+}
