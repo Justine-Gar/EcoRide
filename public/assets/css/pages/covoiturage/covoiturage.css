@@ -45,16 +45,20 @@
   box-shadow: none;
   border-color: #4DBC84;
 }
-
+::placeholder {
+  font-family: 'NunitoR', sans-serif;
+  font-size: 12px;
+}
 /* Style du bouton de recherche */
 .btn-search {
+  font-family: 'NunitoR';
+  font-size: 16px;
   background-color: #4DBC84;
   color: #F3F3F3;
   width: 100%;
   padding: 12px;
   border: none;
   border-radius: 4px;
-  font-weight: 500;
   transition: background-color 0.3s ease;
 }
 
@@ -64,19 +68,20 @@
 }
 
 .btn-filter {
+  font-family: 'PoppinsR';
   background-color: #4DBC84;
   color: #F3F3F3;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .btn-filter:hover {
   background-color: #3f7b6a;
   color: #F3F3F3;
-  font-size: 16px;
+  font-size: 12px;
 }
 .btn-filter img {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
 }
 
 /*Section ----- Crard ----- */
@@ -117,12 +122,14 @@
 }
 
 .nom-pseudo {
+  font-family: 'PoppinsR';
   font-size: 16px;
-  color: #313A50;
+  color: #2B293F;
 }
 
 .role-note {
-  color: #313A50;
+  font-family: 'PoppinsR';
+  color: #2B293F;
   font-size: 14px;
 }
 
@@ -171,13 +178,15 @@
 }
 
 .horaire {
-  color: #313A50;
+  font-family: 'PoppinsB';
+  color: #2B293F;
   font-size: 14px;
 }
 
-.places-info {
-  color: #313A50;
-  font-size: 14px;
+.calcul-horaires, .places-info {
+  font-family: 'PoppinsR';
+  color: #2B293F;
+  font-size: 12px;
 }
 
 .trajet-info {
@@ -191,6 +200,7 @@
   padding: 10px;
 }
 .btn-details, .btn-participer {
+  font-family: 'NunitoB';
   background: #4DBC84;
   border: none;
   padding: 7px 10px;
@@ -204,16 +214,26 @@
 }
 
 .card-footer span, .detail-participer span{
-  color: #4a4a4a;
-  font-size: 14px;
+  font-family: 'NunitoB';
+  color: #2B293F;
+  font-size: 16px;
 }
 
 /* -- détail card --*/
 .detail-voiture h6, .detail-preferences h6, .detail-avis h6 {
   color: #3f7b6a;
-  font-size: 16px;
+  font-size: 14px;
+  font-family: 'PoppinsB';
 }
+.detail-voiture, .detail-preferences, .detail-avis {
+  color: #2B293F;
+  font-size: 14px;
+  font-family: 'PoppinsR';
+}
+ul, ol {
+  list-style: disc;
 
+}
 .detailsContent {
   max-height: 0;
   overflow: hidden;
@@ -228,3 +248,10 @@
   visibility: visible;
   transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
 }
+
+.filter-menu {
+  color: #2B293F;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+
