@@ -46,7 +46,7 @@
 
                 <!-- Bouton Recherche -->
                 <div class="col-md-3">
-                    <button class="btn btn-search">RECHERCHE</button>
+                    <button class="btn btn-search">Recherche</button>
                 </div>
             </div>
         </div>
@@ -60,12 +60,14 @@
           </button>
           
           <!--Modal filtrage-->
-          <div class="modal fade" id="filterModal" tabindex="-1">
+          <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content filter-menu">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="filterModalLabel">Filtres de rechercher</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <div class="modal-body">
-                  <h5 class="filter-title">Filtres de recherche</h5>
-                  
                   <!-- Type de véhicule -->
                   <div class="filter-section">
                     <label>Type de véhicule :</label>
@@ -120,7 +122,7 @@
           
                   <!-- Bouton Filtrer -->
                   <div class="text-center mt-4">
-                    <button class="btn-filter-apply">FILTRER</button>
+                    <button class="btn btn-modal-filtre">Filtrer</button>
                   </div>
                 </div>
               </div>
