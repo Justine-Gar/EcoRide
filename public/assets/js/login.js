@@ -1,21 +1,22 @@
 // Fonctions utilitaires
+//affiche msg erreur
 function showError(message) {
     const errorDiv = document.getElementById('loginError');
     errorDiv.textContent = message;
     errorDiv.classList.remove('d-none');
 }
-
+//masque msg erreur
 function hideError() {
     const errorDiv = document.getElementById('loginError');
     errorDiv.classList.add('d-none');
 }
-
+//valide format email
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
+//valide longeure minimal mdp
 function isValidPassword(password) {
-    return password.length >= 10;
+    return password.length >= 8;
 }
 
 // Gestionnaire principal
