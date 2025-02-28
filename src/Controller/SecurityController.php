@@ -26,4 +26,10 @@ class SecurityController extends AbstractController
         // Cette méthode sera interceptée par le firewall
         throw new \LogicException('Cette méthode ne devrait jamais être appelée.');
     }
+
+    #[Route('/register', name: 'app_register', methods: ['POST'])]
+    public function register(): JsonResponse
+    {
+        return new JsonResponse(['message' => 'Cette route est protégée par l\'authenticateur']);
+    }
 }

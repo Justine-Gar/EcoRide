@@ -45,39 +45,39 @@
 					<div class="row mb-3">
 						<div class="col">
 							<label for="firstname" class="form-label">Prénom</label>
-							<input type="text" class="form-control" id="firstname" name="_firstname" required>
+							<input type="text" class="form-control" id="firstname" name="firstname" required>
 						</div>
 						<div class="col">
 							<label for="name" class="form-label">Nom</label>
-							<input type="text" class="form-control" id="name" name="_name" required>
+							<input type="text" class="form-control" id="name" name="_ame" required>
 						</div>
 					</div>
 					<div class="mb-3">
 						<label for="email" class="form-label">Email</label>
-						<input type="email" class="form-control" id="email" name="_email" required>
+						<input type="email" class="form-control" id="email" name="email" required>
 					</div>
 					<div class="mb-3">
 						<label for="phone" class="form-label">Téléphone</label>
-						<input type="tel" class="form-control" id="phone_number" name="_phone_number" pattern="[0-9]{10}" required>
+						<input type="tel" class="form-control" id="phone_number" name="phone_number" pattern="[0-9]{10}" required>
 					</div>
 					<div class="mb-3">
 						<label for="register-password" class="form-label">Mot de passe</label>
-						<input type="password" class="form-control" id="register-password" name="_password" required>
+						<input type="password" class="form-control" id="register-password" name="password" required>
 					</div>
 					<div class="mb-3">
 						<label for="confirm-password" class="form-label">Confirmer le mot de passe</label>
-						<input type="password" class="form-control" id="confirm-password" name="_confirm_password" required>
+						<input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
 					</div>
 					<div class="mb-4">
 						<label class="form-label">Je souhaite m'inscrire en tant que :</label>
 						<div class="form-check">
-								<input class="form-check-input" type="radio" name="_role" id="role-passager" value="Passager" checked>
+								<input class="form-check-input" type="radio" name="role" id="role-passager" value="Passager" checked>
 								<label class="form-check-label" for="role-passager">
 										Passager
 								</label>
 						</div>
 						<div class="form-check">
-								<input class="form-check-input" type="radio" name="_role" id="role-conducteur" value="Conducteur">
+								<input class="form-check-input" type="radio" name="role" id="role-conducteur" value="Conducteur">
 								<label class="form-check-label" for="role-conducteur">
 										Conducteur
 								</label>
@@ -91,10 +91,10 @@
 							J'accepte les conditions d'utilisation
 						</label>
 					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="submit" class="btn btn-connexion" form="registerForm">S'inscrire</button>
+					</div>
 				</form>
-			</div>
-			<div class="modal-footer justify-content-center">
-				<button type="submit" class="btn btn-connexion" form="registerForm">S'inscrire</button>
 			</div>
 			<div class="text-center mb-3">
 				<p>Déjà un compte ?
