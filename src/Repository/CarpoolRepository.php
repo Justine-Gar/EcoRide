@@ -147,6 +147,36 @@ class CarpoolRepository extends ServiceEntityRepository
     }
 
     /**
+    * Rechercher des covoiturages par termes simples
+    */
+    public function search(?string $depart = null, ?string $arrivee = null, ?string $date = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.statut = :status')
+            ->setParameter('status', 'actif');
+        
+        if ($depart) {
+            $qb->andWhere('c.location_start LIKE :depart')
+            ->setParameter('depart', '%' . $depart . '%');
+        }
+        
+        if ($arrivee) {
+            $qb->andWhere('c.location_reach LIKE :arrivee')
+            ->setParameter('arrivee', '%' . $arrivee . '%');
+        }
+        
+        if ($date) {
+            $qb->andWhere('c.date_start = :date')
+            ->setParameter('date', new \DateTime($date));
+        }
+        
+        $qb->orderBy('c.date_start', 'ASC')
+        ->addOrderBy('c.hour_start', 'ASC');
+        
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Rechercher des covoiturages par critères
      */
     public function searchCarpools(array $criteria): array
