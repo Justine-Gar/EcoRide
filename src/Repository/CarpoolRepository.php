@@ -17,7 +17,7 @@ class CarpoolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Creer un nouveau covoiturage
+     * Creer un nouveau covoit
      */
     public function createCarpool(User $user, array $date): Carpool
     {

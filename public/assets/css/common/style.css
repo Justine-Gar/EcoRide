@@ -27,14 +27,23 @@ footer {
   margin-top: auto;
 }
 
-body.modal-open {
-  padding-right: 0 !important;
+html body.modal-open,
+html body.modal-open.overflow-hidden {
   overflow-y: auto !important;
-}
-body.modal-open header.fixed-top {
   padding-right: 0 !important;
 }
-.modal {
+
+html body.modal-open header,
+html body.modal-open header.fixed-top {
+  padding-right: 0 !important;
+}
+
+.modal-open .modal {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 0 !important;
+}
+.fade.modal.show {
   padding-right: 0 !important;
 }
 .modal-backdrop {
