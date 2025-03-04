@@ -127,4 +127,15 @@ class UserRepository extends ServiceEntityRepository
         return $total;
     }
 
+    /**
+     * Met à jour les crédits d'un user
+     */
+    public function updateCredits(User $user, int $amont): void
+    {   
+        //Recupere les crédit  + le montant a ajouter (peut etre négatif)
+        $newCredits = $user->getCredits() + $amont;
+        //Met a jour le crédit et sauvegarde les modifs
+        $user->setCredits($newCredits);
+        $this->save($user, true);
+    }
 }

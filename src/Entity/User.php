@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -185,6 +186,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+
     public function getCredits(): ?int
     {
         return $this->credits;
@@ -195,6 +198,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->credits = $credits;
         return $this;
     }
+
+
 
     public function getSenderReviews(): Collection
     {
