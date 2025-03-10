@@ -5,291 +5,107 @@
 {% endblock %}
 
 {% block stylesheets %}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturage.css') }}">
-  <link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturageResponsive.css') }}">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturage.css') }}">
+	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturageResponsive.css') }}">
 {% endblock %}
 
 {% block body %}
-<!--=============START MAIN============-->
-  <main>
-    <!--La rechercher-->
-    <section class="search">
-    
-      <div class="container search-container">
-        <!-- Barre de recherche -->
-        <div class="search-bar">
-            <div class="row g-0 d-flex align-items-center">
-                <!-- Champ Départs -->
-                <div class="col-md-3">
-                    <div class="search-input">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" class="form-control" placeholder="Départs">
-                    </div>
-                </div>
+	<!--=============START MAIN============-->
+	<main>
+		<!--La rechercher-->
+		<section class="search">
 
-                <!-- Champ Arrivée -->
-                <div class="col-md-3">
-                    <div class="search-input">
-                        <i class="fas fa-location-arrow"></i>
-                        <input type="text" class="form-control" placeholder="Arrivée">
-                    </div>
-                </div>
+			<div class="container search-container">
+				<!-- Barre de recherche -->
+				<form action="{{ path('app_covoiturage') }}" method="get" class="search-bar">
+					<div class="row g-0 d-flex align-items-center">
+						<!-- Champ Départs -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-map-marker-alt"></i>
+								<input type="text" name="depart" class="form-control" value="{{ depart }}" placeholder="Départs">
+							</div>
+						</div>
 
-                <!-- Champ Date -->
-                <div class="col-md-3">
-                    <div class="search-input">
-                        <i class="far fa-calendar"></i>
-                        <input type="date" class="form-control" placeholder="Date">
-                    </div>
-                </div>
+						<!-- Champ Arrivée -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-location-arrow"></i>
+								<input type="text" name="arrivee" class="form-control" value="{{ arrivee }}" placeholder="Arrivée" >
+							</div>
+						</div>
 
-                <!-- Bouton Recherche -->
-                <div class="col-md-3">
-                    <button class="btn btn-search">Recherche</button>
-                </div>
-            </div>
-        </div>
-        
-        <!--Bouton de filtrage-->
-        <div class="search-filter d-flex justify-content-end mt-3">
+						<!-- Champ Date -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="far fa-calendar"></i>
+								<input type="date" name="date" class="form-control" placeholder="Date" value="{{ date }}">
+							</div>
+						</div>
 
-          <button class="btn btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+						<!-- Bouton Recherche -->
+						<div class="col-md-3">
+							<button type="submit" class="btn btn-search">Recherche</button>
+						</div>
+
+            {% if selectedCarpool %}
+              <input type="hidden" name="id" value="{{ selectedCarpool.idCarpool }}">
+            {% endif %}
+
+					</div>
+				</form>
+
+				<!--Bouton de filtrage-->
+				<div class="search-filter d-flex justify-content-end mt-3">
+          <!--Si connecter proposer un trajet
+          <a href="{{ path('app_covoiturage_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Proposer un trajet
+          </a>
+          -->
+					<button class="btn btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
             Filtrer
-            <img src="../../../assets/images/icon/iconFiltre.svg" alt="">
+            <img src="{{ asset('assets/images/icon/iconFiltre.svg') }}" alt="">
           </button>
-          
-        </div>
+				</div>
 
-      </div>
+			</div>
+		</section>
 
+    <!--La Carte-->
+    <section class="carte">
+      <div id="map" class="map-container container-fluid"></div>
     </section>
 
-  <!--Le résultat de la recherche-->
-    <section class="container card-result">
-      <div class="card-search d-flex flex-wrap justify-content-center">
 
-      <!--Apparission des card-covoit pour la recherche-->
-        <div class="card-covoit">
-          <div class="card">
-            <div class="card-body">
-            <!--Tete avec nom et image profil-->
-              <div class="card-header custom-header d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="nom-pseudo">
-                    <span>Nom / pseudo</span>
-                  </div>
-                  <div class="role-note d-flex align-items-center gap-2">
-                    <span>Rôle : passager</span>
-                    <span>5,0</span>
-                    <span class="etoile">★</span>
-                  </div>
-                </div>
-                
-                <div class="avatar">
-                  <img src="../../../assets/images/default-profile.png" alt="Avatar">
-                </div>
-              </div>
-    
-            <!--Section principal avec les horaire et places-->
-              <div class="trajet-info d-flex justify-content-between align-items-center">
-                <div class="calcul-horaires">
-                  <span>teste</span>
-                </div>
-                <div class="horaires d-flex flex-column">
-                  <div class="timeline-container d-flex flex-column justify-content-between">
-                    <!-- Point et horaire de départ -->
-                    <div class="time-point">
-                      <div class="point point-depart"></div>
-                      <span class="horaire">13H30</span>
-                    </div>
-                    
-                    <!-- Ligne verticale -->
-                    <div class="timeline-line"></div>
-                    
-                    <!-- Point et horaire d'arrivée -->
-                    <div class="time-point">
-                      <div class="point point-arrivee"></div>
-                      <span class="horaire">18H50</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="places-info">
-                  <p>Places disponibles : 3</p>
-                  <p>Voyage écologique : oui</p>
-                </div>
-              </div>
-    
-            <!--Pied de la carte-->
-              <div class="card-footer custom-footer d-flex justify-content-between align-items-center">
-                <span>0 crédits</span>
-                <button type="button" class="btn-details btn toggleDetailButton">+ Détails</button>
-              </div>
-  
-            <!--Détails-->
-              <div class="detail-section detailsContent">
-                <div class="détail-conducteur border-top">
-                  <div class="detail-voiture border-bottom p-2">
-                    <h6>Votre conducteur roule en :</h6>
-                    <p>NOM de la voiture</p>
-                  </div>
-                  <div class="detail-preferences border-bottom p-2">
-                    <h6>Préférences du conducteur</h6>
-                    <ul>
-                      <li>Exemple1</li>
-                      <li>Exemple2</li>
-                    </ul>
-                  </div>
-                  <div class="detail-avis border-bottom p-2">
-                    <h6>Avis sur le conducteur :</h6>
-                    <div>
-                      <div class="border-bottom pt-3 pb-3">
-                        <div>
-                          <span>nom/prenom</span>
-                          <span>note</span>
-                          <span class="etoile">★</span>
-                        </div>
-                        <div>
-                          <p>Commentaire</p>
-                        </div>
-                      </div>
-                      <div class="pt-3 pb-3">
-                        <div>
-                          <span>nom/prenom</span>
-                          <span>note</span>
-                          <span class="etoile">★</span>
-                        </div>
-                        <div>
-                          <p>Commentaire</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-  
-                  <div class="detail-participer d-flex justify-content-between align-items-center p-2">
-                    <span>0 crédits</span>
-                    <button class="btn-participer btn">Participer</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card-covoit">
-          <div class="card">
-            <div class="card-body">
-            <!--Tete avec nom et image profil-->
-              <div class="card-header custom-header d-flex justify-content-between align-items-start">
-                <div>
-                  <div class="nom-pseudo">
-                    <span>Nom / pseudo</span>
-                  </div>
-                  <div class="role-note d-flex align-items-center gap-2">
-                    <span>Rôle : passager</span>
-                    <span>5,0</span>
-                    <span class="etoile">★</span>
-                  </div>
-                </div>
-                
-                <div class="avatar">
-                  <img src="../../../assets/images/default-profile.png" alt="Avatar">
-                </div>
-              </div>
-    
-            <!--Section principal avec les horaire et places-->
-              <div class="trajet-info d-flex justify-content-between align-items-center">
-                <div class="calcul-horaires">
-                  <span>teste</span>
-                </div>
-                <div class="horaires d-flex flex-column">
-                  <div class="timeline-container d-flex flex-column justify-content-between">
-                    <!-- Point et horaire de départ -->
-                    <div class="time-point">
-                      <div class="point point-depart"></div>
-                      <span class="horaire">13H30</span>
-                    </div>
-                    
-                    <!-- Ligne verticale -->
-                    <div class="timeline-line"></div>
-                    
-                    <!-- Point et horaire d'arrivée -->
-                    <div class="time-point">
-                      <div class="point point-arrivee"></div>
-                      <span class="horaire">18H50</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="places-info">
-                  <p>Places disponibles : 3</p>
-                  <p>Voyage écologique : oui</p>
-                </div>
-              </div>
-    
-            <!--Pied de la carte-->
-              <div class="card-footer custom-footer d-flex justify-content-between align-items-center">
-                <span>0 crédits</span>
-                <button type="button" class="btn-details btn toggleDetailButton">+ Détails</button>
-              </div>
-  
-            <!--Détails-->
-              <div class="detail-section detailsContent">
-                <div class="détail-conducteur border-top">
-                  <div class="detail-voiture border-bottom p-2">
-                    <h6>Votre conducteur roule en :</h6>
-                    <p>NOM de la voiture</p>
-                  </div>
-                  <div class="detail-preferences border-bottom p-2">
-                    <h6>Préférences du conducteur</h6>
-                    <ul>
-                      <li>Exemple1</li>
-                      <li>Exemple2</li>
-                    </ul>
-                  </div>
-                  <div class="detail-avis border-bottom p-2">
-                    <h6>Avis sur le conducteur :</h6>
-                    <div>
-                      <div class="border-bottom pt-3 pb-3">
-                        <div>
-                          <span>nom/prenom</span>
-                          <span>note</span>
-                          <span class="etoile">★</span>
-                        </div>
-                        <div>
-                          <p>Commentaire</p>
-                        </div>
-                      </div>
-                      <div class="pt-3 pb-3">
-                        <div>
-                          <span>nom/prenom</span>
-                          <span>note</span>
-                          <span class="etoile">★</span>
-                        </div>
-                        <div>
-                          <p>Commentaire</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-  
-                  <div class="detail-participer d-flex justify-content-between align-items-center p-2">
-                    <span>0 crédits</span>
-                    <button class="btn-participer btn">Participer</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      
+		<!--Le résultat de la recherche = show + détails-->
+    <section class="resultats container card-result">
+      {% if selectedCarpool %}
+        {% include 'covoiturage/_carpool_details.html.twig' %}
+      {% elseif carpools is defined %}
+        {% include 'covoiturage/_search_results.html.twig' %}
+      {% else %}
+        {% include 'covoiturage/_welcome.html.twig' %}
+      {% endif %}
     </section>
 
-  </main>
+
+
+	</main>
 
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{ asset('assets/js/btnDetail.js') }}"></script>
+  {{ parent() }}
+	<script src="{{ asset('assets/js/btnDetail.js') }}"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    {% if carpools is defined and carpools|length > 0 %}
+      var carpools = {{ carpools|json_encode|raw }};
+    {% endif %}
+    
+    {% if selectedCarpool is defined and selectedCarpool %}
+      var selectedCarpool = {{ selectedCarpool|json_encode|raw }};
+    {% endif %}
+  <script src="{{ asset('assets/js/search.js') }}"></script>
 {% endblock %}
+

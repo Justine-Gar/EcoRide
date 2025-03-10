@@ -1,0 +1,91 @@
+<div class="container">
+  {% if carpools|length > 0 %}
+  
+    <!-- Résumé de la recherche -->
+    <div class="alert alert-info mb-4">
+      <p class="mb-0">
+        {% if depart %}De <strong>{{ depart }}</strong>{% endif %}
+        {% if arrivee %}vers <strong>{{ arrivee }}</strong>{% endif %}
+        {% if date %}le <strong>{{ date|date('d/m/Y') }}</strong>{% endif %}
+      </p>
+    </div>
+    
+    <h5 class="mb-4">{{ carpools|length }} trajet(s) trouvé(s)</h5>
+    
+    <div class="card-search d-flex flex-wrap justify-content-center">
+      {% for carpool in carpools %}
+        <!-- Card de covoiturage -->
+        <div class="card-covoit">
+          <div class="card">
+            <div class="card-body">
+              <!-- Tête avec nom et image profil -->
+              <div class="card-header custom-header d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="nom-pseudo">
+                    <span>{{ carpool.user.firstname }} {{ carpool.user.name }}</span>
+                  </div>
+                  <div class="role-note d-flex align-items-center gap-2">
+                    <span>Rôle : conducteur</span>
+                    <span>5,0</span>
+                    <span class="etoile">★</span>
+                  </div>
+                </div>
+                
+                <div class="avatar">
+                  {% if carpool.user.profilPicture %}
+                    <img src="{{ asset('uploads/profile/' ~ carpool.user.profilPicture) }}" alt="Avatar">
+                  {% else %}
+                    <img src="{{ asset('assets/images/default-profile.png') }}" alt="Avatar">
+                  {% endif %}
+                </div>
+              </div>
+    
+              <!-- Section principale avec les horaires et places -->
+              <div class="trajet-info d-flex justify-content-between align-items-center">
+                <div class="calcul-horaires">
+                  <div><strong>{{ carpool.locationStart }}</strong></div>
+                  <div><strong>{{ carpool.locationReach }}</strong></div>
+                </div>
+                <div class="horaires d-flex flex-column">
+                  <div class="timeline-container d-flex flex-column justify-content-between">
+                    <!-- Point et horaire de départ -->
+                    <div class="time-point">
+                      <div class="point point-depart"></div>
+                      <span class="horaire">{{ carpool.hourStart|date('H\\hi') }}</span>
+                    </div>
+                    
+                    <!-- Ligne verticale -->
+                    <div class="timeline-line"></div>
+                    
+                    <!-- Point et horaire d'arrivée -->
+                    <div class="time-point">
+                      <div class="point point-arrivee"></div>
+                      <span class="horaire">{{ carpool.hourReach|date('H\\hi') }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="places-info">
+                  <p>Places disponibles : {{ carpool.nbrPlaces - carpool.passengers|length }}</p>
+                  <p>Date : {{ carpool.dateStart|date('d/m/Y') }}</p>
+                </div>
+              </div>
+    
+              <!-- Pied de la carte -->
+              <div class="card-footer custom-footer d-flex justify-content-between align-items-center">
+                <span>{{ carpool.credits }} crédits</span>
+                <a href="{{ path('app_covoiturage', {'id': carpool.idCarpool, 'depart': depart, 'arrivee': arrivee, 'date': date}) }}" class="btn-details btn">Voir détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Aucun résultat -->
+    <div class="alert alert-warning">
+      <p>Aucun trajet ne correspond à votre recherche. Veuillez essayer avec d'autres critères ou 
+      <strong><a href="{{ path('app_login') }}">connectez-vous</a></strong> pour proposer un trajet.</p>
+    </div>
+  {% endif %}
+</div>

@@ -27,28 +27,38 @@ class CovoiturageController extends AbstractController
   }
 
   #[Route('/', name: 'app_covoiturage')]
-  public function index(Request $request): Response
-  {
-    return $this->render('covoiturage/index.html.twig');
-  }
-
-  //Route pour la recherche de covoiturage
-  #[Route('/search', name: 'app_covoiturage_search')]
-  public function search(Request $request, CarpoolRepository $carpoolRepository): Response
+  public function index(Request $request, CarpoolRepository $carpoolRepository): Response
   {
     $depart = $request->query->get('depart');
     $arrivee = $request->query->get('arrivee');
     $date = $request->query->get('date');
 
-    $carpools = $carpoolRepository->search($depart, $arrivee, $date);
+    // ID du covoiturage pour afficher les détails
+    $carpoolId = $request->query->get('id');
+    $selectedCarpool = null;
 
-    return $this->render('covoiturage/search.html.twig', [
-      'carpools' => $carpools,
+    // Résultats de recherche
+    $carpools = null;
+
+    // Si des critères de recherche sont fournis, effectuer la recherche
+    if ($depart || $arrivee || $date) {
+      $carpools = $carpoolRepository->search($depart, $arrivee, $date);
+    }
+
+    // Si un ID de covoiturage est fourni, récupérer les détails
+    if ($carpoolId) {
+      $selectedCarpool = $carpoolRepository->find($carpoolId);
+    }
+
+    return $this->render('covoiturage/index.html.twig', [
       'depart' => $depart,
       'arrivee' => $arrivee,
-      'date' => $date
+      'date' => $date,
+      'carpools' => $carpools,
+      'selectedCarpool' => $selectedCarpool
     ]);
   }
+
 
   //Route pour la création de covoiturage
   #[Route('/new', name: 'app_covoiturage_new')]
@@ -100,6 +110,7 @@ class CovoiturageController extends AbstractController
       'form' => $form->createView()
     ]);
   }
+
 
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
