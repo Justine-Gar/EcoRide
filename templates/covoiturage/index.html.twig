@@ -73,8 +73,8 @@
 		</section>
 
     <!--La Carte-->
-    <section class="carte">
-      <div id="map" class="map-container container-fluid"></div>
+    <section class="container carte">
+      <div id="map" class="map-container"></div>
     </section>
 
 
@@ -89,16 +89,14 @@
       {% endif %}
     </section>
 
-
-
 	</main>
 
 {% endblock %}
 
 {% block javascripts %}
-  {{ parent() }}
-	<script src="{{ asset('assets/js/btnDetail.js') }}"></script>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script>
     {% if carpools is defined and carpools|length > 0 %}
       var carpools = {{ carpools|json_encode|raw }};
     {% endif %}
@@ -106,6 +104,10 @@
     {% if selectedCarpool is defined and selectedCarpool %}
       var selectedCarpool = {{ selectedCarpool|json_encode|raw }};
     {% endif %}
+  </script>
+
+	<script src="{{ asset('assets/js/btnDetail.js') }}"></script>
   <script src="{{ asset('assets/js/search.js') }}"></script>
+
 {% endblock %}
 

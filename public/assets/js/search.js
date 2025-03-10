@@ -107,7 +107,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
           // Click event
           li.addEventListener('click', function () {
-            input.value = address.display_name;
+            const cityParts = address.display_name.split(',');
+            const cityName = cityParts[0].trim();
+            input.value = cityName; // Utiliser uniquement le nom de la ville
             latInput.value = address.lat;
             lngInput.value = address.lon;
 
@@ -134,24 +136,129 @@ document.addEventListener('DOMContentLoaded', function () {
               }).addTo(map).bindPopup('Destination: ' + address.display_name);
             }
 
-            // Ajuster la vue de la carte pour inclure les deux marqueurs
+            // Vue de la carte pour inclure les deux marqueurs
             if (departureMark && arrivalMark) {
-              const bounds = L.latLngBounds(
-                [departureMark.getLatLng(), arrivalMark.getLatLng()]
-              );
-              map.fitBounds(bounds, { padding: [50, 50] });
+              calculateRouteForPoints(departureMark.getLatLng(), arrivalMark.getLatLng());
+            }
 
-              // Tracer une ligne entre les deux points
+            // Fonction pour calculer l'itinéraire entre deux points
+            function calculateRouteForPoints(start, end) {
+              // Supprimer l'ancienne route si elle existe
               if (window.routeLine) map.removeLayer(window.routeLine);
-              window.routeLine = L.polyline([
-                departureMark.getLatLng(),
-                arrivalMark.getLatLng()
-              ], {
+              
+              // Calculer la distance à vol d'oiseau
+              const distance = calculateHaversineDistance(
+                start.lat, start.lng,
+                end.lat, end.lng
+              );
+              
+              //console.log(`Distance à vol d'oiseau: ${distance.toFixed(1)} km`);
+              
+              // Pour les trajets courts, utiliser OSRM pour un itinéraire précis
+              if (distance <= 250) {
+                const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=polyline`;
+                
+                fetch(url)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                      // Ajouter le décodeur polyline si nécessaire
+                      if (!L.Polyline.fromEncoded) {
+                        L.Polyline.fromEncoded = function(encoded) {
+                          var points = [];
+                          var index = 0, len = encoded.length;
+                          var lat = 0, lng = 0;
+                          
+                          while (index < len) {
+                            var b, shift = 0, result = 0;
+                            do {
+                              b = encoded.charAt(index++).charCodeAt(0) - 63;
+                              result |= (b & 0x1f) << shift;
+                              shift += 5;
+                            } while (b >= 0x20);
+                            var dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                            lat += dlat;
+                            
+                            shift = 0;
+                            result = 0;
+                            do {
+                              b = encoded.charAt(index++).charCodeAt(0) - 63;
+                              result |= (b & 0x1f) << shift;
+                              shift += 5;
+                            } while (b >= 0x20);
+                            var dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+                            lng += dlng;
+                            
+                            points.push(L.latLng(lat * 1e-5, lng * 1e-5));
+                          }
+                          
+                          return points;
+                        };
+                      }
+                      
+                      // Décoder la géométrie polyline
+                      const routeCoordinates = L.Polyline.fromEncoded(data.routes[0].geometry);
+
+                      // Créer la ligne de l'itinéraire
+                      window.routeLine = L.polyline(routeCoordinates, {
+                        color: '#3388ff',
+                        weight: 3,
+                        opacity: 0.7
+                      }).addTo(map);
+
+                      // Calculer la distance et le temps
+                      const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
+                      const durationFormatted = formatDuration(data.routes[0].duration);
+
+                      // Ajouter un popup avec les informations
+                      window.routeLine.bindPopup(`
+                        <strong>Itinéraire routier</strong><br>
+                        Distance: ${distanceKm} km<br>
+                        Durée estimée: ${durationFormatted}
+                      `);
+
+                      // Ajuster la vue pour voir tout l'itinéraire
+                      map.fitBounds(window.routeLine.getBounds(), { padding: [50, 50] });
+                    } else {
+                      createFallbackRoute(start, end);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Erreur:', error);
+                    createFallbackRoute(start, end);
+                  });
+              } else {
+                // Pour les trajets longs, utiliser une méthode alternative
+                createFallbackRoute(start, end);
+              }
+            }
+
+            // Fonction pour créer un itinéraire alternatif lorsque OSRM échoue ou pour les longues distances
+            function createFallbackRoute(start, end) {
+              const waypoints = generateIntermediateWaypoints(start, end);
+              
+              window.routeLine = L.polyline(waypoints, {
                 color: '#3388ff',
                 weight: 3,
                 opacity: 0.7,
-                dashArray: '5, 10'
+                smoothFactor: 2
               }).addTo(map);
+              
+              // Calculer la distance approximative
+              const distanceEstimated = calculateRouteDistance(waypoints);
+              
+              // Estimer la durée (vitesse moyenne ~80 km/h)
+              const durationSeconds = (distanceEstimated / 80) * 3600;
+              const durationFormatted = formatDuration(durationSeconds);
+              
+              window.routeLine.bindPopup(`
+                <strong>Itinéraire estimé</strong><br>
+                Distance estimée: ${distanceEstimated.toFixed(1)} km<br>
+                Durée estimée: ${durationFormatted}
+              `);
+              
+              // Ajuster la vue
+              map.fitBounds(window.routeLine.getBounds(), { padding: [50, 50] });
             }
 
             // Supprimer la liste de suggestions
@@ -177,6 +284,88 @@ document.addEventListener('DOMContentLoaded', function () {
         timeout = setTimeout(() => func.apply(context, args), wait);
       };
     }
+    // Ajouter ces fonctions de calcul de distance et conversion
+    function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Rayon de la Terre en km
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      return distance;
+    }
+
+    function toRad(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
+    // Fonction pour formater la durée
+    function formatDuration(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.round((seconds % 3600) / 60);
+      
+      if (hours > 0) {
+        return `${hours}h ${minutes}min`;
+      } else {
+        return `${minutes} minutes`;
+      }
+    }
+
+    // Fonction pour générer des points intermédiaires (pour les itinéraires réalistes)
+    function generateIntermediateWaypoints(start, end) {
+      // start et end sont des objets LatLng de Leaflet
+      const waypoints = [start];
+      
+      // Calculer la distance directe
+      const distance = calculateHaversineDistance(
+        start.lat, start.lng,
+        end.lat, end.lng
+      );
+      
+      // Déterminer le nombre de points intermédiaires basé sur la distance
+      const numPoints = Math.max(2, Math.ceil(distance / 100));
+      
+      // Générer des points intermédiaires avec un peu de variation
+      for (let i = 1; i < numPoints; i++) {
+        const fraction = i / numPoints;
+        
+        // Interpolation linéaire entre les points avec une légère variation
+        const lat = start.lat + (end.lat - start.lat) * fraction;
+        const lng = start.lng + (end.lng - start.lng) * fraction;
+        
+        // Ajouter une variation pour simuler des routes réelles
+        const variation = Math.sin(fraction * Math.PI) * 0.15;
+        const randomLat = lat + (Math.random() - 0.5) * variation;
+        const randomLng = lng + (Math.random() - 0.5) * variation;
+        
+        waypoints.push(L.latLng(randomLat, randomLng));
+      }
+      
+      waypoints.push(end);
+      return waypoints;
+    }
+
+    // Fonction pour calculer la distance d'un itinéraire avec plusieurs points
+    function calculateRouteDistance(waypoints) {
+      let totalDistance = 0;
+      
+      for (let i = 0; i < waypoints.length - 1; i++) {
+        const p1 = waypoints[i];
+        const p2 = waypoints[i + 1];
+        
+        totalDistance += calculateHaversineDistance(
+          p1.lat, p1.lng, 
+          p2.lat, p2.lng
+        );
+      }
+      
+      // Ajouter 20% pour tenir compte des détours réels des routes
+      return totalDistance * 1.2;
+    }
+
 
     // Fixer le type du bouton de recherche
     if (searchButton) {
@@ -216,18 +405,56 @@ document.addEventListener('DOMContentLoaded', function () {
         if (carpool.latStart && carpool.lngStart && carpool.latReach && carpool.lngReach) {
           const endPoint = [carpool.latReach, carpool.lngReach];
           bounds.push(endPoint);
-
-          // Tracer la route entre départ et arrivée
-          const routeLine = L.polyline([
-            [carpool.latStart, carpool.lngStart],
-            [carpool.latReach, carpool.lngReach]
-          ], {
+          
+          // Ajouter un marqueur pour l'arrivée
+          const endMarker = L.marker(endPoint, {
+            icon: L.divIcon({
+              className: 'arrival-marker',
+              html: '<i class="fas fa-flag-checkered" style="color: #28a745; font-size: 24px;"></i>',
+              iconSize: [20, 20],
+              iconAnchor: [10, 20]
+            })
+          }).addTo(map);
+          
+          endMarker.bindPopup(`
+            <strong>Arrivée: ${carpool.locationReach}</strong><br>
+            <a href="?id=${carpool.idCarpool}" class="btn btn-sm btn-primary mt-2">Voir détails</a>
+          `);
+          
+          markers.push(endMarker);
+          
+          // Calculer la distance à vol d'oiseau
+          const distanceKm = calculateHaversineDistance(
+            carpool.latStart, carpool.lngStart,
+            carpool.latReach, carpool.lngReach
+          );
+          
+          // Créer l'itinéraire
+          const start = L.latLng(carpool.latStart, carpool.lngStart);
+          const end = L.latLng(carpool.latReach, carpool.lngReach);
+          const waypoints = generateIntermediateWaypoints(start, end);
+          
+          const routeLine = L.polyline(waypoints, {
             color: '#3388ff',
             weight: 3,
             opacity: 0.7,
-            dashArray: '5, 10'
+            smoothFactor: 2
           }).addTo(map);
-
+          
+          // Calculer la distance approximative
+          const distance = calculateRouteDistance(waypoints);
+          
+          // Estimer la durée (vitesse moyenne ~80 km/h)
+          const durationSeconds = (distance / 80) * 3600;
+          const durationFormatted = formatDuration(durationSeconds);
+          
+          routeLine.bindPopup(`
+            <strong>Trajet: ${carpool.locationStart} → ${carpool.locationReach}</strong><br>
+            Distance estimée: ${distance.toFixed(1)} km<br>
+            Durée estimée: ${durationFormatted}<br>
+            <a href="?id=${carpool.idCarpool}" class="btn btn-sm btn-primary mt-2">Voir détails</a>
+          `);
+          
           markers.push(routeLine);
         }
       });
@@ -268,21 +495,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }).addTo(map).bindPopup(`Arrivée: ${selectedCarpool.locationReach}`);
 
         // Tracer une ligne entre départ et arrivée
-        window.routeLine = L.polyline([
-          [selectedCarpool.latStart, selectedCarpool.lngStart],
-          [selectedCarpool.latReach, selectedCarpool.lngReach]
-        ], {
+        // Calculer la distance à vol d'oiseau
+        const distance = calculateHaversineDistance(
+          selectedCarpool.latStart, selectedCarpool.lngStart,
+          selectedCarpool.latReach, selectedCarpool.lngReach
+        );
+
+        // Créer l'itinéraire
+        const start = L.latLng(selectedCarpool.latStart, selectedCarpool.lngStart);
+        const end = L.latLng(selectedCarpool.latReach, selectedCarpool.lngReach);
+        const waypoints = generateIntermediateWaypoints(start, end);
+
+        window.routeLine = L.polyline(waypoints, {
           color: '#3388ff',
           weight: 4,
-          opacity: 0.8
+          opacity: 0.8,
+          smoothFactor: 2
         }).addTo(map);
 
-        // Ajuster la vue pour voir tout le trajet
-        const bounds = L.latLngBounds(
-          [[selectedCarpool.latStart, selectedCarpool.lngStart],
-          [selectedCarpool.latReach, selectedCarpool.lngReach]]
-        );
-        map.fitBounds(bounds, { padding: [50, 50] });
+        // Calculer la distance approximative
+        const routeDistance = calculateRouteDistance(waypoints);
+
+        // Estimer la durée (vitesse moyenne ~80 km/h)
+        const durationSeconds = (routeDistance / 80) * 3600;
+        const durationFormatted = formatDuration(durationSeconds);
+
+        window.routeLine.bindPopup(`
+          <strong>Trajet: ${selectedCarpool.locationStart} → ${selectedCarpool.locationReach}</strong><br>
+          Distance estimée: ${routeDistance.toFixed(1)} km<br>
+          Durée estimée: ${durationFormatted}
+        `).openPopup();
+
+        // Ajuster la vue pour voir tout l'itinéraire
+        map.fitBounds(window.routeLine.getBounds(), { padding: [50, 50] });
       }
     }
 

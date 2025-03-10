@@ -100,13 +100,24 @@
   color: #F3F3F3;
 }
 
+/*Section ----- MAP -----*/
+.carte {
+  width: 100%;
+  height: 300px;
+}
+.map-container {
+  height: 300px;
+  width: 100%;
+  z-index: -5;
+  margin-top: 40px;
+}
 
 /*Section ----- Crard ----- */
 
 .card-result{
   margin-top: 30px;
   margin-bottom: 30px;
-  padding-top: 80px;
+  padding-top: 30px;
   padding-bottom: 30px;
 }
 .card-search{
