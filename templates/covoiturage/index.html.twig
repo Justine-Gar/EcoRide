@@ -80,9 +80,7 @@
 
 		<!--Le résultat de la recherche = show + détails-->
     <section class="resultats container card-result">
-      {% if selectedCarpool %}
-        {% include 'covoiturage/_carpool_details.html.twig' %}
-      {% elseif carpools is defined %}
+      {% if carpools is defined %}
         {% include 'covoiturage/_search_results.html.twig' %}
       {% else %}
         {% include 'covoiturage/_welcome.html.twig' %}

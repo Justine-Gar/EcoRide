@@ -73,8 +73,60 @@
               <!-- Pied de la carte -->
               <div class="card-footer custom-footer d-flex justify-content-between align-items-center">
                 <span>{{ carpool.credits }} crédits</span>
-                <a href="{{ path('app_covoiturage', {'id': carpool.idCarpool, 'depart': depart, 'arrivee': arrivee, 'date': date}) }}" class="btn-details btn">Voir détails</a>
+                <button type="button" class="btn-details btn toggleDetailButton">+ Détails</button>
               </div>
+
+              <div class="detail-section detailsContent">
+                <div class="détail-conducteur border-top">
+                  <div class="detail-voiture border-bottom p-2">
+                    <h6>Votre conducteur roule en:</h6>
+                    <p>{{ carpool.vehicle ?? 'Non spécifié' }}</p>
+                  </div>
+                  <div class="detail-preferences border-bottom p-2">
+                    <h6>Préférences du conducteur</h6>
+                    <ul>
+                      {% if carpool.user.preferences is defined and carpool.user.preferences|length > 0 %}
+                        {% for preference in carpool.user.preferences %}
+                          <li>{{ preference.name }}</li>
+                        {% endfor %}
+                      {% else %}
+                        <li>Aucune préférence spécifiée</li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                  <div class="detail-avis border-bottom p-2">
+                    <h6>Avis sur le conducteur</h6>
+                    <div>
+                      {% if carpool.user.reviews is defined and carpool.user.reviews|length > 0 %}
+                        {% for review in carpool.user.reviews %}
+                          <div class="{% if not loop.last %}border-bottom{% endif %} pt-3 pb-3">
+                            <div>
+                              <span>{{ review.reviewer.firstname }} {{ review.reviewer.name }}</span>
+                              <span>{{ review.rating }}</span>
+                              <span class="etoile">★</span>
+                            </div>
+                            <div>
+                              <p>{{ review.comment }}</p>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                        <div class="pt-3 pb-3">
+                          <p>Aucun avis pour le moment.</p>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  
+                  <div class="detail-participer d-flex justify-content-between align-items-center p-2">
+                    <span>{{ carpool.credits }} crédits</span>
+                    <a href="#" class="btn-participer btn">Participer</a>
+                  </div>
+                  
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

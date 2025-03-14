@@ -59,6 +59,34 @@ class CovoiturageController extends AbstractController
     ]);
   }
 
+  #[Route('/search', name: 'app_covoiturage_search')]
+  public function search(Request $request, CarpoolRepository $carpoolRepository): Response
+  {
+    $depart = $request->query->get('depart');
+    $arrivee = $request->query->get('arrivee');
+    $date = $request->query->get('date');
+
+    // Extraire les noms de ville des adresses complètes si nécessaire
+    if ($depart && strpos($depart, ',') !== false) {
+      $departParts = explode(',', $depart);
+      $depart = trim($departParts[0]);
+    }
+
+    if ($arrivee && strpos($arrivee, ',') !== false) {
+        $arriveeParts = explode(',', $arrivee);
+        $arrivee = trim($arriveeParts[0]);
+    }
+
+    // Effectuer la recherche
+    $carpools = $carpoolRepository->search($depart, $arrivee, $date);
+
+    return $this->render('covoiturage/_search_results.html.twig', [
+        'carpools' => $carpools,
+        'depart' => $depart,
+        'arrivee' => $arrivee,
+        'date' => $date
+    ]);
+  }
 
   //Route pour la création de covoiturage
   #[Route('/new', name: 'app_covoiturage_new')]
