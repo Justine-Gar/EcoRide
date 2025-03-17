@@ -13,17 +13,18 @@
 {% block body %}
 <!--=============START MAIN============-->
 	<main >
+		
 		<section class="search">
-			<!-- Barre de recherche -->
+
 			<div class="container search-container">
-				<div class="search-bar">
-					<div
-						class="row g-0 d-flex align-items-center">
+				<!-- Barre de recherche -->
+				<form action="{{ path('app_covoiturage') }}" method="get" class="search-bar">
+					<div class="row g-0 d-flex align-items-center">
 						<!-- Champ Départs -->
 						<div class="col-md-3">
 							<div class="search-input">
 								<i class="fas fa-map-marker-alt"></i>
-								<input type="text" class="form-control" placeholder="Départs">
+								<input type="text" name="depart" class="form-control" value="{{ depart }}" placeholder="Départs">
 							</div>
 						</div>
 
@@ -31,7 +32,7 @@
 						<div class="col-md-3">
 							<div class="search-input">
 								<i class="fas fa-location-arrow"></i>
-								<input type="text" class="form-control" placeholder="Arrivée">
+								<input type="text" name="arrivee" class="form-control" value="{{ arrivee }}" placeholder="Arrivée" >
 							</div>
 						</div>
 
@@ -39,16 +40,35 @@
 						<div class="col-md-3">
 							<div class="search-input">
 								<i class="far fa-calendar"></i>
-								<input type="date" class="form-control" placeholder="Date">
+								<input type="date" name="date" class="form-control" placeholder="Date" value="{{ date }}">
 							</div>
 						</div>
 
 						<!-- Bouton Recherche -->
 						<div class="col-md-3">
-							<button class="btn btn-search">RECHERCHE</button>
+							<button type="submit" class="btn btn-search">Recherche</button>
 						</div>
+
+            {% if selectedCarpool %}
+              <input type="hidden" name="id" value="{{ selectedCarpool.idCarpool }}">
+            {% endif %}
+
 					</div>
+				</form>
+
+				<!--Bouton de filtrage-->
+				<div class="search-filter d-flex justify-content-end mt-3">
+          <!--Si connecter proposer un trajet
+          <a href="{{ path('app_covoiturage_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Proposer un trajet
+          </a>
+          -->
+					<button class="btn btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+            Filtrer
+            <img src="{{ asset('assets/images/icon/iconFiltre.svg') }}" alt="">
+          </button>
 				</div>
+
 			</div>
 		</section>
 
@@ -107,40 +127,11 @@
 			</div>
 		</section>
 
-		<!--Leaf map-->
-		<!--
-		<div class="row">
-				<div class="col-12">
-								<h1 class="mb-4">{{ title }}</h1>
-								
-								{# Carte #}
-								<div id="map" style="height: 500px; margin-bottom: 20px;" class="rounded shadow"></div>
-						</div>
-				</div>
-		-->
 	</main>
 {% endblock %}
 
 {% block javascripts %}
 <script src="{{ asset('assets/js/login.js') }}"></script>
 <script src="{{ asset('assets/js/register.js') }}"></script>
-<!--
-	<script>
-	    document.addEventListener('DOMContentLoaded', function() {
-	        // Initialisation de la carte
-	        var map = L.map('map').setView([48.866667, 2.333333], 13);
-	        
-	        // Ajout des tuiles OpenStreetMap
-	        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	            attribution: '© OpenStreetMap contributors'
-	        }).addTo(map);
-	        
-	        // Ajout d'un marqueur exemple
-	        L.marker([48.866667, 2.333333])
-	            .addTo(map)
-	            .bindPopup('Point de départ')
-	            .openPopup();
-	    });
-	</script>
--->
+  <script src="{{ asset('assets/js/search.js') }}"></script>
 {% endblock %}

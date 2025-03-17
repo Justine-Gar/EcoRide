@@ -40,9 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // J'intercepte la soumission du formulaire pour utiliser AJAX
     if (searchForm) {
       searchForm.addEventListener('submit', function (event) {
+        // Je vérifie si je suis sur la page de covoiturage ou sur une autre page
+        const isCovoituragePage = window.location.pathname.includes('/covoiturage');
+        // Si je ne suis pas sur la page de covoiturage, je laisse le comportement par défaut (redirection)
+        if (!isCovoituragePage) {
+          return true;
+        }
         // J'empêche le comportement par défaut (rechargement de la page)
         event.preventDefault();
-
+        
         // Je récupère les valeurs du formulaire
         const depart = departureInput ? departureInput.value : '';
         const arrivee = arrivalInput ? arrivalInput.value : '';
