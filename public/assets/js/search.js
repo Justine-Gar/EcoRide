@@ -754,9 +754,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Éléments DOM de la modale de filtrage
   const creditRange = document.getElementById('credit-range');
   const creditDisplay = document.getElementById('credit-value');
-
-  const durationRange = document.getElementById('duration-range');
-  const durationDisplay = document.getElementById('duration-value');
   
   const filterButton = document.querySelector('.btn-modal-filtre');
   
@@ -766,16 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
           creditDisplay.textContent = `${this.value} crédits`;
       });
   }
-  
-  // Mise à jour de l'affichage de la durée
-  if (durationRange && durationDisplay) {
-      durationRange.addEventListener('input', function() {
-          const minutes = parseInt(this.value);
-          const hours = Math.floor(minutes / 60);
-          const mins = minutes % 60;
-          durationDisplay.textContent = `${hours}h${mins.toString().padStart(2, '0')}min`;
-      });
-  }
+
   
   // Application des filtres
   if (filterButton) {
@@ -784,8 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const vehicleType = document.querySelector('input[name="vehicleType"]:checked').id;
           const passengerCount = document.querySelector('.filter-section input[type="number"][max="5"]').value;
           const maxCredits = creditRange.value;
-          const maxDuration = durationRange.value;
-          const driverRating = document.querySelector('.filter-section input[type="number"][max="5"]:last-of-type').value;
+          const driverRating = parseFloat(document.querySelector('#driver-rating').value);
           
           // Récupération des paramètres de recherche actuels (ville départ, arrivée, date)
           const urlParams = new URLSearchParams(window.location.search);
@@ -801,7 +788,6 @@ document.addEventListener('DOMContentLoaded', function() {
               vehicleType: vehicleType,
               passengerCount: passengerCount,
               maxCredits: maxCredits,
-              maxDuration: maxDuration,
               driverRating: driverRating,
               filtered: 'true'
           });
@@ -854,7 +840,6 @@ document.addEventListener('DOMContentLoaded', function() {
                       vehicleType,
                       passengerCount,
                       maxCredits,
-                      maxDuration,
                       driverRating
                   }));
                   

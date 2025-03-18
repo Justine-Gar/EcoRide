@@ -114,6 +114,16 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
+     * Met a jour la note moyenne d'un User
+     */
+    public function updateRating(User $user): void
+    {
+        $rating = $this->calculateRating($user);
+        $user->setRating($rating);
+        $this->save($user, true);
+    }
+
+    /**
      * Calcule le total des crédits d'un user
      */
     private function calculateTotalCredits(User $user): int

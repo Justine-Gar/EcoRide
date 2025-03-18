@@ -157,18 +157,10 @@
 					<input type="range" id="credit-range" class="form-range" min="0" max="50" value="20">
 				</div>
 
-				<!-- Durée maximum -->
-				<div class="filter-section">
-					<label>Durée maximum :
-						<span id="duration-value">4h20min</span>
-					</label>
-					<input type="range" id="duration-range"class="form-range" min="0" max="720" value="260">
-				</div>
-
 				<!-- Note maximale du conducteur -->
 				<div class="filter-section">
-					<label>Note maximal du conducteur :</label>
-					<input type="number" class="form-control" min="0" max="5" value="5">
+					<label for="driver-rating">Note minimal du conducteur :</label>
+					<input type="number" id="driver-rating" class="form-control" min="0" max="5" step="0.1" value="5">
 				</div>
 
 				<!-- Bouton Filtrer -->

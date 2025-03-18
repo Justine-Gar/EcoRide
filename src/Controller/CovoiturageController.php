@@ -97,11 +97,10 @@ class CovoiturageController extends AbstractController
     $arrivee = $request->query->get('arrivee');
     $date = $request->query->get('date');
     //Recupère parametre de filtre 
-    $vehiculeType = $request->request->get('');
-    $passagerCount = (int) $request->request->get('', 1);
+    $vehiculeType = $request->query->get('vehicleType', 'allVehicles');
+    $passagerCount = (int) $request->query->get('passengerCount', 1);
     $maxCredits = (int) $request->request->get('maxCredits', 50);
-    $maxDuration = (int) $request->request->get('maxDuration', 720);
-    $driverRating = (int) $request->request->get('driverRating', 5);
+    $driverRating = (float) $request->query->get('driverRating', 5.0);
 
     // Effectuer d'abord la recherche standard
     $carpools = $carpoolRepository->search($depart, $arrivee, $date);
@@ -121,28 +120,9 @@ class CovoiturageController extends AbstractController
             continue;
         }
         
-        // Calculer la durée en minutes
-        $departureTime = clone $carpool->getDateStart();
-        $departureTime->setTime(
-            $carpool->getHourStart()->format('H'),
-            $carpool->getHourStart()->format('i')
-        );
-        
-        $arrivalTime = clone $carpool->getDateReach();
-        $arrivalTime->setTime(
-            $carpool->getHourReach()->format('H'),
-            $carpool->getHourReach()->format('i')
-        );
-        
-        $durationInMinutes = ($arrivalTime->getTimestamp() - $departureTime->getTimestamp()) / 60;
-        
-        if ($durationInMinutes > $maxDuration) {
-            continue;
-        }
-        
         // Filtrer par note du conducteur
         $driver = $carpool->getUser();
-        $driverRatingValue = $driver->getRating() ?? 5; // Utiliser 5 comme valeur par défaut si pas de note
+        $driverRatingValue = $driver->getRating() ?? 0; // Utiliser 5 comme valeur par défaut si pas de note
         
         if ($driverRatingValue < $driverRating) {
             continue;

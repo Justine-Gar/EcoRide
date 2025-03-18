@@ -14,7 +14,8 @@ CREATE TABLE `users` (
     password VARCHAR(255) NOT NULL,
     phone_number VARCHAR(50) NULL,
     profil_picture TEXT NULL,
-    credits INT NOT NULL
+    credits INT NOT NULL,
+    rating FLOAT NULL
 );
 
 --Table de Liaison role et user

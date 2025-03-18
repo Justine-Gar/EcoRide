@@ -42,6 +42,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column ]
     private ?int $credits = 0;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $rating = null;
+
     /**
      * @var Collection<int, Role>
      */
@@ -186,8 +189,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
-
     public function getCredits(): ?int
     {
         return $this->credits;
@@ -199,6 +200,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): self
+    {
+        $this->rating = $rating;
+        return $this;
+    }
 
 
     public function getSenderReviews(): Collection
