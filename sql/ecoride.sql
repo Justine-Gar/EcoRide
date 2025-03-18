@@ -79,11 +79,13 @@ CREATE TABLE `carpool_users` (
 --Table pour les avis
 CREATE TABLE `reviews` (
     id_review INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  
-    comment VARCHAR(250) NOT NULL,
-    note DECIMAL(5, 1) NOT NULL,
-    statut VARCHAR(50) NOT NULL,
+    id_user INT NOT NULL,
     id_sender INT NOT NULL,
-    id_recipient INT NOT NULL
+    id_recipient INT NOT NULL,
+    id_carpool INT NOT NULL,
+    comment VARCHAR(250) NOT NULL,
+    note DECIMAL(5,1) NOT NULL,
+    statut VARCHAR(50) NOT NULL
 );
 
 -- Création des clés étrangères
@@ -106,8 +108,10 @@ ALTER TABLE `carpool_users`
   ADD CONSTRAINT fk_carpool_users_user FOREIGN KEY (id_user) REFERENCES users (id_user);
 
 ALTER TABLE `reviews`
+  ADD CONSTRAINT fk_reviews_user FOREIGN KEY (id_user) REFERENCES users (id_user),
   ADD CONSTRAINT fk_sender_user FOREIGN KEY (id_sender) REFERENCES users (id_user),
-  ADD CONSTRAINT fk_recipient_user FOREIGN KEY (id_recipient) REFERENCES users (id_user);
+  ADD CONSTRAINT fk_recipient_user FOREIGN KEY (id_recipient) REFERENCES users (id_user),
+  ADD CONSTRAINT fk_reviews_carpool FOREIGN KEY (id_carpool) REFERENCES carpools (id_carpool);
 
 
 -- Insertion des données de base
@@ -138,27 +142,27 @@ INSERT INTO `user_roles` (`id_user`, `id_role`) VALUES
 
 INSERT INTO `carpools` (`id_user`, `date_start`, `location_start`, `hour_start`, `date_reach`, `location_reach`, `hour_reach`, `statut`, `credits`, `nbr_places`, `lat_start`, `lng_start`, `lat_reach`, `lng_reach`) VALUES
 
-(3, '2023-02-28', 'Paris', '07:00:00', '2023-02-28', 'Nantes', '10:30:00', 'actif', 22, 3, 48.86, 2.35, 47.22, -1.55),
-(4, '2023-02-28', 'Paris', '12:15:00', '2023-02-28', 'Nantes', '15:45:00', 'actif', 22, 2, 48.86, 2.35, 47.22, -1.55),
-(5, '2023-02-28', 'Paris', '17:30:00', '2023-02-28', 'Nantes', '21:00:00', 'actif', 24, 4, 48.86, 2.35, 47.22, -1.55),
+(3, '2025-02-18', 'Paris', '07:00:00', '2025-02-18', 'Nantes', '10:30:00', 'actif', 22, 3, 48.86, 2.35, 47.22, -1.55),
+(4, '2025-02-18', 'Paris', '12:15:00', '2025-02-18', 'Nantes', '15:45:00', 'actif', 22, 2, 48.86, 2.35, 47.22, -1.55),
+(5, '2025-02-18', 'Paris', '17:30:00', '2025-02-18', 'Nantes', '21:00:00', 'actif', 24, 4, 48.86, 2.35, 47.22, -1.55),
 
-(3, '2023-02-15', 'Paris', '08:00:00', '2023-02-15', 'Lyon', '12:30:00', 'actif', 25, 3, 48.86, 2.35, 45.76, 4.83),
-(3, '2023-02-20', 'Lyon', '16:00:00', '2023-02-20', 'Paris', '20:30:00', 'annulé', 25, 3, 45.76, 4.83, 48.86, 2.35),
-(3, '2023-02-28', 'Paris', '07:15:00', '2023-02-28', 'Lille', '09:45:00', 'terminé', 18, 4, 48.86, 2.35, 50.63, 3.07),
-(3, '2023-01-10', 'Paris', '14:30:00', '2023-01-10', 'Orléans', '16:15:00', 'terminé', 12, 3, 48.86, 2.35, 47.90, 1.90),
-(3, '2023-01-25', 'Paris', '09:00:00', '2023-01-25', 'Reims', '10:45:00', 'terminé', 15, 2, 48.86, 2.35, 49.26, 4.03),
+(3, '2025-02-18', 'Paris', '08:00:00', '2025-02-18', 'Lyon', '12:30:00', 'actif', 25, 3, 48.86, 2.35, 45.76, 4.83),
+(3, '2025-02-20', 'Lyon', '16:00:00', '2025-02-20', 'Paris', '20:30:00', 'annulé', 25, 3, 45.76, 4.83, 48.86, 2.35),
+(3, '2025-02-28', 'Paris', '07:15:00', '2025-02-28', 'Lille', '09:45:00', 'terminé', 18, 4, 48.86, 2.35, 50.63, 3.07),
+(3, '2025-01-10', 'Paris', '14:30:00', '2025-01-10', 'Orléans', '16:15:00', 'terminé', 12, 3, 48.86, 2.35, 47.90, 1.90),
+(3, '2025-01-25', 'Paris', '09:00:00', '2025-01-25', 'Reims', '10:45:00', 'terminé', 15, 2, 48.86, 2.35, 49.26, 4.03),
 
-(4, '2023-02-16', 'Marseille', '10:00:00', '2023-02-16', 'Nice', '12:15:00', 'actif', 15, 2, 43.30, 5.37, 43.70, 7.25),
-(4, '2023-03-01', 'Marseille', '07:00:00', '2023-03-01', 'Montpellier', '09:30:00', 'terminé', 12, 3, 43.30, 5.37, 43.61, 3.87),
-(4, '2023-01-12', 'Marseille', '11:30:00', '2023-01-12', 'Toulon', '12:45:00', 'terminé', 10, 4, 43.30, 5.37, 43.12, 5.93),
-(4, '2023-01-28', 'Marseille', '15:00:00', '2023-01-28', 'Aix-en-Provence', '15:45:00', 'terminé', 8, 3, 43.30, 5.37, 43.53, 5.45),
+(4, '2025-02-16', 'Marseille', '10:00:00', '2025-02-16', 'Nice', '12:15:00', 'actif', 15, 2, 43.30, 5.37, 43.70, 7.25),
+(4, '2025-03-01', 'Marseille', '07:00:00', '2025-03-01', 'Montpellier', '09:30:00', 'terminé', 12, 3, 43.30, 5.37, 43.61, 3.87),
+(4, '2025-01-12', 'Marseille', '11:30:00', '2025-01-12', 'Toulon', '12:45:00', 'terminé', 10, 4, 43.30, 5.37, 43.12, 5.93),
+(4, '2025-01-28', 'Marseille', '15:00:00', '2025-01-28', 'Aix-en-Provence', '15:45:00', 'terminé', 8, 3, 43.30, 5.37, 43.53, 5.45),
 
-(5, '2023-02-17', 'Bordeaux', '14:00:00', '2023-02-17', 'Toulouse', '17:30:00', 'terminé', 20, 2, 44.84, -0.58, 43.60, 1.44),
-(5, '2023-01-15', 'Bordeaux', '10:00:00', '2023-01-15', 'Arcachon', '11:15:00', 'terminé', 12, 3, 44.84, -0.58, 44.66, -1.17),
-(5, '2023-01-30', 'Bordeaux', '17:30:00', '2023-01-30', 'Bergerac', '19:00:00', 'terminé', 14, 2, 44.84, -0.58, 44.85, 0.48),
+(5, '2025-02-17', 'Bordeaux', '14:00:00', '2025-02-17', 'Toulouse', '17:30:00', 'terminé', 20, 2, 44.84, -0.58, 43.60, 1.44),
+(5, '2025-01-15', 'Bordeaux', '10:00:00', '2025-01-15', 'Arcachon', '11:15:00', 'terminé', 12, 3, 44.84, -0.58, 44.66, -1.17),
+(5, '2025-01-30', 'Bordeaux', '17:30:00', '2025-01-30', 'Bergerac', '19:00:00', 'terminé', 14, 2, 44.84, -0.58, 44.85, 0.48),
 
-(6, '2023-01-18', 'Strasbourg', '13:00:00', '2023-01-18', 'Colmar', '14:00:00', 'terminé', 8, 4, 48.58, 7.75, 48.08, 7.36),
-(7, '2023-01-29', 'Strasbourg', '08:30:00', '2023-01-29', 'Metz', '10:15:00', 'terminé', 14, 3, 48.58, 7.75, 49.12, 6.17);
+(6, '2025-01-18', 'Strasbourg', '13:00:00', '2025-01-18', 'Colmar', '14:00:00', 'terminé', 8, 4, 48.58, 7.75, 48.08, 7.36),
+(7, '2025-01-29', 'Strasbourg', '08:30:00', '2025-01-29', 'Metz', '10:15:00', 'terminé', 14, 3, 48.58, 7.75, 49.12, 6.17);
 
 INSERT INTO `carpool_users` (`id_carpool`, `id_user`) VALUES
 --Pour le covoit(Paris → Nantes, créé par Dupont)
@@ -173,3 +177,13 @@ INSERT INTO `carpool_users` (`id_carpool`, `id_user`) VALUES
 -- Pour le covoit(Marseille → Nice, créé par Martin)
 (9, 3),  --Dupont participe au covoiturage 9
 (9, 5);  --Garcia participe au covoiturage 9
+
+INSERT INTO `reviews` (`id_user`, `id_sender`, `id_recipient`, `id_carpool`, `comment`, `note`, `statut`) VALUES
+(3, 4, 3, 6, 'Voyage très agréable, conducteur ponctuel et sympathique. La voiture était propre et confortable.', 4.5, 'publié'),
+(3, 5, 3, 7, 'Conducteur professionnel et aimable. Trajet très confortable, je recommande vivement !', 5.0, 'publié'),
+(4, 3, 4, 10, 'Super trajet ! Sophie est une conductrice prudente et la conversation était très intéressante.', 5.0, 'publié'),
+(4, 5, 4, 11, 'Bonne ambiance et conduite sécuritaire. Le trajet est passé très vite !', 4.5, 'publié'),
+(5, 6, 5, 14, 'Trajet correct mais la voiture n\'était pas très propre. Le conducteur était néanmoins agréable.', 3.5, 'publié'),
+(5, 7, 5, 15, 'Un peu de retard au départ mais bonne communication. Conduite prudente.', 4.0, 'publié'),
+(6, 8, 6, 16, 'Parfait ! Marie est très sympa et conduit prudemment. Horaires respectés.', 5.0, 'publié'),
+(7, 3, 7, 17, 'Robert est ponctuel et courtois. Véhicule propre et confortable.', 4.0, 'publié');
