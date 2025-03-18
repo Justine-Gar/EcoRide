@@ -59,6 +59,7 @@ class CovoiturageController extends AbstractController
     ]);
   }
 
+  
   #[Route('/search', name: 'app_covoiturage_search')]
   public function search(Request $request, CarpoolRepository $carpoolRepository): Response
   {
@@ -87,6 +88,112 @@ class CovoiturageController extends AbstractController
         'date' => $date
     ]);
   }
+
+  #[Route('/filter', name: 'app_covoiturage_filter', methods: ['GET', 'POST'])]
+  public function filter(Request $request, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
+  {
+    //Recupere paramatre de recherche covoit
+    $depart = $request->query->get('depart');
+    $arrivee = $request->query->get('arrivee');
+    $date = $request->query->get('date');
+    //Recupère parametre de filtre 
+    $vehiculeType = $request->request->get('');
+    $passagerCount = (int) $request->request->get('', 1);
+    $maxCredits = (int) $request->request->get('maxCredits', 50);
+    $maxDuration = (int) $request->request->get('maxDuration', 720);
+    $driverRating = (int) $request->request->get('driverRating', 5);
+
+    // Effectuer d'abord la recherche standard
+    $carpools = $carpoolRepository->search($depart, $arrivee, $date);
+    
+    // Filtrer les résultats avec les critères supplémentaires
+    $filteredCarpools = [];
+    
+    foreach ($carpools as $carpool) {
+        // Filtrer par nombre de places disponibles
+        $availablePlaces = $carpool->getNbrPlaces() - count($carpool->getPassengers());
+        if ($availablePlaces < $passagerCount) {
+            continue;
+        }
+        
+        // Filtrer par crédits
+        if ($carpool->getCredits() > $maxCredits) {
+            continue;
+        }
+        
+        // Calculer la durée en minutes
+        $departureTime = clone $carpool->getDateStart();
+        $departureTime->setTime(
+            $carpool->getHourStart()->format('H'),
+            $carpool->getHourStart()->format('i')
+        );
+        
+        $arrivalTime = clone $carpool->getDateReach();
+        $arrivalTime->setTime(
+            $carpool->getHourReach()->format('H'),
+            $carpool->getHourReach()->format('i')
+        );
+        
+        $durationInMinutes = ($arrivalTime->getTimestamp() - $departureTime->getTimestamp()) / 60;
+        
+        if ($durationInMinutes > $maxDuration) {
+            continue;
+        }
+        
+        // Filtrer par note du conducteur
+        $driver = $carpool->getUser();
+        $driverRatingValue = $driver->getRating() ?? 5; // Utiliser 5 comme valeur par défaut si pas de note
+        
+        if ($driverRatingValue < $driverRating) {
+            continue;
+        }
+        
+        // Filtrer par type de véhicule (si spécifié et différent de "tous")
+        if ($vehiculeType !== 'allVehicles') {
+            // Récupérer le véhicule du conducteur
+            $cars = $driver->getCars();
+            
+            if ($cars->isEmpty()) {
+                continue; // Pas de véhicule
+            }
+            
+            // Vérifier si au moins une voiture correspond au type de carburant
+            $hasMatchingVehicle = false;
+            
+            foreach ($cars as $car) {
+                // Mapper les IDs des inputs aux valeurs en base de données
+                $fuelTypeMap = [
+                    'essence' => 'Essence',
+                    'diesel' => 'Diesel',
+                    'hybrid' => 'Hybride',
+                    'electric' => 'Électrique'
+                ];
+                
+                $fuelTypeToCheck = $fuelTypeMap[$vehiculeType] ?? null;
+                
+                if ($car->getFuelType() === $fuelTypeToCheck) {
+                    $hasMatchingVehicle = true;
+                    break;
+                }
+            }
+            
+            if (!$hasMatchingVehicle) {
+                continue;
+            }
+        }
+        
+        // Ce covoiturage a passé tous les filtres
+        $filteredCarpools[] = $carpool;
+    }
+    
+    return $this->render('covoiturage/_search_results.html.twig', [
+        'carpools' => $filteredCarpools,
+        'depart' => $depart,
+        'arrivee' => $arrivee,
+        'date' => $date
+    ]);
+  }
+
 
   //Route pour la création de covoiturage
   #[Route('/new', name: 'app_covoiturage_new')]

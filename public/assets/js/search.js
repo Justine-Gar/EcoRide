@@ -748,3 +748,200 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
+// Gestion des filtres
+document.addEventListener('DOMContentLoaded', function() {
+  // Éléments DOM de la modale de filtrage
+  const creditRange = document.getElementById('credit-range');
+  const creditDisplay = document.getElementById('credit-value');
+
+  const durationRange = document.getElementById('duration-range');
+  const durationDisplay = document.getElementById('duration-value');
+  
+  const filterButton = document.querySelector('.btn-modal-filtre');
+  
+  // Mise à jour de l'affichage des crédits
+  if (creditRange && creditDisplay) {
+      creditRange.addEventListener('input', function() {
+          creditDisplay.textContent = `${this.value} crédits`;
+      });
+  }
+  
+  // Mise à jour de l'affichage de la durée
+  if (durationRange && durationDisplay) {
+      durationRange.addEventListener('input', function() {
+          const minutes = parseInt(this.value);
+          const hours = Math.floor(minutes / 60);
+          const mins = minutes % 60;
+          durationDisplay.textContent = `${hours}h${mins.toString().padStart(2, '0')}min`;
+      });
+  }
+  
+  // Application des filtres
+  if (filterButton) {
+      filterButton.addEventListener('click', function() {
+          // Récupération des valeurs de filtres
+          const vehicleType = document.querySelector('input[name="vehicleType"]:checked').id;
+          const passengerCount = document.querySelector('.filter-section input[type="number"][max="5"]').value;
+          const maxCredits = creditRange.value;
+          const maxDuration = durationRange.value;
+          const driverRating = document.querySelector('.filter-section input[type="number"][max="5"]:last-of-type').value;
+          
+          // Récupération des paramètres de recherche actuels (ville départ, arrivée, date)
+          const urlParams = new URLSearchParams(window.location.search);
+          const depart = urlParams.get('depart') || '';
+          const arrivee = urlParams.get('arrivee') || '';
+          const date = urlParams.get('date') || '';
+          
+          // Construction des paramètres de la requête
+          const filterParams = new URLSearchParams({
+              depart: depart,
+              arrivee: arrivee,
+              date: date,
+              vehicleType: vehicleType,
+              passengerCount: passengerCount,
+              maxCredits: maxCredits,
+              maxDuration: maxDuration,
+              driverRating: driverRating,
+              filtered: 'true'
+          });
+          
+          // Affichage d'un indicateur de chargement
+          const loadingDiv = document.createElement('div');
+          loadingDiv.className = 'loading-overlay';
+          loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div>';
+          loadingDiv.style.position = 'fixed';
+          loadingDiv.style.top = '0';
+          loadingDiv.style.left = '0';
+          loadingDiv.style.width = '100%';
+          loadingDiv.style.height = '100%';
+          loadingDiv.style.backgroundColor = 'rgba(255,255,255,0.7)';
+          loadingDiv.style.display = 'flex';
+          loadingDiv.style.justifyContent = 'center';
+          loadingDiv.style.alignItems = 'center';
+          loadingDiv.style.zIndex = '9999';
+          document.body.appendChild(loadingDiv);
+          
+          // Requête AJAX pour appliquer les filtres
+          fetch(`/covoiturage/filter?${filterParams.toString()}`)
+              .then(response => response.text())
+              .then(html => {
+                  // Suppression de l'indicateur de chargement
+                  document.body.removeChild(loadingDiv);
+                  
+                  // Mise à jour du contenu des résultats
+                  const resultsContainer = document.querySelector('.resultats');
+                  if (resultsContainer) {
+                      resultsContainer.innerHTML = html;
+                      
+                      // Initialisation des boutons de détails après mise à jour du contenu
+                      if (window.initDetailButtons) {
+                          window.initDetailButtons();
+                      }
+                  }
+                  
+                  // Mise à jour de l'URL pour permettre le partage et l'historique
+                  const newUrl = window.location.pathname + '?' + filterParams.toString();
+                  window.history.pushState({ path: newUrl }, '', newUrl);
+                  
+                  // Charger les données pour la carte
+                  if (typeof fetchMapData === 'function') {
+                      fetchMapData(filterParams);
+                  }
+                  
+                  // Sauvegarder les filtres dans sessionStorage
+                  sessionStorage.setItem('ecoride_filters', JSON.stringify({
+                      vehicleType,
+                      passengerCount,
+                      maxCredits,
+                      maxDuration,
+                      driverRating
+                  }));
+                  
+                  // Fermer la modale
+                  const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+                  if (modal) {
+                      modal.hide();
+                  }
+              })
+              .catch(error => {
+                  console.error('Erreur lors du filtrage:', error);
+                  document.body.removeChild(loadingDiv);
+                  alert('Une erreur est survenue lors du filtrage. Veuillez réessayer.');
+              });
+      });
+  }
+  
+  // Initialisation du bouton reset pour les filtres
+  const resetButton = document.createElement('button');
+  resetButton.className = 'btn btn-outline-secondary me-2';
+  resetButton.textContent = 'Réinitialiser';
+  
+  const buttonContainer = document.querySelector('.filter-menu .modal-body .text-center');
+  if (buttonContainer) {
+      // Insérer le bouton de réinitialisation avant le bouton de filtrage
+      buttonContainer.insertBefore(resetButton, buttonContainer.firstChild);
+      
+      resetButton.addEventListener('click', function() {
+          // Réinitialiser les filtres
+          document.getElementById('allVehicles').checked = true;
+          
+          const passengerInput = document.querySelector('.filter-section input[type="number"][max="5"]');
+          if (passengerInput) passengerInput.value = 1;
+          
+          if (creditRange) {
+              creditRange.value = 20;
+              creditDisplay.textContent = '20 crédits';
+          }
+          
+          if (durationRange) {
+              durationRange.value = 260;
+              durationDisplay.textContent = '4h20min';
+          }
+          
+          const ratingInput = document.querySelector('.filter-section input[type="number"][max="5"]:last-of-type');
+          if (ratingInput) ratingInput.value = 5;
+          
+          // Supprimer les filtres enregistrés
+          sessionStorage.removeItem('ecoride_filters');
+      });
+  }
+  
+  // Restaurer les filtres depuis sessionStorage au chargement
+  const savedFilters = sessionStorage.getItem('ecoride_filters');
+  if (savedFilters) {
+      try {
+          const filters = JSON.parse(savedFilters);
+          
+          // Restaurer les valeurs dans la modale
+          if (filters.vehicleType && document.getElementById(filters.vehicleType)) {
+              document.getElementById(filters.vehicleType).checked = true;
+          }
+          
+          if (filters.passengerCount) {
+              const passengerInput = document.querySelector('.filter-section input[type="number"][max="5"]');
+              if (passengerInput) passengerInput.value = filters.passengerCount;
+          }
+          
+          if (filters.maxCredits && creditRange) {
+              creditRange.value = filters.maxCredits;
+              creditDisplay.textContent = `${filters.maxCredits} crédits`;
+          }
+          
+          if (filters.maxDuration && durationRange) {
+              durationRange.value = filters.maxDuration;
+              const hours = Math.floor(filters.maxDuration / 60);
+              const mins = filters.maxDuration % 60;
+              durationDisplay.textContent = `${hours}h${mins.toString().padStart(2, '0')}min`;
+          }
+          
+          if (filters.driverRating) {
+              const ratingInput = document.querySelector('.filter-section input[type="number"][max="5"]:last-of-type');
+              if (ratingInput) ratingInput.value = filters.driverRating;
+          }
+      } catch (error) {
+          console.error('Erreur lors de la restauration des filtres:', error);
+          sessionStorage.removeItem('ecoride_filters');
+      }
+  }
+});

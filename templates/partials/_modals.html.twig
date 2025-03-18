@@ -145,24 +145,24 @@
 				<!-- Nombre de passagers -->
 				<div class="filter-section">
 					<label>Nombre de passager :</label>
-					<input type="number" class="form-control" min="1" max="5" value="1">
-					<small class="text-muted">Maximum 5 passagers par véhicules</small>
+					<input type="number" class="form-control" min="1" max="4" value="1">
+					<small class="text-muted">Max 4 passagers / véhicules, nous prennons en compte le conducteur</small>
 				</div>
 
 				<!-- Crédits maximum -->
 				<div class="filter-section">
 					<label>Crédits maximum :
-						<span>20 crédits</span>
+						<span id="credit-value">20 crédits</span>
 					</label>
-					<input type="range" class="form-range" min="0" max="50" value="20">
+					<input type="range" id="credit-range" class="form-range" min="0" max="50" value="20">
 				</div>
 
 				<!-- Durée maximum -->
 				<div class="filter-section">
 					<label>Durée maximum :
-						<span>4h20min</span>
+						<span id="duration-value">4h20min</span>
 					</label>
-					<input type="range" class="form-range" min="0" max="720" value="260">
+					<input type="range" id="duration-range"class="form-range" min="0" max="720" value="260">
 				</div>
 
 				<!-- Note maximale du conducteur -->
