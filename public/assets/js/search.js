@@ -751,6 +751,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Gestion des filtres
 document.addEventListener('DOMContentLoaded', function() {
+  // Vérifier si un paramètre filtered=true est présent dans l'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.get('filtered')) {
+      // Si nous ne sommes pas sur une page filtrée, effacer le storage
+      sessionStorage.removeItem('ecoride_filters');
+  }
+
   // Éléments DOM de la modale de filtrage
   const creditRange = document.getElementById('credit-range');
   const creditDisplay = document.getElementById('credit-value');
@@ -770,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
       filterButton.addEventListener('click', function() {
           // Récupération des valeurs de filtres
           const vehicleType = document.querySelector('input[name="vehicleType"]:checked').id;
-          const passengerCount = document.querySelector('.filter-section input[type="number"][max="5"]').value;
+          const passengerCount = document.querySelector('#passager-count').value;
           const maxCredits = creditRange.value;
           const driverRating = parseFloat(document.querySelector('#driver-rating').value);
           
@@ -838,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   // Sauvegarder les filtres dans sessionStorage
                   sessionStorage.setItem('ecoride_filters', JSON.stringify({
                       vehicleType,
-                      passengerCount,
+                      passengerCount: parseInt(passengerCount, 10),
                       maxCredits,
                       driverRating
                   }));
@@ -879,11 +886,6 @@ document.addEventListener('DOMContentLoaded', function() {
               creditDisplay.textContent = '20 crédits';
           }
           
-          if (durationRange) {
-              durationRange.value = 260;
-              durationDisplay.textContent = '4h20min';
-          }
-          
           const ratingInput = document.querySelector('.filter-section input[type="number"][max="5"]:last-of-type');
           if (ratingInput) ratingInput.value = 5;
           
@@ -904,20 +906,15 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           if (filters.passengerCount) {
-              const passengerInput = document.querySelector('.filter-section input[type="number"][max="5"]');
-              if (passengerInput) passengerInput.value = filters.passengerCount;
+            const passengerInput = document.querySelector('#passager-count');
+            if (passengerInput) {
+              passengerInput.value = filters.passengerCount;
+            }
           }
           
           if (filters.maxCredits && creditRange) {
               creditRange.value = filters.maxCredits;
               creditDisplay.textContent = `${filters.maxCredits} crédits`;
-          }
-          
-          if (filters.maxDuration && durationRange) {
-              durationRange.value = filters.maxDuration;
-              const hours = Math.floor(filters.maxDuration / 60);
-              const mins = filters.maxDuration % 60;
-              durationDisplay.textContent = `${hours}h${mins.toString().padStart(2, '0')}min`;
           }
           
           if (filters.driverRating) {

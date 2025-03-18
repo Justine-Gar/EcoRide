@@ -89,6 +89,7 @@ class CovoiturageController extends AbstractController
     ]);
   }
 
+  
   #[Route('/filter', name: 'app_covoiturage_filter', methods: ['GET', 'POST'])]
   public function filter(Request $request, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
   {
@@ -99,7 +100,7 @@ class CovoiturageController extends AbstractController
     //Recupère parametre de filtre 
     $vehiculeType = $request->query->get('vehicleType', 'allVehicles');
     $passagerCount = (int) $request->query->get('passengerCount', 1);
-    $maxCredits = (int) $request->request->get('maxCredits', 50);
+    $maxCredits = (int) $request->query->get('maxCredits', 50);
     $driverRating = (float) $request->query->get('driverRating', 5.0);
 
     // Effectuer d'abord la recherche standard
@@ -110,9 +111,8 @@ class CovoiturageController extends AbstractController
     
     foreach ($carpools as $carpool) {
         // Filtrer par nombre de places disponibles
-        $availablePlaces = $carpool->getNbrPlaces() - count($carpool->getPassengers());
-        if ($availablePlaces < $passagerCount) {
-            continue;
+        if (!$carpool->canAccomodate($passagerCount)) {
+          continue;
         }
         
         // Filtrer par crédits
@@ -276,6 +276,7 @@ class CovoiturageController extends AbstractController
     return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
     
   }
+
 
   //Route pour supprimer un covoiturage
   #[Route('/{id}/cancel', name: 'app_covoiturage_cancel', requirements: ['id' => '\d+'])]
