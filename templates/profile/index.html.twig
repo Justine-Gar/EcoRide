@@ -4,15 +4,16 @@
 {% endblock %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/style.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/profilUser.css') }}">
 
 
 {% endblock %}
 
 {% block body %}
 <!--=============START MAIN============-->
-	<!---------------Alert -->
+	
 	<main class="container profil">
+		<!---------------Alert -->
 		<div id="alert-container" class="mt-3">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
@@ -36,29 +37,41 @@
 				<div class="card mb-4">
 					<div class="card-body text-center">
 						<img src="{% if user.profilPicture %}{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}{% else %}{{ asset('assets/images/default-profile.png') }}{% endif %}" class="rounded-circle mb-3" alt="Photo de profil">
-						<h5 class="mb-1">Sophie Martin</h5>
+						<h5 class="mb-2">Sophie Martin</h5>
 
 						<!-- Badge de rôles -->
-						<div class="mb-2">
-							<span class="badge bg-success me-1">Conducteur</span>
-							<span class="badge bg-info">Passager</span>
-						</div>
-
-						<!-- Affichage des crédits -->
-						<div class="border rounded p-3 mb-3 bg-light">
-							<h6 class="mb-1">Mes Crédits</h6>
-							<h3 class="mb-0 text-success">45
-								<small>crédits</small>
-							</h3>
+						<div class="mb-4 role-switch">
+							<div>
+								<p id="role-display">Rôle actuel : Conducteur</p>
+							</div>
+							<div class="switch-container conducteur-active">
+								<div class="switch-background">
+										<div class="bg-conducteur"></div>
+										<div class="bg-passager"></div>
+								</div>
+								<div class="switch-options">
+										<div class="option option-conducteur option-active" onclick="activateOption('conducteur')">
+											<i class="fas fa-car"></i>
+											Conducteur
+										</div>
+										<div class="option option-passager" onclick="activateOption('passager')">
+											Passager
+											<i class="fas fa-hand-paper"></i>
+										</div>
+								</div>
+							</div>
 						</div>
 
 						<!--nouveau trajet-->
-						<div>
-							<button class="btn btn-outline-success">Recherche Covoiturage</button>
+						<div class="mb-2">
+							<button class="btn btn-outline-success">Recherche covoiturage</button>
+							<button class="btn btn-outline-success">Créer un trajet</button>
 						</div>
-
 					</div>
 				</div>
+
+				
+
 			</section>
 
 			<!---------Colonne de droite - Information Personelles-->
@@ -147,41 +160,50 @@
 				</div>
 
 			</section>
+
 			<!---------------Statistiques-->
 			<section class="col-lg-4">
-				<div class="card mb-4">
-					<div class="card-header">
-						<h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Statistique</h5>
-					</div>
-					<div class="card-body">
-						<div class="row g-4">
 
-							<!-- Note moyenne -->
-							<div class="col-md-8 col-lg-6">
-								<div class="card border-warning">
-									<div class="card-body text-center">
-										<h6 class="text-muted mb-2">Note moyenne</h6>
-										<div class="text-warning h2 mb-0">
-											4.8
-											<small class="text-muted">/5</small>
+				<div>
+					<!--Affichage des crédits-->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h5 class="mb-0"><i class="far fa-credit-card me-2"></i>Crédits</h5>
+						</div>
+						<div class="card-body text-center">
+							<h3 class="mb-0 text-success">45
+									<small>crédits</small>
+							</h3>
+						</div>
+					</div>
+
+					<!--Affichage Note et distance(option)-->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Note</h5>
+						</div>
+						<div class="card-body">
+							<div class="g-4">
+
+								<!-- Note moyenne -->
+								<div>
+									<div class="card border-warning">
+										<div class="card-body text-center">
+											<h6 class="text-muted mb-2">Note moyenne</h6>
+											<div class="text-warning h2 mb-0">
+												4.8
+												<small class="text-muted">/5</small>
+											</div>
 										</div>
 									</div>
 								</div>
+
 							</div>
 
-							<!-- Distance totale-->
-							<div class="col-md-6 col-lg-6">
-								<div class="card border-primary">
-									<div class="card-body text-center">
-										<h6 class="text-muted mb-2">Distance totale</h6>
-										<h3 class="text-primary mb-0">1250 km</h3>
-									</div>
-								</div>
-							</div>
+
 						</div>
-
-
 					</div>
+
 				</div>
 			</section>
 
@@ -817,4 +839,5 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('assets/js/profile.js') }}"></script>
+		<script src="{{ asset('assets/js/btnSwitch.js') }}"></script>
 {% endblock %}
