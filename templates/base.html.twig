@@ -2,14 +2,27 @@
 <html>
 
     <head>
+        <!-- Meta tags de base -->
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="description" content="EcoRide - Plateforme de covoiturage écologique. Trouvez ou proposez des trajets facilement et contribuez à réduire votre empreinte carbone.">
+        <meta name="keywords" content="covoiturage, transport partagé, écologie, mobilité durable, trajet partagé, géolocalisation, EcoRide">
+        <meta name="author" content="Justine Garandel">
+        <meta name="robots" content="index, follow">
+        <meta name="language" content="fr">
+
+        <!-- Open Graph minimal (pour les partages sur réseaux sociaux) -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://www.ecoride.website">
+        <meta property="og:title" content="EcoRide - Covoiturage écologique et géolocalisé">
+        <meta property="og:description" content="Trouvez ou proposez des trajets facilement avec EcoRide. Notre plateforme de covoiturage écologique.">
+        <meta property="og:image" content="https://www.ecoride.website/images/og-image.jpg">
+
         <title>{% block title %}EcoRide{% endblock %}</title>
         
         {# Bootstrap CSS #}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        {# Leaflet CSS #}
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
         
         <link rel="stylesheet" href="{{ asset('assets/css/common/style.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/css/common/responsive.css') }}">
@@ -18,9 +31,7 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-
-        {% block stylesheets %}
-        {% endblock %}
+        {% block stylesheets %}{% endblock %}
 
     </head>
 
@@ -34,10 +45,10 @@
 
         {% include 'partials/_footer.html.twig' %}
 
+        {% include 'partials/_modals.html.twig' %}
+
         {# Bootstrap JS #}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        {# Leaflet JS #}
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         
         {% block javascripts %}{% endblock %}
         

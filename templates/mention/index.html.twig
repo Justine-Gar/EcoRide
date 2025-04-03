@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales -
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/mention/mention.css') }}">
+{% endblock %}
+
+{% block body %}
+<!--=============START MAIN============-->
+<main class="mention">
+	<div class="container-fluide mention-title">
+		<h1>Mentions légales</h1>
+  </div>
+  <div class="container mention-corps mt-4">
+		<section class="mb-4">
+			<h2>1. Éditeur du site</h2>
+			<p>Le site EcoRide, accessible à l'adresse www.ecoride.website, est édité par :</p>
+			<ul>
+				<li><strong>Nom</strong>: Justine Garandel</li>
+        <li><strong>Email de contact</strong>: contact@ecoride.website</li>
+
+			</ul>
+		</section>
+
+		<section class="mb-4">
+			<h2>2. Hébergement</h2>
+			<p>Le site EcoRide est hébergé par :</p>
+			<ul>
+				<li><strong>Nom de l'hébergeur</strong>: IONOS</li>
+        <li><strong>Siège social</strong>: 7 Place de la Gare - 57200 Sarreguemines - France</li>
+				<li><strong>Site web</strong>: www.ionos.fr</li>
+			</ul>
+		</section>
+
+		<section class="mb-4">
+			<h2>3. Propriété intellectuelle</h2>
+			<p>L'ensemble du contenu du site EcoRide (textes, images, logos, etc.) est protégé par le droit d'auteur. Toute reproduction ou utilisation sans autorisation préalable est interdite.</p>
+		</section>
+
+		<section class="mb-4">
+			<h2>4. Protection des données personnelles</h2>
+
+      <div class="mention-decale mb-3"> 
+        <h5>4.1. Collecte de données</h5>
+        <p>Dans le cadre de l'utilisation du service EcoRide, nous collectons les données suivantes :</p>
+        <ul>
+          <li>Nom et prénom</li>
+          <li>Adresse email</li>
+          <li>Téléphone</li>
+          <li>Données de géolocalisation</li>
+          <li>Informations sur les trajets</li>
+        </ul>
+      </div>
+
+      <div class="mention-decale mb-3">
+        <h5>4.2. Finalité</h5>
+        <p>Ces données sont collectées pour :</p>
+        <ul>
+          <li>Permettre la création et la gestion de votre compte</li>
+          <li>Faciliter la mise en relation entre conducteurs et passagers</li>
+          <li>Assurer le bon fonctionnement du service</li>
+        </ul>
+      </div>
+
+      <div class="mention-decale mb-3">
+        <h5>4.3. Droits des utilisateurs</h5>
+        <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition concernant vos données personnelles.</p>
+        <p>Pour exercer ces droits, vous pouvez nous contacter à l'adresse email suivante : rgpd@ecoride.website</p>
+      </div>
+		</section>
+
+		<section class="mb-4">
+			<h2>5. Cookies</h2>
+
+      <div class="mention-decale mb-3">
+        <h5>5.1. Définition</h5>
+        <p>Un cookie est un petit fichier texte déposé sur votre terminal lors de votre visite sur notre site.</p>
+      </div>
+
+      <div class="mention-decale mb-3">
+        <h5>5.2. Types de cookies utilisés</h5>
+        <p>Notre site utilise des cookies pour :</p>
+        <ul>
+          <li>Assurer le fonctionnement technique du site</li>
+          <li>Mesurer l'audience</li>
+          <li>Permettre la géolocalisation pour le service de covoiturage</li>
+        </ul>
+      </div>
+
+      <div class="mention-decale mb-3"> 
+        <h5>5.3. Gestion des cookies</h5>
+        <p>Vous pouvez configurer votre navigateur pour refuser l'installation des cookies.</p>
+      </div>
+		</section>
+
+		<section class="mb-4">
+			<h2>6. Limitation de responsabilité</h2>
+			<p>EcoRide ne pourra être tenu responsable des dommages directs ou indirects résultant de l'utilisation du site ou des services proposés.</p>
+			<p>EcoRide agit comme intermédiaire entre conducteurs et passagers et ne peut être tenu responsable des incidents pouvant survenir lors des trajets.</p>
+		</section>
+
+		<section class="mb-4">
+			<h2>7. Droit applicable</h2>
+			<p>Les présentes mentions légales sont soumises au droit français.</p>
+		</section>
+
+		<section class="mb-4">
+			<h2>8. Contact</h2>
+			<p>Pour toute question concernant ces mentions légales, vous pouvez nous contacter à l'adresse suivante : contact@ecoride.website</p>
+		</section>
+
+	</div>
+</main>
+{% endblock %}

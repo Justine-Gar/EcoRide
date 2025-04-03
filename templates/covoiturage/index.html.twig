@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil -
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturage.css') }}">
+	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturageResponsive.css') }}">
+{% endblock %}
+
+{% block body %}
+	<!--=============START MAIN============-->
+	<main>
+		<!--La rechercher-->
+		<section class="search">
+
+			<div class="container search-container">
+				<!-- Barre de recherche -->
+				<form action="{{ path('app_covoiturage') }}" method="get" class="search-bar">
+					<div class="row g-0 d-flex align-items-center">
+						<!-- Champ Départs -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-map-marker-alt"></i>
+								<input type="text" name="depart" class="form-control" value="{{ depart }}" placeholder="Départs">
+							</div>
+						</div>
+
+						<!-- Champ Arrivée -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-location-arrow"></i>
+								<input type="text" name="arrivee" class="form-control" value="{{ arrivee }}" placeholder="Arrivée" >
+							</div>
+						</div>
+
+						<!-- Champ Date -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="far fa-calendar"></i>
+								<input type="date" name="date" class="form-control" placeholder="Date" value="{{ date }}">
+							</div>
+						</div>
+
+						<!-- Bouton Recherche -->
+						<div class="col-md-3">
+							<button type="submit" class="btn btn-search">Recherche</button>
+						</div>
+
+            {% if selectedCarpool %}
+              <input type="hidden" name="id" value="{{ selectedCarpool.idCarpool }}">
+            {% endif %}
+
+					</div>
+				</form>
+
+				<!--Bouton de filtrage-->
+				<div class="search-filter d-flex justify-content-end mt-3">
+          <!--Si connecter proposer un trajet
+          <a href="{{ path('app_covoiturage_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Proposer un trajet
+          </a>
+          -->
+					<button class="btn btn-filter" data-bs-toggle="modal" data-bs-target="#filterModal">
+            Filtrer
+            <img src="{{ asset('assets/images/icon/iconFiltre.svg') }}" alt="">
+          </button>
+				</div>
+
+			</div>
+		</section>
+
+    <!--La Carte-->
+    <section class="container carte">
+      <div id="map" class="map-container"></div>
+    </section>
+
+
+		<!--Le résultat de la recherche = show + détails-->
+    <section class="resultats container card-result">
+      {% if carpools is defined %}
+        {% include 'covoiturage/_search_results.html.twig' %}
+      {% else %}
+        {% include 'covoiturage/_welcome.html.twig' %}
+      {% endif %}
+    </section>
+
+	</main>
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script>
+    {% if carpools is defined and carpools|length > 0 %}
+      var carpools = {{ carpools|json_encode|raw }};
+    {% endif %}
+    
+    {% if selectedCarpool is defined and selectedCarpool %}
+      var selectedCarpool = {{ selectedCarpool|json_encode|raw }};
+    {% endif %}
+  </script>
+
+	<script src="{{ asset('assets/js/btnDetail.js') }}"></script>
+  <script src="{{ asset('assets/js/search.js') }}"></script>
+
+{% endblock %}
+

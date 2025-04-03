@@ -15,6 +15,7 @@ em {
 }
 html, body {
   overflow-x: hidden;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,4 +25,69 @@ main {
 }
 footer {
   margin-top: auto;
+}
+
+html body.modal-open,
+html body.modal-open.overflow-hidden {
+  overflow-y: auto !important;
+  padding-right: 0 !important;
+}
+
+html body.modal-open header,
+html body.modal-open header.fixed-top {
+  padding-right: 0 !important;
+}
+
+.modal-open .modal {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 0 !important;
+}
+.fade.modal.show {
+  padding-right: 0 !important;
+}
+.modal-backdrop {
+  z-index: 1040;
+}
+.modal {
+  z-index: 1050;
+}
+
+@font-face {
+  font-family: 'Architects';
+  src: url('../fonts/ArchitectsDaughter-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NunitoB';
+  src: url('../fonts/Nunito-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'NunitoR';
+  src: url('../fonts/Nunito-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PoppinsB';
+  src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: bolder;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PoppinsR';
+  src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PoppinsSB';
+  src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
 }

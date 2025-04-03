@@ -1,0 +1,287 @@
+/*-------------Sections-------------*/
+
+/*Section ------ Search ------ */
+
+.search {
+  width: 100%;
+  height: 415px;
+  background-color: #313A50;
+  padding-top: 135px;
+}
+
+/* Container de la barre de recherche */
+.search-container {
+  padding: 20px 20px;
+}
+
+.search-bar {
+  background: #F3F3F3;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Style des inputs */
+.search-input {
+  position: relative;
+  padding: 8px;
+}
+
+.search-input i {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4DBC84;
+  z-index: 1;
+}
+
+.search-input .form-control {
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #F3F3F3;
+  border-radius: 4px;
+}
+
+.search-input .form-control:focus {
+  box-shadow: none;
+  border-color: #4DBC84;
+}
+::placeholder {
+  font-family: 'NunitoR', sans-serif;
+  font-size: 14px;
+}
+
+/* Style du bouton de recherche */
+.btn-search {
+  font-family: 'NunitoR';
+  font-size: 16px;
+  text-transform: uppercase;
+  background-color: #4DBC84;
+  color: #F3F3F3;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-search:hover {
+  background-color: #3f7b6a;
+  color: #F3F3F3;
+}
+
+.btn-filter {
+  font-family: 'PoppinsR';
+  background-color: #4DBC84;
+  color: #F3F3F3;
+  font-size: 12px;
+}
+
+.btn-filter:hover {
+  background-color: #3f7b6a;
+  color: #F3F3F3;
+  font-size: 12px;
+}
+.btn-filter img {
+  width: 15px;
+  height: 15px;
+}
+
+
+.btn-modal-filtre {
+  font-family: 'NunitoR';
+  background-color: #4DBC84;
+  color: #F3F3F3;
+  font-size: 16px;
+}
+
+.btn-modal-filtre:hover {
+  background-color: #3f7b6a;
+  color: #F3F3F3;
+}
+
+/*Section ----- MAP -----*/
+.carte {
+  width: 100%;
+  height: 300px;
+}
+.map-container {
+  height: 300px;
+  width: 100%;
+  z-index: -5;
+  margin-top: 40px;
+}
+
+/*Section ----- Crard ----- */
+
+.card-result{
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.card-search{
+  gap: 25px;
+}
+
+/*--Tete card--*/
+/*tete*/
+.card {
+  background-color: none;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 325px;
+}
+
+.card-body {
+  padding: 10px;
+}
+
+.card-header {
+  padding: 10px;
+}
+
+.card-covoit {
+  width: 100%;
+  max-width: 325px;
+}
+
+.custom-header, .custom-footer {
+  --bs-card-cap-bg: transparent;
+  background: transparent;
+}
+
+.nom-pseudo {
+  font-family: 'PoppinsR';
+  font-size: 16px;
+  color: #2B293F;
+}
+
+.role-note {
+  font-family: 'PoppinsR';
+  color: #2B293F;
+  font-size: 14px;
+}
+
+.etoile {
+  color: #4DBC84;
+  margin-left: 4px;
+}
+
+.avatar img {
+  border: 3px solid #4DBC84;
+  max-width: 50px; 
+  max-height: 50px;
+  border-radius: 50%;
+}
+
+
+/*-- corps card--*/
+.timeline-container {
+  position: relative;
+  padding-left: 0px;
+  height: 80px; /* a ajustez  */
+}
+
+.timeline-line {
+  position: absolute;
+  left: 4px; /* pour centrer avec les points */
+  top: 10px; /* ajustez selon la taille de vos points */
+  bottom: 10px;
+  width: 2px;
+  background: #4DBC84;
+}
+
+.time-point {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  background: #4DBC84;
+  border-radius: 50%;
+  z-index: 1; 
+}
+
+.horaire {
+  font-family: 'PoppinsB';
+  color: #2B293F;
+  font-size: 14px;
+}
+
+.calcul-horaires, .places-info {
+  font-family: 'PoppinsR';
+  color: #2B293F;
+  font-size: 12px;
+}
+
+.trajet-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+/*-- pied card --*/
+.card-footer {
+  padding: 10px;
+}
+.btn-details, .btn-participer {
+  font-family: 'NunitoB';
+  background: #4DBC84;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #F3F3F3;
+  font-size: 14px;
+}
+.btn-details:hover, .btn-participer:hover {
+  background: #3f7b6a;
+  color: #F3F3F3;
+}
+
+.card-footer span, .detail-participer span{
+  font-family: 'NunitoB';
+  color: #2B293F;
+  font-size: 16px;
+}
+
+/* -- détail card --*/
+.detail-voiture h6, .detail-preferences h6, .detail-avis h6 {
+  color: #3f7b6a;
+  font-size: 14px;
+  font-family: 'PoppinsB';
+}
+.detail-voiture, .detail-preferences, .detail-avis {
+  color: #2B293F;
+  font-size: 14px;
+  font-family: 'PoppinsR';
+}
+ul, ol {
+  list-style: disc;
+
+}
+.detailsContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.detailsContent.visible {
+  max-height: 2000px; /* Ajustez selon vos besoins */
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+.filter-menu {
+  color: #2B293F;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+

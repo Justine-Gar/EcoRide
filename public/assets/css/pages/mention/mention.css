@@ -1,0 +1,31 @@
+/* ---- Mention ---- */
+.mention {
+  width: 100%;
+  padding-top: 114px;
+}
+.mention-title {
+  width: 100%;
+  padding: 25px;
+  background-color: #313A50;
+}
+.mention-title h1 {
+  color: #F3F3F3;
+  font-family: 'Architects';
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.mention-corps h2 {
+  color: #4DBC84;
+}
+.mention-corps h5 {
+  color: #3f7b6a;
+}
+
+.mention-corps p {
+  color: #2B293F;
+}
+.mention-decale {
+  padding-left: 20px;
+  padding-right: 15px;
+}

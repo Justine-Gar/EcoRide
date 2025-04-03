@@ -17,7 +17,7 @@ class CarpoolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Creer un nouveau covoiturage
+     * Creer un nouveau covoit
      */
     public function createCarpool(User $user, array $date): Carpool
     {
@@ -64,7 +64,7 @@ class CarpoolRepository extends ServiceEntityRepository
         $carpool->setHourReach(new \DateTime($data['hour_reach']));
         $carpool->setNbrPlaces($data['nbr_places']);
         $carpool->setCredits($data['credits']);
-        $carpool->setStatut('active');
+        $carpool->setStatut('actif');
 
         // Coordonnées géographiques si fournies
         if (isset($data['lat_start']) && isset($data['lng_start'])) {
@@ -116,7 +116,7 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('c.statut = :status')
             ->andWhere('c.nbr_places > 0')
             ->andWhere('c.date_start >= :today')
-            ->setParameter('status', 'active')
+            ->setParameter('status', 'actif')
             ->setParameter('today', new DateTime('today'))
             ->orderBy('c.date_start', 'ASC')
             ->getQuery()
@@ -147,13 +147,43 @@ class CarpoolRepository extends ServiceEntityRepository
     }
 
     /**
+    * Rechercher des covoiturages par termes simples
+    */
+    public function search(?string $depart = null, ?string $arrivee = null, ?string $date = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.statut = :status')
+            ->setParameter('status', 'actif');
+        
+        if ($depart) {
+            $qb->andWhere('c.location_start LIKE :depart')
+            ->setParameter('depart', '%' . $depart . '%');
+        }
+        
+        if ($arrivee) {
+            $qb->andWhere('c.location_reach LIKE :arrivee')
+            ->setParameter('arrivee', '%' . $arrivee . '%');
+        }
+        
+        if ($date) {
+            $qb->andWhere('c.date_start = :date')
+            ->setParameter('date', new \DateTime($date));
+        }
+        
+        $qb->orderBy('c.date_start', 'ASC')
+        ->addOrderBy('c.hour_start', 'ASC');
+        
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Rechercher des covoiturages par critères
      */
     public function searchCarpools(array $criteria): array
     {
         $qb = $this->createQueryBuilder('c')
             ->where('c.statut = :status')
-            ->setParameter('status', 'active');
+            ->setParameter('status', 'actif');
 
         if (isset($criteria['date_start'])) {
             $qb->andWhere('c.date_start = :date_start')

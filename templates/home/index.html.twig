@@ -5,138 +5,120 @@
 {% endblock %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/style.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/responsive.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/home.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/home/homeResponsive.css') }}">
 
 {% endblock %}
 
 {% block body %}
-	<section class="search">
-		<!-- Barre de recherche -->
-		<div class="container search-container">
-			<div class="search-bar">
-				<div
-					class="row g-0 d-flex align-items-center">
-					<!-- Champ Départs -->
-					<div class="col-md-3">
-						<div class="search-input">
-							<i class="fas fa-map-marker-alt"></i>
-							<input type="text" class="form-control" placeholder="Départs">
+<!--=============START MAIN============-->
+	<main >
+		
+		<section class="search">
+
+			<div class="container search-container">
+				<!-- Barre de recherche -->
+				<form action="{{ path('app_covoiturage') }}" method="get" class="search-bar">
+					<div class="row g-0 d-flex align-items-center">
+						<!-- Champ Départs -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-map-marker-alt"></i>
+								<input type="text" name="depart" class="form-control" value="{{ depart }}" placeholder="Départs">
+							</div>
 						</div>
-					</div>
 
-					<!-- Champ Arrivée -->
-					<div class="col-md-3">
-						<div class="search-input">
-							<i class="fas fa-location-arrow"></i>
-							<input type="text" class="form-control" placeholder="Arrivée">
+						<!-- Champ Arrivée -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="fas fa-location-arrow"></i>
+								<input type="text" name="arrivee" class="form-control" value="{{ arrivee }}" placeholder="Arrivée" >
+							</div>
 						</div>
-					</div>
 
-					<!-- Champ Date -->
-					<div class="col-md-3">
-						<div class="search-input">
-							<i class="far fa-calendar"></i>
-							<input type="date" class="form-control" placeholder="Date">
+						<!-- Champ Date -->
+						<div class="col-md-3">
+							<div class="search-input">
+								<i class="far fa-calendar"></i>
+								<input type="date" name="date" class="form-control" placeholder="Date" value="{{ date }}">
+							</div>
 						</div>
-					</div>
 
-					<!-- Bouton Recherche -->
-					<div class="col-md-3">
-						<button class="btn btn-search">RECHERCHE</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<section class="concept">
-		<!--Idée global de ecoride-->
-		<div class="container concept-container">
-			<div class="row d-flex justify-content-around">
-
-				<div class="col-sm-12 col-md-5 col-lg-3">
-
-					<div class="concept-body economy p-3">
-						<img src="../../../assets/images/icon/economi_icon.svg" class="concept-img-top" alt="Icon d'une tirelire">
-						<div>
-							<p class="concept-text">
-								Réduisez significativement vos frais de transport ! 
-								En partageant les coûts du trajet entre covoitureurs, économisez jusqu'à 75% sur vos déplacements quotidiens. 
-								Essence, péages, entretien du véhicule... Divisez vos dépenses tout en optimisant l'utilisation de votre voiture.
-								Une solution maline pour votre portefeuille en ces temps d'inflation.
-							</p>
+						<!-- Bouton Recherche -->
+						<div class="col-md-3">
+							<button type="submit" class="btn btn-search">Recherche</button>
 						</div>
+
+            {% if selectedCarpool %}
+              <input type="hidden" name="id" value="{{ selectedCarpool.idCarpool }}">
+            {% endif %}
+
 					</div>
-				</div>
-
-				<div class="col-sm-12 col-md-5 col-lg-3">
-
-					<div class="concept-body ecology p-3">
-						<img src="../../../assets/images/icon/energi_car_icon.svg" class="concept-img-top" alt="Icon d'une voiture électrique">
-						<div>
-							<p class="concept-text">
-								Chaque covoiturage est un geste pour la planète. 
-								En partageant votre trajet, vous réduisez votre empreinte carbone de 2,2 kg de CO2 en moyenne par trajet. 
-								Nos covoitureurs ont déjà permis d'éviter l'émission de plusieurs tonnes de CO2 cette année. 
-								Rejoignez notre communauté d'éco-conducteurs engagés pour une mobilité plus responsable.
-							</p>
-						</div>
-					</div>
-
-				</div>
-
-				<div class="col-sm-12 col-md-5 col-lg-3">
-
-					<div class="concept-body convivial p-3">
-						<img src="../../../assets/images/icon/humanitarian_icon.svg" class="concept-img-top" alt="Icon de main qui enlace un coeur">
-						<div>
-							<p class="concept-text">
-								Transformez vos trajets en moments de partage ! 
-								Rencontrez des personnes aux parcours enrichissants, échangez des anecdotes et rendez vos voyages plus animés. 
-								Notre communauté bienveillante et nos systèmes d'évaluation garantissent des trajets agréables dans une ambiance décontractée. 
-								Qui sait, votre prochain covoiturage sera peut-être le début d'une belle amitié !
-							</p>
-						</div>
-					</div>
-				</div>
+				</form>
 
 			</div>
-		</div>
-	</section>
+		</section>
 
-	<!--Leaf map-->
-	<!--
-	<div class="row">
-	    <div class="col-12">
-	            <h1 class="mb-4">{{ title }}</h1>
-	            
-	            {# Carte #}
-	            <div id="map" style="height: 500px; margin-bottom: 20px;" class="rounded shadow"></div>
-	        </div>
-	    </div>
-	-->
+		<section class="concept">
+			<!--Idée global de ecoride-->
+			<div class="container concept-container">
+				<div class="row d-flex justify-content-around">
+
+					<div class="col-sm-12 col-md-5 col-lg-3">
+
+						<div class="concept-body economy p-3">
+							<img src="../../../assets/images/icon/peggyMoney.svg" class="concept-img-top" alt="Icon d'une tirelire">
+							<div>
+								<p class="concept-text">
+									Réduisez significativement vos frais de transport ! 
+									En partageant les coûts du trajet entre covoitureurs, économisez jusqu'à 75% sur vos déplacements quotidiens. 
+									Essence, péages, entretien du véhicule... Divisez vos dépenses tout en optimisant l'utilisation de votre voiture.
+									Une solution maline pour votre portefeuille en ces temps d'inflation.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-sm-12 col-md-5 col-lg-3">
+
+						<div class="concept-body ecology p-3">
+							<img src="../../../assets/images/icon/carElectric.svg" class="concept-img-top" alt="Icon d'une voiture électrique">
+							<div>
+								<p class="concept-text">
+									Chaque covoiturage est un geste pour la planète. 
+									En partageant votre trajet, vous réduisez votre empreinte carbone de 2,2 kg de CO2 en moyenne par trajet. 
+									Nos covoitureurs ont déjà permis d'éviter l'émission de plusieurs tonnes de CO2 cette année. 
+									Rejoignez notre communauté d'éco-conducteurs engagés pour une mobilité plus responsable.
+								</p>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="col-sm-12 col-md-5 col-lg-3">
+
+						<div class="concept-body convivial p-3">
+							<img src="../../../assets/images/icon/handheart.svg" class="concept-img-top" alt="Icon de main qui enlace un coeur">
+							<div>
+								<p class="concept-text">
+									Transformez vos trajets en moments de partage ! 
+									Rencontrez des personnes aux parcours enrichissants, échangez des anecdotes et rendez vos voyages plus animés. 
+									Notre communauté bienveillante et nos systèmes d'évaluation garantissent des trajets agréables dans une ambiance décontractée. 
+									Qui sait, votre prochain covoiturage sera peut-être le début d'une belle amitié !
+								</p>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</section>
+
+	</main>
 {% endblock %}
 
 {% block javascripts %}
 <script src="{{ asset('assets/js/login.js') }}"></script>
-<!--
-	<script>
-	    document.addEventListener('DOMContentLoaded', function() {
-	        // Initialisation de la carte
-	        var map = L.map('map').setView([48.866667, 2.333333], 13);
-	        
-	        // Ajout des tuiles OpenStreetMap
-	        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	            attribution: '© OpenStreetMap contributors'
-	        }).addTo(map);
-	        
-	        // Ajout d'un marqueur exemple
-	        L.marker([48.866667, 2.333333])
-	            .addTo(map)
-	            .bindPopup('Point de départ')
-	            .openPopup();
-	    });
-	</script>
--->
+<script src="{{ asset('assets/js/register.js') }}"></script>
+  <script src="{{ asset('assets/js/search.js') }}"></script>
 {% endblock %}

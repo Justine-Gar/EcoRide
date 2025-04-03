@@ -26,10 +26,20 @@
       font-size: 0.75rem;
   }
     
-  
 }
 @media (min-width: 768px) {
   .search {
     padding-top: 280px;
+  }
+}
+
+@media (min-width: 1199px) and (max-width: 1399px) {
+  .concept-text{
+    font-size: 14px;
+  }
+}
+@media (min-width: 1400px) {
+  .concept-text{
+    font-size: 15px;
   }
 }

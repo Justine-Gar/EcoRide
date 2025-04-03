@@ -1,0 +1,16 @@
+.contact {
+  padding-top: 130px;
+}
+.carecoride {
+  width: 100%;
+  min-width: 100px;
+  position: relative;
+}
+.btn-success {
+  background-color: #4DBC84;
+  border: #4DBC84;
+}
+.btn-sucess:hover {
+  background-color: #3f7b6a;
+  border: #3f7b6a;
+}

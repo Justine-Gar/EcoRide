@@ -16,7 +16,7 @@
 
 /* Styles des liens de navigation */
 .nav-link {
-  color: #4a4a4a;
+  color: #2B293F;
   font-size: 14px;
   margin: 0 10px;
   transition: color 0.3s ease;
@@ -70,4 +70,24 @@
 
 .nav-link:hover .rounded-circle {
   border-color: #3f7b6a;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  width: 1.8em;
+  height: 1.8em;
+  filter: invert(1);
+  filter: brightness(0) saturate(100%) invert(68%) sepia(57%) saturate(380%) hue-rotate(90deg) brightness(93%) contrast(89%);
+}
+
+.nav-link {
+  font-family: 'NunitoR';
+  font-size: 18px;
+}
+
+.modal-title {
+  color: #3f7b6a;
 }

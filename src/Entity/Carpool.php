@@ -60,14 +60,12 @@ class Carpool
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
     private ?User $user = null;
 
-    /**
-     * @var Collection<int, User>
-     */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'carpoolParticipations')]
     #[ORM\JoinTable(name: 'carpool_users',
         joinColumns: [new ORM\JoinColumn(name: 'id_carpool', referencedColumnName: 'id_carpool')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user')]
     )]
+
     private Collection $passengers;
 
     public function __construct()
@@ -75,6 +73,7 @@ class Carpool
         $this->passengers = new ArrayCollection();
     }
 
+    
     public function getIdCarpool(): ?int
     {
         return $this->id_carpool;
@@ -248,9 +247,7 @@ class Carpool
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
+
     public function getPassengers(): Collection
     {
         return $this->passengers;
@@ -271,4 +268,38 @@ class Carpool
 
         return $this;
     }
+
+    /**
+     * Nombre de place encore disponible
+     */
+    public function getAvailablePlace(): int
+    {
+        return $this->nbr_places - $this->passengers->count();
+    }
+
+    /**
+     * Vérifie si covoit à encore de la place
+     */
+    public function canAccomodate(int $numberPassagers): bool
+    {
+        return $this->getAvailablePlace() >= $numberPassagers;
+    }
+
+    /**
+     * Vérifie si covoit est complet
+     */
+    public function isFull(): bool
+    {
+        return $this->getAvailablePlace() <= 0;
+    }
+
+    /**
+     * Nombre total de personne dans coivoit(véhicule)
+     */
+    public function getTotalPeopleVehicule(): int
+    {
+        //conducteur + les passagers
+        return 1 + $this->passengers->count();
+    }
+
 }

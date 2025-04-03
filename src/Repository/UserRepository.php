@@ -114,6 +114,16 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
+     * Met a jour la note moyenne d'un User
+     */
+    public function updateRating(User $user): void
+    {
+        $rating = $this->calculateRating($user);
+        $user->setRating($rating);
+        $this->save($user, true);
+    }
+
+    /**
      * Calcule le total des crédits d'un user
      */
     private function calculateTotalCredits(User $user): int
@@ -127,4 +137,15 @@ class UserRepository extends ServiceEntityRepository
         return $total;
     }
 
+    /**
+     * Met à jour les crédits d'un user
+     */
+    public function updateCredits(User $user, int $amont): void
+    {   
+        //Recupere les crédit  + le montant a ajouter (peut etre négatif)
+        $newCredits = $user->getCredits() + $amont;
+        //Met a jour le crédit et sauvegarde les modifs
+        $user->setCredits($newCredits);
+        $this->save($user, true);
+    }
 }

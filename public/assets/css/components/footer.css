@@ -1,6 +1,19 @@
 /*-------------FOOTER-------------*/
-.footerbg{
+.footer-bg{
   background-color: #313A50;
-  color: #F3F3F3;
   text-align: center;
+}
+
+.footer-liens{
+  font-family: 'PoppinsSB';
+  text-decoration: underline;
+  color: #F3F3F3;
+  font-size: 13px;
+}
+
+.footer-legal {
+  font-family: 'PoppinsR';
+  color: #F3F3F3;
+  font-size: 10px;
+  text-transform: uppercase;
 }

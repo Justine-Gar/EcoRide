@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -40,6 +41,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column ]
     private ?int $credits = 0;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $rating = null;
 
     /**
      * @var Collection<int, Role>
@@ -195,6 +199,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->credits = $credits;
         return $this;
     }
+
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): self
+    {
+        $this->rating = $rating;
+        return $this;
+    }
+
 
     public function getSenderReviews(): Collection
     {
