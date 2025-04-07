@@ -1,0 +1,104 @@
+<!-- Modal de connexion -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="loginModalLabel">Connexion</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="loginForm" method="POST" action="{{ path('app_login') }}" class="needs-validation" novalidate>
+					<div class="mb-3">
+						<input type="email" class="form-control" id="loginEmail" name="_username" required placeholder="Entrez votre email" autocomplete="email">
+					</div>
+					<div class="mb-3">
+						<input type="password" class="form-control" id="loginPassword" name="_password" required placeholder="Entrez votre mot de passe" autocomplete="current-password">
+					</div>
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+					<div class="alert alert-danger d-none" id="loginError"></div>
+					<div class="modal-footer justify-content-center">
+						<button type="submit" class="btn btn-connexion">Se connecter</button>
+					</div>
+				</form>
+			</div>
+			<div class="text-center mb-3">
+				<p>Pas encore de compte ?
+					<a href="#" class="texte-vert" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Inscrivez-vous</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal d'inscription -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="registerModalLabel">Inscription</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="registerForm" method="POST">
+					<div class="row mb-3">
+						<div class="col">
+							<label for="firstname" class="form-label">Prénom</label>
+							<input type="text" class="form-control" id="firstname" name="firstname" required>
+						</div>
+						<div class="col">
+							<label for="name" class="form-label">Nom</label>
+							<input type="text" class="form-control" id="name" name="name" required>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="email" class="form-label">Email</label>
+						<input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+					</div>
+					<div class="mb-3">
+						<label for="phone_number" class="form-label">Téléphone</label>
+						<input type="tel" class="form-control" id="phone_number" name="phone_number" pattern="[0-9]{10}" required>
+					</div>
+					<div class="mb-3">
+						<label for="register_password" class="form-label">Mot de passe</label>
+						<input type="password" class="form-control" id="register-password" name="register_password" autocomplete="new-password" required>
+					</div>
+					<div class="mb-3">
+						<label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+						<input type="password" class="form-control" id="confirm-password" name="confirm_password" autocomplete="new-password" required>
+					</div>
+					<div class="mb-4">
+						<label class="form-label">Je souhaite m'inscrire en tant que :</label>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="role" id="role-passager" value="Passager" checked>
+							<label class="form-check-label" for="role-passager">
+								Passager
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="role" id="role-conducteur" value="Conducteur">
+							<label class="form-check-label" for="role-conducteur">
+								Conducteur
+							</label>
+						</div>
+						<small class="text-muted">Vous pourrez changer de rôle ultérieurement depuis votre profil.</small>
+					</div>
+					<div class="alert alert-danger d-none" id="registerError"></div>
+					<div class="form-check mb-3">
+						<input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+						<label class="form-check-label" for="terms">
+							J'accepte les conditions d'utilisation
+						</label>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="submit" class="btn btn-connexion" form="registerForm">S'inscrire</button>
+					</div>
+				</form>
+			</div>
+			<div class="text-center mb-3">
+				<p>Déjà un compte ?
+					<a href="#" class="texte-vert" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Connectez-vous</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>

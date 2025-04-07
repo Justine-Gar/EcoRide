@@ -88,7 +88,9 @@
     </section>
 
 	</main>
-
+	
+	{% include 'partials/modals/trip_modals.html.twig' with {'cars': cars is defined ? cars : []} %}
+	
 {% endblock %}
 
 {% block javascripts %}

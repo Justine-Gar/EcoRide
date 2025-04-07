@@ -1,5 +1,4 @@
 // Ce script gère le formulaire d'édition du profil et les alertes associées
-
 document.addEventListener('DOMContentLoaded', function () {
     // === PARTIE 1: GESTION DU FORMULAIRE DE PROFIL ===
 
@@ -52,4 +51,27 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.hide();
         }
     }
-})
+});
+
+// Ce script gere le filtrage des avis
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion du filtrage des avis
+    const filterLinks = document.querySelectorAll('.dropdown-menu a[data-filter]');
+    const reviewItems = document.querySelectorAll('.review-item');
+    
+    filterLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filter = this.getAttribute('data-filter');
+            
+            reviewItems.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else {
+                    const role = item.getAttribute('data-role');
+                    item.style.display = (role === filter) ? 'block' : 'none';
+                }
+            });
+        });
+    });
+});

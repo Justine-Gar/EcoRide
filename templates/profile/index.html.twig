@@ -22,7 +22,7 @@
 				<div class="card mb-4">
 					<div class="card-body text-center">
 						<img src="{% if user.profilPicture %}{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}{% else %}{{ asset('assets/images/default-profile.png') }}{% endif %}" class="rounded-circle mb-3" alt="Photo de profil">
-						<h5 class="mb-2">Sophie Martin</h5>
+						<h5 class="mb-2">{{user.firstname}} {{user.name}}</h5>
 
 						<!-- Badge de rôles -->
 						<div class="mb-4 role-switch">
@@ -72,11 +72,11 @@
 					<div class="card-body">
 						<div class="mb-3">
 							<label class="text-muted d-block">Email</label>
-							<div>sophie.martin@email.com</div>
+							<div>{{ user.email}}</div>
 						</div>
 						<div class="mb-3">
 							<label class="text-muted d-block">Téléphone</label>
-							<div>06 12 34 56 78</div>
+							<div>{{ user.phoneNumber}}</div>
 						</div>
 
 						<button type="button" class="btn btn-blue mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
@@ -84,64 +84,7 @@
 						</button>
 					</div>
 
-					{# Modal de modification #}
-					<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="editProfileModalLabel">Modifier mon profil</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-                
-									{{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'profile-edit-form', 'class': 'needs-validation'}}) }}
-
-									{% if user.profilPicture %}
-										<div class="mb-3 text-center">
-											<img src="{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;" alt="Photo de profil actuelle">
-										</div>
-									{% endif %}
-
-                  {# Affichage des messages d'erreur/succès #}
-                  {% for message in app.flashes('success') %}
-                      <div class="alert alert-success">
-                          {{ message }}
-                      </div>
-                  {% endfor %}
-                  {% for message in app.flashes('error') %}
-                      <div class="alert alert-danger">
-                          {{ message }}
-                      </div>
-                  {% endfor %}
-
-									<div class="mb-3">
-										{{ form_row(form.firstname) }}
-									</div>
-									<div class="mb-3">
-										{{ form_row(form.name) }}
-									</div>
-									<div class="mb-3">
-										{{ form_row(form.email) }}
-									</div>
-									<div class="mb-3">
-										{{ form_row(form.phone_number) }}
-									</div>
-									<div class="mb-3">
-										{{ form_row(form.profilePicture) }}
-										<small class="text-muted">
-											<i class="fas fa-info-circle"></i>
-											Taille maximale : 1 Mo - Formats acceptés : JPG, PNG
-										</small>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-										<button type="submit" id="profile-submit" class="btn btn-primary">Enregistrer</button>
-									</div>
-									{{ form_end(form) }}
-								</div>
-							</div>
-						</div>
-					</div>
+					
 				</div>
 
 			</section>
@@ -156,13 +99,15 @@
 							<h5 class="mb-0"><i class="far fa-credit-card me-2"></i>Crédits</h5>
 						</div>
 						<div class="card-body text-center">
-							<h3 class="mb-0 text-success">45
-									<small>crédits</small>
+							<h3 class="mb-0 text-success">
+								{{ user.credits }}
+								<small>crédits</small>
 							</h3>
 						</div>
 					</div>
 
 					<!--Affichage Note et distance(option)-->
+					{% if user.rating is not null %}
 					<div class="card mb-4">
 						<div class="card-header">
 							<h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Note</h5>
@@ -176,7 +121,7 @@
 										<div class="card-body text-center">
 											<h6 class="text-muted mb-2">Note moyenne</h6>
 											<div class="text-warning h2 mb-0">
-												4.8
+												{{ user.rating|number_format(1) }}
 												<small class="text-muted">/5</small>
 											</div>
 										</div>
@@ -188,7 +133,7 @@
 
 						</div>
 					</div>
-
+					{% endif %}
 				</div>
 			</section>
 
@@ -254,54 +199,54 @@
 									</div>
 								</div>
 								<div class="card-body">
-									<!-- Avis individuel -->
-									<div class="border-bottom pb-3 mb-3">
-										<div class="d-flex justify-content-between align-items-start mb-2">
-											<div class="d-flex align-items-center">
-												<img src="#" class="rounded-circle me-2" alt="Avatar">
-												<div>
-													<h6 class="mb-0">Pierre Dubois</h6>
-													<small class="text-muted">Trajet Paris → Lyon, 15 jan. 2025</small>
-												</div>
+									{% if user.recipientReviews|length > 0 %}
+											{% for review in user.recipientReviews %}
+													{% if review.statut == 'publié' %}
+															<!-- Avis individuel -->
+															<div class="border-bottom pb-3 mb-3 review-item" 
+																	data-role="{% if review.carpool.user.idUser == user.idUser %}driver{% else %}passenger{% endif %}">
+																	<div class="d-flex justify-content-between align-items-start mb-2">
+																			<div class="d-flex align-items-center">
+																					<img src="{% if review.sender.profilPicture %}{{ asset('uploads/profile_pictures/' ~ review.sender.profilPicture) }}{% else %}{{ asset('assets/images/default-profile.png') }}{% endif %}" 
+																							class="rounded-circle me-2" alt="Avatar" style="width: 40px; height: 40px;">
+																					<div>
+																							<h6 class="mb-0">{{ review.sender.firstname }} {{ review.sender.name }}</h6>
+																							<small class="text-muted">
+																									Trajet {{ review.carpool.locationStart }} → {{ review.carpool.locationReach }}, 
+																									{{ review.carpool.dateStart|date('d M Y') }}
+																							</small>
+																					</div>
+																			</div>
+																			<div class="text-warning">
+																					{% set rating = review.note|number_format(1) %}
+																					{% for i in 1..5 %}
+																							{% if i <= rating %}★{% else %}☆{% endif %}
+																					{% endfor %}
+																					<span class="text-dark ms-1">{{ rating }}</span>
+																			</div>
+																	</div>
+																	<p class="mb-1">{{ review.comment }}</p>
+																	<div class="d-flex align-items-center">
+																			{% if review.carpool.user.idUser == user.idUser %}
+																					<span class="badge bg-success me-2">Conducteur</span>
+																			{% else %}
+																					<span class="badge bg-info me-2">Passager</span>
+																			{% endif %}
+																			<small class="text-muted">Vérifié par la modération</small>
+																	</div>
+															</div>
+													{% endif %}
+											{% endfor %}
+									{% else %}
+											<div class="text-center py-4">
+													<i class="far fa-comment-alt fa-3x mb-3 text-muted"></i>
+													<p>Aucun avis reçu pour le moment</p>
 											</div>
-											<div class="text-warning">
-												★★★★★
-												<span class="text-dark ms-1">5.0</span>
-											</div>
-										</div>
-										<p class="mb-1">Conductrice très ponctuelle et sympathique. Voiture propre et confortable. Discussion agréable pendant le trajet !</p>
-										<div class="d-flex align-items-center">
-											<span class="badge bg-success me-2">Conducteur</span>
-											<small class="text-muted">Vérifié par la modération</small>
-										</div>
-									</div>
-
-									<!-- Autre avis -->
-									<div class="border-bottom pb-3 mb-3">
-										<div class="d-flex justify-content-between align-items-start mb-2">
-											<div class="d-flex align-items-center">
-												<img src="#" class="rounded-circle me-2" alt="Avatar">
-												<div>
-													<h6 class="mb-0">Marie Lambert</h6>
-													<small class="text-muted">Trajet Lyon → Marseille, 5 jan. 2025</small>
-												</div>
-											</div>
-											<div class="text-warning">
-												★★★★☆
-												<span class="text-dark ms-1">4.0</span>
-											</div>
-										</div>
-										<p class="mb-1">Bonne communication et respect des horaires. Sophie est une passagère agréable.</p>
-										<div class="d-flex align-items-center">
-											<span class="badge bg-info me-2">Passager</span>
-											<small class="text-muted">Vérifié par la modération</small>
-										</div>
-									</div>
-
-
+									{% endif %}
 								</div>
 							</div>
 							<!-- Pagination -->
+							{% if user.recipientReviews|length > 5 %}
 							<nav aria-label="Page navigation" class="mt-4">
 								<ul class="pagination justify-content-center">
 									<li class="page-item disabled">
@@ -321,6 +266,7 @@
 									</li>
 								</ul>
 							</nav>
+							{% endif %}
 						</div>
 
 						<!-- Contenu Véhicules -->
@@ -797,6 +743,9 @@
 
 	</main>
 
+	{% include 'partials/modals/profile_modals.html.twig' with {'form': form, 'carForm': carForm, 'user': user} %}
+	{% include 'partials/modals/trip_modals.html.twig' with {'cars': cars is defined ? cars : []} %}
+	
 {% endblock %}
 
 {% block javascripts %}
