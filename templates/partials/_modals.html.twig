@@ -173,155 +173,162 @@
 </div>
 
 <!-- Modal de création de trajet -->
-<div class="modal fade" id="createTripModal" tabindex"-1" aria-labelledby="createTripModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
+<div class="modal modal-xl fade" id="createTripModal" tabindex"-1" aria-labelledby="createTripModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="createTripModalLabel">Créer un covoiturage</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form id="createCarpoolForm" method="post" action="{{ path('app_covoiturage_new')}}">
+				<div class="row g-0">
 
-				<!-- Départ / Arrivée -->
-					<div class="row mb-3">
-            <div class="col-md-6">
-              <label for="location_start" class="form-label">Lieu de départ</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                <input type="text" class="form-control" id="location_start" name="location_start" placeholder="Ville, adresse de départ" required>
-              </div>
-              <input type="hidden" id="lat_start" name="lat_start">
-              <input type="hidden" id="lng_start" name="lng_start">
-            </div>
-            <div class="col-md-6">
-              <label for="location_reach" class="form-label">Lieu d'arrivée</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-flag-checkered"></i></span>
-                <input type="text" class="form-control" id="location_reach" name="location_reach" placeholder="Ville, adresse d'arrivée" required>
-              </div>
-              <input type="hidden" id="lat_reach" name="lat_reach">
-              <input type="hidden" id="lng_reach" name="lng_reach">
-            </div>
-          </div>
+					<!-- Carte à gauche -->
+					<div class="col-md-5">
+						<label class="form-label">Itinéraire</label>
+						<div id="mapPreview" style="height: 100%; min-height: 500px; border-radius: 8px 0 0 8px;"></div>
+					</div>
 
+					<!-- Formulaire à droite -->
+					<div class="col-md-7 p-4">
+						<form id="createCarpoolForm" method="post" action="{{ path('app_covoiturage_new')}}">
 
-				<!-- Date / Heure Départ/Arrivée -->
-					<div class="row mb-3">
-            <div class="col-md-3">
-              <label for="date_start" class="form-label">Date de départ</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="date" class="form-control" id="date_start" name="date_start" required min="{{ 'now'|date('Y-m-d') }}">
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="hour_start" class="form-label">Heure de départ</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                <input type="time" class="form-control" id="hour_start" name="hour_start" required>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="date_reach" class="form-label">Date d'arrivée</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                <input type="date" class="form-control" id="date_reach" name="date_reach" required min="{{ 'now'|date('Y-m-d') }}">
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="hour_reach" class="form-label">Heure d'arrivée</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                <input type="time" class="form-control" id="hour_reach" name="hour_reach" required>
-              </div>
-            </div>
-          </div>
+						<!-- Départ / Arrivée -->
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="location_start" class="form-label">Lieu de départ</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+										<input type="text" class="form-control" id="location_start" name="location_start" placeholder="Ville, adresse de départ" required>
+									</div>
+									<input type="hidden" id="lat_start" name="lat_start">
+									<input type="hidden" id="lng_start" name="lng_start">
+								</div>
+								<div class="col-md-6">
+									<label for="location_reach" class="form-label">Lieu d'arrivée</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-flag-checkered"></i></span>
+										<input type="text" class="form-control" id="location_reach" name="location_reach" placeholder="Ville, adresse d'arrivée" required>
+									</div>
+									<input type="hidden" id="lat_reach" name="lat_reach">
+									<input type="hidden" id="lng_reach" name="lng_reach">
+								</div>
+							</div>
 
 
-				<!-- Véhicule et Nombre de places -->
-					<div class="row mb-3">
-            <div class="col-md-6">
-              <label for="car_id" class="form-label">Véhicule</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-car"></i></span>
-                <select class="form-select" id="car_id" name="car_id" required>
-                  <option value="" selected disabled>Choisissez votre véhicule</option>
-									{% if cars is defined and cars is not empty %}
-										{% for car in cars %}
-											<option value="{{ car.id }}">{{ car.marque }} {{ car.modele }} ({{ car.color }})</option>
-										{% endfor %}
-									{% else %}
-										<option value="" disabled>Aucun véhicule disponible</option>
-									{% endif %}
-                </select>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label for="nbr_places" class="form-label">Nombre de places disponibles</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-user-friends"></i></span>
-                <select class="form-select" id="nbr_places" name="nbr_places" required>
-                  <option value="" selected disabled>Nombre de places</option>
-                  <option value="1">1 place</option>
-                  <option value="2">2 places</option>
-                  <option value="3">3 places</option>
-                  <option value="4">4 places</option>
-                </select>
-              </div>
-            </div>
-          </div>
+						<!-- Date / Heure Départ/Arrivée -->
+							<div class="row mb-3">
+								<div class="col-md-3">
+									<label for="date_start" class="form-label">Date de départ</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+										<input type="date" class="form-control" id="date_start" name="date_start" required min="{{ 'now'|date('Y-m-d') }}">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<label for="hour_start" class="form-label">Heure de départ</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-clock"></i></span>
+										<input type="time" class="form-control" id="hour_start" name="hour_start" required>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<label for="date_reach" class="form-label">Date d'arrivée</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+										<input type="date" class="form-control" id="date_reach" name="date_reach" required min="{{ 'now'|date('Y-m-d') }}">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<label for="hour_reach" class="form-label">Heure d'arrivée</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-clock"></i></span>
+										<input type="time" class="form-control" id="hour_reach" name="hour_reach" required>
+									</div>
+								</div>
+							</div>
 
 
-				<!-- Crédits -->
-					<div class="row mb-3">
-            <div class="col-md-6">
-              <label for="credits" class="form-label">Prix (en crédits)</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-coins"></i></span>
-                <input type="number" class="form-control" id="credits" name="credits" min="5" max="50" value="20" required>
-              </div>
-              <small class="form-text text-muted">Prix par passager (entre 5 et 50 crédits)</small>
-            </div>
-            
-          </div>
-          
-        <!-- Préférences -->
-          <div class="mb-3">
-            <label class="form-label">Préférences</label>
-            <div class="d-flex flex-wrap gap-2">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="preference_smoke" name="user_preferences[]" value="non_fumeur">
-                <label class="form-check-label" for="preference_smoke"><i class="fas fa-smoking-ban"></i> Non fumeur</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="preference_music" name="user_preferences[]" value="musique">
-                <label class="form-check-label" for="preference_music"><i class="fas fa-music"></i> Musique</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="preference_animals" name="user_preferences[]" value="animaux">
-                <label class="form-check-label" for="preference_animals"><i class="fas fa-paw"></i> Animaux acceptés</label>
-              </div>
-            </div>
-          </div>
-          
-        <!-- Carte de prévisualisation -->
-          <div class="mb-3">
-            <label class="form-label">Itinéraire</label>
-            <div id="mapPreview" style="height: 250px; border-radius: 8px;"></div>
-          </div>
+						<!-- Véhicule et Nombre de places -->
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="car_id" class="form-label">Véhicule</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-car"></i></span>
+										<select class="form-select" id="car_id" name="car_id" required>
+											<option value="" selected disabled>Choisissez votre véhicule</option>
+											{% if cars is defined and cars is not empty %}
+												{% for car in cars %}
+													<option value="{{ car.id }}">{{ car.marque }} {{ car.modele }} ({{ car.color }})</option>
+												{% endfor %}
+											{% else %}
+												<option value="" disabled>Aucun véhicule disponible</option>
+											{% endif %}
+										</select>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<label for="nbr_places" class="form-label">Nombre de places disponibles</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-user-friends"></i></span>
+										<select class="form-select" id="nbr_places" name="nbr_places" required>
+											<option value="" selected disabled>Nombre de places</option>
+											<option value="1">1 place</option>
+											<option value="2">2 places</option>
+											<option value="3">3 places</option>
+											<option value="4">4 places</option>
+										</select>
+									</div>
+								</div>
+							</div>
 
 
-				<!-- Résumer trajet -->
-					<div class="alert alert-info" id="tripSummary" style="display: none;">
-            <h6 class="alert-heading">Résumé du trajet</h6>
-            <p id="summaryText"></p>
-            <p id="summaryPrice" class="mb-0"></p>
-          </div>
+						<!-- Crédits -->
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="credits" class="form-label">Prix (en crédits)</label>
+									<div class="input-group">
+										<span class="input-group-text"><i class="fas fa-coins"></i></span>
+										<input type="number" class="form-control" id="credits" name="credits" min="5" max="50" value="20" required>
+									</div>
+									<small class="form-text text-muted">Prix par passager (entre 5 et 50 crédits)</small>
+								</div>
+								
+							</div>
+							
+						<!-- Préférences -->
+							<div class="mb-3">
+								<label class="form-label">Préférences</label>
+								<div class="d-flex flex-wrap gap-2">
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="preference_smoke" name="user_preferences[]" value="non_fumeur">
+										<label class="form-check-label" for="preference_smoke"><i class="fas fa-smoking-ban"></i> Non fumeur</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="preference_music" name="user_preferences[]" value="musique">
+										<label class="form-check-label" for="preference_music"><i class="fas fa-music"></i> Musique</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="preference_animals" name="user_preferences[]" value="animaux">
+										<label class="form-check-label" for="preference_animals"><i class="fas fa-paw"></i> Animaux acceptés</label>
+									</div>
+								</div>
+							</div>
+							
 
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('create_carpool') }}">
+						<!-- Résumer trajet -->
+							<div class="alert alert-info" id="tripSummary" style="display: none;">
+								<h6 class="alert-heading">Résumé du trajet</h6>
+								<p id="summaryText"></p>
+								<p id="summaryPrice" class="mb-0"></p>
+							</div>
 
-				</form>
+							<input type="hidden" name="_csrf_token" value="{{ csrf_token('create_carpool') }}">
+
+						</form>
+					</div>
+	
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
