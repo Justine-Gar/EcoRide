@@ -15,13 +15,42 @@
   width: 80px;
 }
 
+
+/*------BOUTON------*/
+.buttons-container{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.btn.btn-blue {
+  color: #313A50;
+  background-color: #f3f3f3;
+  border: 2px solid #313A50;
+  
+}
+.btn.btn-blue:hover {
+  color: #f3f3f3;
+  background-color: #313A50;
+}
+.btn.btn-green {
+  color: #3F7B6A;
+  background-color: #f3f3f3;
+  border: 2px solid #3F7B6A;
+  transition: opacity 0.3s ease;
+}
+.btn.btn-green:hover {
+  color: #f3f3f3;
+  background-color: #3F7B6A;
+}
+
+
+/*------BTN SWITCH------*/
 .role-switch {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
-
 /*Switch bouton profilUser*/
 .switch-container {
   position: relative;
@@ -34,7 +63,6 @@
   border: 3px solid #313A50;
   z-index: 1;
 }
-
 .switch-options {
   position: relative;
   width: 100%;
@@ -43,7 +71,6 @@
   z-index: 3;
   overflow: hidden;
 }
-
 .option {
   flex: 1;
   display: flex;
@@ -56,8 +83,6 @@
   overflow: hidden;
   gap: 10px;
 }
-
-
 /* Background avec effet de transition*/
 .bg-conducteur, .bg-passager {
   position: absolute;
@@ -68,31 +93,25 @@
   border-radius: 12px;
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
-
 .bg-conducteur {
   background-color: #4DBC84; 
   transform: translateX(100%);
 }
-
 .bg-passager {
   right: 0px;
   background-color: #4DBC84;
   transform: translateX(-100%);
 }
-
 /* Styles pour l'option active et inactive */
 .option-active {
   color: #f3f3f3;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
   z-index: 4;
 }
-
 /* Styles spécifiques quand pas actif */
 .conducteur-active .option-passager, .passager-active .option-conducteur {
   color: #f3f3f3;
 }
-
-
 /* Active backgrounds */
 .conducteur-active .bg-conducteur, .passager-active .bg-passager {
   transform: translateX(0);
