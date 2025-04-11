@@ -304,7 +304,39 @@ class CovoiturageController extends AbstractController
       // Changer le statut du covoiturage
       $carpoolRepository->updateStatus($carpool, 'annulé');
       
+      
       $this->addFlash('success', 'Le covoiturage a été annulé et les passagers ont été remboursés.');
       return $this->redirectToRoute('app_covoiturage');
+  }
+
+  //Route pour finir un covoiturage
+  #[Route('/{id}/finish', name: 'app_covoiturage_finish', requirements: ['id' => '\d+'])]
+  public function finish(Carpool $carpool, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
+  {
+      $user = $this->security->getUser();
+      
+      // Vérifier si l'utilisateur est connecté
+      if (!$user) {
+          $this->addFlash('error', 'Vous devez être connecté pour terminer un covoiturage.');
+          return $this->redirectToRoute('app_login');
+      }
+      
+      // Vérifier si c'est bien le conducteur qui termine le trajet
+      if ($carpool->getUser() !== $user) {
+          $this->addFlash('error', 'Vous ne pouvez pas terminer un covoiturage dont vous n\'êtes pas le conducteur.');
+          return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      }
+      
+      // Changer le statut du covoiturage
+      $carpoolRepository->updateStatus($carpool, 'terminé');
+      
+      // Créditer le conducteur
+      $userRepository->updateCredits($user, $carpool->getCredits());
+      
+      // Envoyer un email aux passagers pour qu'ils puissent laisser un avis
+      // Cette partie dépend de votre configuration d'envoi d'emails
+      
+      $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés.');
+      return $this->redirectToRoute('app_profile');
   }
 }

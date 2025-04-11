@@ -117,3 +117,12 @@
   transform: translateX(0);
   opacity: 1;
 }
+
+.badge-driver {
+  background-color: #4DBC84;
+  color: #f3f3f3;
+}
+.badge-passenger {
+  background-color: #313A50;
+  color: #f3f3f3;
+}

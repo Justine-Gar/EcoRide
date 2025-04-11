@@ -9,6 +9,7 @@ use App\Entity\Car;
 use App\Repository\CarRepository;                  
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
 use App\Repository\ReviewRepository;
+use App\Repository\CarpoolRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,19 +26,27 @@ class ProfileController extends AbstractController
         private FileUploader $fileUploader,
         private EntityManagerInterface $entityManager,
         private CarRepository $carRepository,
-        private ReviewRepository $reviewRepository
+        private ReviewRepository $reviewRepository,
+        private CarpoolRepository $carpoolRepository
     ) {}
 
     // Route pour afficher le profil utilisateur
     // Accessible uniquement aux utilisateurs connectés (ROLE_USER)
     #[Route('/profile', name: 'app_profile')]
     #[IsGranted('ROLE_USER')]
-    public function index(): Response
+    public function index(CarpoolRepository $carpoolRepository): Response
     {
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
 
+        // Récupérer les covoiturages "actif" et "terminé" de l'utilisateur
+        $activeCarpoolsAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
+        $completedCarpoolsAsDriver = $carpoolRepository->findCompletedCarpoolsAsDriver($user);
+            
+        // Récupérer les covoiturages où l'utilisateur est passager
+        $activeCarpoolsAsPassenger = $carpoolRepository->findActiveCarpoolsAsPassenger($user);
+        $completedCarpoolsAsPassenger = $carpoolRepository->findCompletedCarpoolsAsPassenger($user);
 
         //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [
@@ -57,7 +66,11 @@ class ProfileController extends AbstractController
             'user' => $user,
             'form' => $form->createView(),
             'cars' => $usersCars,
-            'carForm' => $carForm->createView()
+            'carForm' => $carForm->createView(),
+            'activeCarpoolsAsDriver' => $activeCarpoolsAsDriver,
+            'completedCarpoolsAsDriver' => $completedCarpoolsAsDriver,
+            'activeCarpoolsAsPassenger' => $activeCarpoolsAsPassenger,
+            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger
         ]);
     }
 
@@ -147,6 +160,7 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('app_profile'); // Change si nécessaire
     }
+
 
     // Route pour l'interface administrateur
     // Accessible uniquement aux administrateurs

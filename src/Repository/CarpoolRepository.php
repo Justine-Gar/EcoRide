@@ -210,4 +210,66 @@ class CarpoolRepository extends ServiceEntityRepository
             ->getResult();
     }
     
+
+    /**
+     * Recupérer les covoiturage "actifs" user = conducteur
+     */
+    public function findActiveCarpoolsAsDriver(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', 'actif')
+            ->orderBy('c.date_start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recupérer les covoiturage "terminé" user = conducteur
+     */
+    public function findCompletedCarpoolsAsDriver(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', 'terminé')
+            ->orderBy('c.date_start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+        /**
+     * Recupérer les covoiturage "actifs" user = passager
+     */
+    public function findActiveCarpoolsAsPassenger(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.passengers', 'p')
+            ->where('p.id_user = :userId')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('userId', $user->getIdUser())
+            ->setParameter('statut', 'actif')
+            ->orderBy('c.date_start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recupérer les covoiturage "terminé" user = passager
+     */
+    public function findCompletedCarpoolsAsPassenger(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.passengers', 'p')
+            ->where('p.id_user = :userId')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('userId', $user->getIdUser())
+            ->setParameter('statut', 'terminé')
+            ->orderBy('c.date_start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

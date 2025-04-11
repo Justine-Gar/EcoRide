@@ -75,3 +75,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Ce script gere le filtrage des trajets
+document.addEventListener('DOMContentLoaded', function() {
+    // Récupérer les éléments de filtre
+    const filterLinks = document.querySelectorAll('[data-filter]');
+    const driverCarpools = document.querySelectorAll('.driver-carpool');
+    const passengerCarpools = document.querySelectorAll('.passenger-carpool');
+    
+    // Ajouter les écouteurs d'événements sur les liens de filtre
+    filterLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const filter = this.getAttribute('data-filter');
+            
+            // Appliquer le filtre
+            if (filter === 'all') {
+                // Afficher tous les trajets
+                driverCarpools.forEach(carpool => carpool.style.display = 'block');
+                passengerCarpools.forEach(carpool => carpool.style.display = 'block');
+            } else if (filter === 'driver') {
+                // Afficher uniquement les trajets en tant que conducteur
+                driverCarpools.forEach(carpool => carpool.style.display = 'block');
+                passengerCarpools.forEach(carpool => carpool.style.display = 'none');
+            } else if (filter === 'passenger') {
+                // Afficher uniquement les trajets en tant que passager
+                driverCarpools.forEach(carpool => carpool.style.display = 'none');
+                passengerCarpools.forEach(carpool => carpool.style.display = 'block');
+            }
+        });
+    });
+});
