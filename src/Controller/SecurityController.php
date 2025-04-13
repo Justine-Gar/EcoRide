@@ -14,7 +14,7 @@ class SecurityController extends AbstractController
     public function __construct(private Security $security) // Injection du service Security
     {}
 
-    #[Route('/login', name: 'app_login', methods: ['POST'])]
+    #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(): JsonResponse
     {
         return new JsonResponse(['message' => 'Cette route est protégée par l\'authentificateur.']);

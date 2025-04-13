@@ -14,6 +14,10 @@ use App\Repository\RoleRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -84,29 +88,34 @@ class ProfileController extends AbstractController
 
     //Route pour changer le role actif d'un utilisateur
     // Accessible uniquement aux utilisateur connectés
-    #[Route('/profile/switch-role/{roleName}', name: 'app_profile_switch_role')]
+    #[Route('/profile/switch-role/{roleName}', name: 'app_profile_switch_role', methods: 'GET')]
     #[IsGranted('ROLE_USER')]
-    public function switchRole(string $roleName, RoleRepository $roleRepository): Response
+    public function switchRole(string $roleName, RoleRepository $roleRepository, TokenStorageInterface $tokenStorage, RequestStack $requestStack): Response
     {
         try {
             $user = $this->getUser();
             if (!$user) {
                 throw new \Exception('Utilisateur non connecté');
             }
-            // Utiliser la méthode existante dans le RoleRepository
+            
             $roleRepository->setUserMainRole($user, $roleName);
 
-            $this->addFlash('success', 'Vous êtes maintenant connecté en tant que ' . $roleName);
+            //Symfony ne garde pas le nouveau token dans la session, obliger de créer un nouveau est de le forcer a etre stocker a nouveau
+            // Rafraîchit le token de sécurité
+            $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+            $tokenStorage->setToken($token);
+            // Forcer le stokage session
+            $request = $requestStack->getCurrentRequest();
+            $request->getSession()->set('_security_main', serialize($token));
 
-            // Rediriger vers la page appropriée selon le rôle
-            return $this->redirectToRoute('app_profile');
+            return new JsonResponse(['success' => true, 'role' => $roleName]);
         }
         catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors du changement de rôle: ' . $e->getMessage());
-            return $this->redirectToRoute('app_profile');
+            error_log("Erreur lors du changement de rôle: " . $e->getMessage());
+
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
         }
-        
-        
+    
     }
 
     // Route pour modifier le profil utilisateur

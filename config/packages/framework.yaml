@@ -19,7 +19,7 @@ framework:
         cookie_samesite: lax
         #Durée de vie de la session en secondes ici envirrons 1h = 3600
         # Augmentez cette valeur si vos utilisateurs se plaignent de déconnexions trop fréquentes
-        gc_maxlifetime: 3600
+        gc_maxlifetime: 604800 
         #Nettoyage des sessions
         # Ces valeurs signifient qu'il y a 1% de chance qu'un nettoyage soit déclenché à chaque requête
         gc_probability: 1
