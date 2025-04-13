@@ -137,14 +137,4 @@ class RoleRepository extends ServiceEntityRepository
         return in_array($roleName, self::ADMIN_ROLES);
     }
 
-    //Vérifie si role est un passeur
-    public function isPasseur(User $user): bool
-    {
-        foreach (self::BASIC_ROLES as $roleName) {
-            if (!$this->userHasRole($user, $roleName)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
