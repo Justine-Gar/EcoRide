@@ -5,12 +5,27 @@ framework:
     http_method_override: false
     handle_all_throwables: true
 
-    # Enables session support. Note that the session will ONLY be started if you read or write from it.
-    # Remove or comment this section to explicitly disable session support.
+    # Configuration des sessions
     session:
-        handler_id: null
+        #Utilisation des fichier natif pour stocker les sessions
+        handler_id: session.handler.native_file
+        #Définit ou sont les fichiers de sessions sont stockés
+        # %kernel.project_dir% est le répertoire racine de l'application
+        # %kernel.environment% est l'environnement (dev, prod, test)
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        #Sécurise les cookies en activant automatiquement HTTPS si dispo
         cookie_secure: auto
+        #Politique SameSite pour les cookies(CSRF)
         cookie_samesite: lax
+        #Durée de vie de la session en secondes ici envirrons 1h = 3600
+        # Augmentez cette valeur si vos utilisateurs se plaignent de déconnexions trop fréquentes
+        gc_maxlifetime: 3600
+        #Nettoyage des sessions
+        # Ces valeurs signifient qu'il y a 1% de chance qu'un nettoyage soit déclenché à chaque requête
+        gc_probability: 1
+        gc_divisor: 100
+        #Nom du cookie de session(si plrs appli)
+        #name: 'ECORE_SESSION'
 
     #esi: true
     #fragments: true
