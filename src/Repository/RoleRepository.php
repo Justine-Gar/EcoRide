@@ -73,43 +73,6 @@ class RoleRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    //définir le role principal d'un user, si les 2 devient un passeur
-    public function setUserMainRole(User $user, string $roleName): void
-    {
-        // Vérifie si le rôle est un rôle de base valide
-        if (!in_array($roleName, self::BASIC_ROLES)) {
-            throw new \InvalidArgumentException("Le rôle doit être 'Passager' ou 'Conducteur'");
-        }
-
-        // Récupère le rôle demandé
-        $role = $this->findByName($roleName);
-        if (!$role) {
-            throw new \RuntimeException("Rôle non trouvé");
-        }
-
-        // Vérifie si l'utilisateur a déjà l'autre rôle de base
-        $hasOtherBasicRole = false;
-        foreach (self::BASIC_ROLES as $basicRole) {
-            if ($basicRole !== $roleName && $this->userHasRole($user, $basicRole)) {
-                $hasOtherBasicRole = true;
-                break;
-            }
-        }
-
-        // Ajoute le nouveau rôle s'il ne l'a pas déjà
-        if (!$this->userHasRole($user, $roleName)) {
-            $this->addRoleToUser($user, $role);
-        }
-
-        // Si l'utilisateur a les deux rôles de base, ajoute le rôle Passeur
-        if ($hasOtherBasicRole) {
-            $passeurRole = $this->findByName('Passeur');
-            if ($passeurRole && !$this->userHasRole($user, 'Passeur')) {
-                $this->addRoleToUser($user, $passeurRole);
-            }
-        }
-    }
-
     //Vérifie si un user à un role spécifique
     private function userHasRole(User $user, string $roleName): bool
     {

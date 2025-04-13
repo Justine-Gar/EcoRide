@@ -14,6 +14,7 @@ use App\Repository\RoleRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -166,6 +167,52 @@ class ProfileController extends AbstractController
         $this->addFlash('success', 'Véhicule supprimé avec succès.');
 
         return $this->redirectToRoute('app_profile'); // Change si nécessaire
+    }
+
+
+    // Route pour changer le role actif d'un utilisateur
+     // Accessible uniquement aux utilisateurs connectés
+    #[Route('/profile/switch-role', name: 'app_profile_switch_role', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function switchRole(Request $request, RoleRepository $roleRepository): JsonResponse
+    {
+        //Récupérer les donnée de la requete
+        $data = json_encode($request->getContent(), true);
+        $targetRole = $data['roleTarget'] ?? null;
+
+        //Valider que le role user est valide
+        if (!in_array($targetRole, ['Passager', 'Conducteur']))
+        {
+            return new JsonResponse([
+                'succes' => false,
+                'error' => 'Rôle invalide'
+            ], 400);
+        }
+
+        $user = $this->userRepository->getUser($this->getUser());
+        $role = $roleRepository->findByName($targetRole);
+
+        if (!$role) {
+            return new JsonResponse([
+                'success' => false, 
+                'error' => 'Rôle non trouvé'
+            ], 404);
+        }
+
+        // Si l'utilisateur n'a pas déjà ce rôle, on l'ajoute
+        if (!$user->hasRole($role)) {
+            $user->addRole($role);
+            $this->entityManager->flush();
+        }
+
+        //Stocker le rôle actif dans la session
+        $this->get('session')->set('active_role', $targetRole);
+        
+        return new JsonResponse([
+            'success' => true,
+            'message' => "Vous utilisez maintenant le mode $targetRole",
+            'role' => $targetRole
+        ]);
     }
 
 
