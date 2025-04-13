@@ -35,11 +35,11 @@
 										<div class="bg-passager"></div>
 								</div>
 								<div class="switch-options">
-										<div class="option option-conducteur option-active" onclick="activateOption('conducteur')" data-role-id="{{ conducteurRoleId }}">
+										<div class="option option-conducteur option-active" onclick="activateOption('conducteur')">
 											<i class="fas fa-car"></i>
 											Conducteur
 										</div>
-										<div class="option option-passager" onclick="activateOption('passager')" data-role-id="{{ passagerRoleId }}">
+										<div class="option option-passager" onclick="activateOption('passager')">
 											Passager
 											<i class="fas fa-hand-paper"></i>
 										</div>
@@ -848,11 +848,5 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('assets/js/profile.js') }}"></script>
-		<script>
-			const ROLE_IDS = {
-					conducteur: {{ conducteurRoleId }},
-					passager: {{ passagerRoleId }}
-			};
-		</script>
 		<script src="{{ asset('assets/js/btnSwitch.js') }}"></script>
 {% endblock %}

@@ -94,6 +94,41 @@ class RoleRepository extends ServiceEntityRepository
         }
     }
 
+    //Défini le role principal d'un user
+    public function setUserMainRole(User $user, string $roleName): void
+    {
+        $basicRoles = ['Passager', 'Conducteur'];
+
+        // Vérifie si le rôle est un rôle de base valide
+        if (!in_array($roleName, $basicRoles)) {
+            throw new \InvalidArgumentException("Le rôle doit être 'Passager' ou 'Conducteur'");
+        }
+
+        // Récupère le rôle demandé
+        $role = $this->findByName($roleName);
+        if (!$role) {
+            throw new \RuntimeException("Rôle non trouvé");
+        }
+
+        // Retire l'autre rôle de base (si présent)
+        foreach ($basicRoles as $basicRole) {
+            if ($basicRole !== $roleName) {
+                $otherRole = $this->findByName($basicRole);
+                if ($otherRole && $user->hasRole($otherRole)) {
+                    $user->removeRole($otherRole);
+                }
+            }
+        }
+
+        // Ajoute le nouveau rôle s'il ne l'a pas déjà
+        if (!$this->userHasRole($user, $roleName)) {
+            $this->addRoleToUser($user, $role);
+        }
+        
+        // Sauvegarde les changements
+        $this->getEntityManager()->flush();
+    }
+    
     //Vérifie si role et role administratif
     public function isAdminRole(string $roleName): bool
     {

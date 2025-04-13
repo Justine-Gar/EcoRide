@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,15 +24,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ProfileController extends AbstractController
 {
-    // Injection de dépendance du UserRepository via le constructeur
+    private $requestStack;
+
+    // Injection de dépendance 
     public function __construct(
         private UserRepository $userRepository,
         private FileUploader $fileUploader,
         private EntityManagerInterface $entityManager,
         private CarRepository $carRepository,
         private ReviewRepository $reviewRepository,
-        private CarpoolRepository $carpoolRepository
-    ) {}
+        private CarpoolRepository $carpoolRepository,
+        RequestStack $requestStack
+    ) {
+        $this->requestStack = $requestStack;
+    }
 
     // Route pour afficher le profil utilisateur
     // Accessible uniquement aux utilisateurs connectés (ROLE_USER)
@@ -42,14 +48,10 @@ class ProfileController extends AbstractController
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
-        // Récupérer les rôles directement depuis la base de données
-        $conducteurRole = $roleRepository->findByName('Conducteur');
-        $passagerRole = $roleRepository->findByName('Passager');
 
         // Récupérer les covoiturages "actif" et "terminé" de l'utilisateur
         $activeCarpoolsAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
         $completedCarpoolsAsDriver = $carpoolRepository->findCompletedCarpoolsAsDriver($user);
-            
         // Récupérer les covoiturages où l'utilisateur est passager
         $activeCarpoolsAsPassenger = $carpoolRepository->findActiveCarpoolsAsPassenger($user);
         $completedCarpoolsAsPassenger = $carpoolRepository->findCompletedCarpoolsAsPassenger($user);
@@ -76,10 +78,35 @@ class ProfileController extends AbstractController
             'activeCarpoolsAsDriver' => $activeCarpoolsAsDriver,
             'completedCarpoolsAsDriver' => $completedCarpoolsAsDriver,
             'activeCarpoolsAsPassenger' => $activeCarpoolsAsPassenger,
-            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger,
-            'conducteurRoleId' => $conducteurRole ? $conducteurRole->getIdRole() : 3,
-            'passagerRoleId' => $passagerRole ? $passagerRole->getIdRole() : 4
+            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger
         ]);
+    }
+
+    //Route pour changer le role actif d'un utilisateur
+    // Accessible uniquement aux utilisateur connectés
+    #[Route('/profile/switch-role/{roleName}', name: 'app_profile_switch_role')]
+    #[IsGranted('ROLE_USER')]
+    public function switchRole(string $roleName, RoleRepository $roleRepository): Response
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                throw new \Exception('Utilisateur non connecté');
+            }
+            // Utiliser la méthode existante dans le RoleRepository
+            $roleRepository->setUserMainRole($user, $roleName);
+
+            $this->addFlash('success', 'Vous êtes maintenant connecté en tant que ' . $roleName);
+
+            // Rediriger vers la page appropriée selon le rôle
+            return $this->redirectToRoute('app_profile');
+        }
+        catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors du changement de rôle: ' . $e->getMessage());
+            return $this->redirectToRoute('app_profile');
+        }
+        
+        
     }
 
     // Route pour modifier le profil utilisateur
@@ -170,51 +197,7 @@ class ProfileController extends AbstractController
     }
 
 
-    // Route pour changer le role actif d'un utilisateur
-     // Accessible uniquement aux utilisateurs connectés
-    #[Route('/profile/switch-role', name: 'app_profile_switch_role', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function switchRole(Request $request, RoleRepository $roleRepository): JsonResponse
-    {
-        //Récupérer les donnée de la requete
-        $data = json_encode($request->getContent(), true);
-        $targetRole = $data['roleTarget'] ?? null;
-
-        //Valider que le role user est valide
-        if (!in_array($targetRole, ['Passager', 'Conducteur']))
-        {
-            return new JsonResponse([
-                'succes' => false,
-                'error' => 'Rôle invalide'
-            ], 400);
-        }
-
-        $user = $this->userRepository->getUser($this->getUser());
-        $role = $roleRepository->findByName($targetRole);
-
-        if (!$role) {
-            return new JsonResponse([
-                'success' => false, 
-                'error' => 'Rôle non trouvé'
-            ], 404);
-        }
-
-        // Si l'utilisateur n'a pas déjà ce rôle, on l'ajoute
-        if (!$user->hasRole($role)) {
-            $user->addRole($role);
-            $this->entityManager->flush();
-        }
-
-        //Stocker le rôle actif dans la session
-        $this->get('session')->set('active_role', $targetRole);
-        
-        return new JsonResponse([
-            'success' => true,
-            'message' => "Vous utilisez maintenant le mode $targetRole",
-            'role' => $targetRole
-        ]);
-    }
-
+    
 
     // Route pour l'interface administrateur
     // Accessible uniquement aux administrateurs
