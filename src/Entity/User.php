@@ -306,10 +306,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Role>
      */
-    /**public function getUserRoles(): Collection
+    /*
+    public function getUserRoles(): Collection
     {
         return $this->roles;
-    }**/
+    }*/
     public function addRole(Role $role): static
     {
         if (!$this->roles->contains($role)) {
@@ -325,6 +326,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function hasRole(Role $role): bool
+    {
+        return $this->roles->contains($role);
+    }
+
+    public function hasRoleByName(string $roleName): bool
+    {
+        foreach ($this->roles as $role) {
+            if ($role->getNameRole() === $roleName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * @return Collection<int, Car>
@@ -356,6 +373,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
     /**
      * @return Collection<int, UserPreference>
      */
@@ -386,6 +404,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
     /**
      * @return Collection<int, Review>
      */
@@ -415,6 +434,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, Carpool>
@@ -474,18 +494,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    public function hasRole(Role $role): bool
-    {
-        return $this->roles->contains($role);
-    }
-
-    public function hasRoleByName(string $roleName): bool
-    {
-        foreach ($this->roles as $role) {
-            if ($role->getNameRole() === $roleName) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

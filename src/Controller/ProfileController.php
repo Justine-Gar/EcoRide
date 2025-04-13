@@ -10,6 +10,7 @@ use App\Repository\CarRepository;
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
 use App\Repository\ReviewRepository;
 use App\Repository\CarpoolRepository;
+use App\Repository\RoleRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 
 class ProfileController extends AbstractController
 {
@@ -34,11 +36,14 @@ class ProfileController extends AbstractController
     // Accessible uniquement aux utilisateurs connectés (ROLE_USER)
     #[Route('/profile', name: 'app_profile')]
     #[IsGranted('ROLE_USER')]
-    public function index(CarpoolRepository $carpoolRepository): Response
+    public function index(CarpoolRepository $carpoolRepository, RoleRepository $roleRepository): Response
     {
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
+        // Récupérer les rôles directement depuis la base de données
+        $conducteurRole = $roleRepository->findByName('Conducteur');
+        $passagerRole = $roleRepository->findByName('Passager');
 
         // Récupérer les covoiturages "actif" et "terminé" de l'utilisateur
         $activeCarpoolsAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
@@ -70,7 +75,9 @@ class ProfileController extends AbstractController
             'activeCarpoolsAsDriver' => $activeCarpoolsAsDriver,
             'completedCarpoolsAsDriver' => $completedCarpoolsAsDriver,
             'activeCarpoolsAsPassenger' => $activeCarpoolsAsPassenger,
-            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger
+            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger,
+            'conducteurRoleId' => $conducteurRole ? $conducteurRole->getIdRole() : 3,
+            'passagerRoleId' => $passagerRole ? $passagerRole->getIdRole() : 4
         ]);
     }
 
