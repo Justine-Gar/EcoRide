@@ -24,22 +24,25 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Security;
 
 
 class ProfileController extends AbstractController
 {
     private $requestStack;
+    private $security;
 
     // Injection de dépendance 
     public function __construct(
         private UserRepository $userRepository,
         private FileUploader $fileUploader,
-        private EntityManagerInterface $entityManager,
         private CarRepository $carRepository,
         private ReviewRepository $reviewRepository,
         private CarpoolRepository $carpoolRepository,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        Security $security
     ) {
+        $this->security = $security;
         $this->requestStack = $requestStack;
     }
 
@@ -166,6 +169,7 @@ class ProfileController extends AbstractController
     }
 
     //Route pour ajouter une voiture sur le profil utilisateur
+    // Accessible uniquement aux utilisateurs connectés
     #[Route('/profile/add-car', name: 'app_profile_add_car')]
     #[IsGranted('ROLE_USER')]
     public function addCar(Request $request): Response
@@ -186,6 +190,7 @@ class ProfileController extends AbstractController
     }
 
     //Route pour supprimer une voiture sur profil user
+    // Accessible uniquement aux utilisateurs connectés
     #[Route('/profile/car/delete/{id}', name: 'app_profile_delete_car')]
     #[IsGranted('ROLE_USER')]
     public function deleteCar(int $id, CarRepository $carRepository, EntityManagerInterface $entityManager): Response
@@ -205,7 +210,82 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('app_profile'); // Change si nécessaire
     }
 
+    //Route pour la création de covoiturage
+    // Accessible uniquement aux utilisateurs connectés
+    #[Route('/profile/new-carpool', name: 'app_profile_new_carpool', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function newCarpool(Request $request, CarpoolRepository $carpoolRepository): Response
+    {
+        $user = $this->security->getUser();
+        if (!$user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Non Connecté'
+            ], 403);
+        }
+        
+        $carId = $request->request->get('car_id');
+        if (!$carId) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Veuillez sélectionner un véhicule'
+            ], 400);
+        }
+        // Récupérer la voiture
+        $car = $this->carRepository->find($carId);
+        if (!$car) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Véhicule introuvable'
+            ], 404);
+        }
+        // Vérifier que la voiture appartient à l'utilisateur
+        if ($car->getUser() !== $user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Ce véhicule ne vous appartient pas'
+            ], 403);
+        }
 
+        try {
+
+             // Créer une date de départ
+            $dateStart = $request->request->get('date_start');
+            $hourStart = $request->request->get('hour_start');
+            $dateTime = new \DateTime("$dateStart $hourStart");
+            
+            // Calculer l'heure d'arrivée (2h après le départ)
+            $dateTimeArrivee = clone $dateTime;
+            $dateTimeArrivee->modify('+2 hours');
+
+            $data = [
+                'date_start' => $dateTime->format('Y-m-d'),
+                'hour_start' => $dateTime->format('H:i:s'),
+                'location_start' => $request->request->get('location_start'),
+                'date_reach' => $dateTimeArrivee->format('Y-m-d'),
+                'hour_reach' => $dateTimeArrivee->format('H:i:s'),
+                'location_reach' => $request->request->get('location_reach'),
+                'nbr_places' => $request->request->get('nbr_places'),
+                'credits' => $request->request->get('credits'),
+                'lat_start' => $request->request->get('lat_start'),
+                'lng_start' => $request->request->get('lng_start'),
+                'lat_reach' => $request->request->get('lat_reach'),
+                'lng_reach' => $request->request->get('lng_reach')
+            ];
+
+            $carpool = $carpoolRepository->createCarpool($user, $data);
+
+            return new JsonResponse([
+                'success' => true,
+                'id' => $carpool->getIdCarpool()
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     
 
     // Route pour l'interface administrateur

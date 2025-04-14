@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Carpool;
 use App\Entity\User;
+use App\Entity\Car;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use DateTime;
@@ -19,7 +20,7 @@ class CarpoolRepository extends ServiceEntityRepository
     /**
      * Creer un nouveau covoit
      */
-    public function createCarpool(User $user, array $date): Carpool
+    public function createCarpool(User $user, array $data): Carpool
     {
         // Vérifier si l'utilisateur a le rôle conducteur
         if (!$user->hasRoleByName('Conducteur')) {
@@ -29,6 +30,20 @@ class CarpoolRepository extends ServiceEntityRepository
         // Vérifier si l'utilisateur a une voiture
         if ($user->getCars()->isEmpty()) {
             throw new \Exception('Vous devez avoir une voiture enregistrée pour créer un covoiturage');
+        }
+
+        if (isset($data['car_id'])) {
+            $carRepository = $this->getEntityManager()->getRepository(Car::class);
+            $car = $carRepository->find($data['car_id']);
+            if ($car) {
+                //Associer le car au carpool
+                $carpool->setCar($car);
+                
+                // vérifier que la voiture a assez de places
+                if ($car->getNbrPlaces() < $data['nbr_places']) {
+                    throw new \Exception('Le véhicule sélectionné n\'a pas assez de places');
+                }
+            }
         }
 
         // Créer le covoiturage
@@ -56,14 +71,14 @@ class CarpoolRepository extends ServiceEntityRepository
         }
 
         // Définir toutes les propriétés
-        $carpool->setDateStart($dateStart);
-        $carpool->setDateReach($dateReach);
+        $carpool->setDateStart(new \DateTime($data['date_start']));
         $carpool->setLocationStart($data['location_start']);
-        $carpool->setLocationReach($data['location_reach']);
         $carpool->setHourStart(new \DateTime($data['hour_start']));
+        $carpool->setDateReach(new \DateTime($data['date_reach']));
+        $carpool->setLocationReach($data['location_reach']);
         $carpool->setHourReach(new \DateTime($data['hour_reach']));
-        $carpool->setNbrPlaces($data['nbr_places']);
-        $carpool->setCredits($data['credits']);
+        $carpool->setNbrPlaces((int)$data['nbr_places']);
+        $carpool->setCredits((int)$data['credits']);
         $carpool->setStatut('actif');
 
         // Coordonnées géographiques si fournies

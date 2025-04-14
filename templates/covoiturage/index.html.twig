@@ -95,7 +95,6 @@
 
 {% block javascripts %}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
   <script>
     {% if carpools is defined and carpools|length > 0 %}
       var carpools = {{ carpools|json_encode|raw }};
