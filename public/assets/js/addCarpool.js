@@ -226,31 +226,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Fermer la modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('createTripModal'));
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Fermer la modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createTripModal'));
+                if (modal) {
                     modal.hide();
-
-                    // Notification de succès
-                    const toast = new bootstrap.Toast(document.getElementById('successToast'));
-                    document.getElementById('successToastBody').textContent = 'Votre covoiturage a été créé avec succès!';
-                    toast.show();
-
-                    // Redirection ou rafraîchissement
-                    setTimeout(() => {
-                        window.location.href = '/profile';
-                    }, 2000);
-                } else {
-                    // Notification d'erreur
-                    alert('Erreur: ' + data.message);
                 }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la création du covoiturage:', error);
-                alert('Une erreur est survenue lors de la création du covoiturage.');
-            });
+
+                // Redirection ou rafraîchissement
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/profile';
+                }, 2000);
+            } else {
+                // Notification d'erreur précise
+                alert('Erreur: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur détaillée:', error);
+            alert('Erreur: ' + error.message);
+        });
     });
 
     // Réinitialisation de la carte à l'ouverture de la modal

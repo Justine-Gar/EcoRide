@@ -276,13 +276,16 @@ class ProfileController extends AbstractController
                 'car_id' => $carId
             ];
 
-            error_log("Données de covoiturage: " . print_r($data, true));
+
 
             $carpool = $carpoolRepository->createCarpool($user, $data);
 
+            $this->addFlash('success', 'Votre covoiturage a été créé avec succès !');
+
             return new JsonResponse([
                 'success' => true,
-                'id' => $carpool->getIdCarpool()
+                'id' => $carpool->getIdCarpool(),
+                'redirect' => $this->generateUrl('app_profile')
             ]);
 
         } catch (\Exception $e) {
