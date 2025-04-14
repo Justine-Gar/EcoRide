@@ -247,6 +247,8 @@ class ProfileController extends AbstractController
             ], 403);
         }
 
+
+
         try {
 
              // Créer une date de départ
@@ -270,8 +272,11 @@ class ProfileController extends AbstractController
                 'lat_start' => $request->request->get('lat_start'),
                 'lng_start' => $request->request->get('lng_start'),
                 'lat_reach' => $request->request->get('lat_reach'),
-                'lng_reach' => $request->request->get('lng_reach')
+                'lng_reach' => $request->request->get('lng_reach'),
+                'car_id' => $carId
             ];
+
+            error_log("Données de covoiturage: " . print_r($data, true));
 
             $carpool = $carpoolRepository->createCarpool($user, $data);
 
@@ -279,7 +284,11 @@ class ProfileController extends AbstractController
                 'success' => true,
                 'id' => $carpool->getIdCarpool()
             ]);
+
         } catch (\Exception $e) {
+
+            error_log("Erreur lors de la création du covoiturage: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+
             return new JsonResponse([
                 'success' => false,
                 'message' => $e->getMessage()

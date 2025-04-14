@@ -32,23 +32,26 @@ class CarpoolRepository extends ServiceEntityRepository
             throw new \Exception('Vous devez avoir une voiture enregistrée pour créer un covoiturage');
         }
 
+        // Créer le covoiturage
+        $carpool = new Carpool();
+        $carpool->setUser($user);
+
+        // Associer une voiture si fournie
         if (isset($data['car_id'])) {
             $carRepository = $this->getEntityManager()->getRepository(Car::class);
             $car = $carRepository->find($data['car_id']);
             if ($car) {
-                //Associer le car au carpool
-                $carpool->setCar($car);
+                // Vérifier que la voiture appartient à l'utilisateur
+                if ($car->getUser()->getIdUser() !== $user->getIdUser()) {
+                    throw new \Exception('Ce véhicule ne vous appartient pas');
+                }
                 
-                // vérifier que la voiture a assez de places
+                // Vérifier que la voiture a assez de places
                 if ($car->getNbrPlaces() < $data['nbr_places']) {
                     throw new \Exception('Le véhicule sélectionné n\'a pas assez de places');
                 }
             }
         }
-
-        // Créer le covoiturage
-        $carpool = new Carpool();
-        $carpool->setUser($user);
 
         // Définir les données obligatoires
         if (!isset($data['date_start']) || !isset($data['date_reach']) || 
