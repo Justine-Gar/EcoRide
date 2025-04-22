@@ -56,12 +56,9 @@ class ProfileController extends AbstractController
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
 
-        // Récupérer les covoiturages "actif" et "terminé" de l'utilisateur
-        $activeCarpoolsAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
-        $completedCarpoolsAsDriver = $carpoolRepository->findCompletedCarpoolsAsDriver($user);
-        // Récupérer les covoiturages où l'utilisateur est passager
-        $activeCarpoolsAsPassenger = $carpoolRepository->findActiveCarpoolsAsPassenger($user);
-        $completedCarpoolsAsPassenger = $carpoolRepository->findCompletedCarpoolsAsPassenger($user);
+        // Récupérer les covoiturages en tant que conducteur
+        
+        // Récupérer les covoiturage en tant que passager
 
         //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [
@@ -81,11 +78,7 @@ class ProfileController extends AbstractController
             'user' => $user,
             'form' => $form->createView(),
             'cars' => $usersCars,
-            'carForm' => $carForm->createView(),
-            'activeCarpoolsAsDriver' => $activeCarpoolsAsDriver,
-            'completedCarpoolsAsDriver' => $completedCarpoolsAsDriver,
-            'activeCarpoolsAsPassenger' => $activeCarpoolsAsPassenger,
-            'completedCarpoolsAsPassenger' => $completedCarpoolsAsPassenger
+            'carForm' => $carForm->createView()
         ]);
     }
 

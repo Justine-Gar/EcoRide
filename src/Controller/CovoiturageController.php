@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/covoiturage')]
 class CovoiturageController extends AbstractController
@@ -178,16 +179,11 @@ class CovoiturageController extends AbstractController
   
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
+  #[IsGranted('ROLE_USER')]
   public function join(Carpool $carpool, UserRepository $userRepository): Response
   {
-    $securityUser = $this->security->getUser();
-    //Vérifié sur utilisateur est connecter
-    if (!$securityUser) {
-      $this->addFlash('error', 'Vous devez être connecté pour participer à un covoiturage.');
-      return $this->redirectToRoute('app_login');
-    }
 
-    $user = $userRepository->findOneByEmail($securityUser->getUserIdentifier());
+    $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
 
     //Vérifier si ce n'est pas le conducteur qui essaie de rejoindre
     if ($carpool->getUser() === $user) {
@@ -217,7 +213,7 @@ class CovoiturageController extends AbstractController
       // Ajouter l'utilisateur comme passager
       $carpool->addPassenger($user);
       // Déduire les crédits de l'utilisateur
-      $userRepository->upddateCredits($user, -$carpool->getCredits());
+      $userRepository->updateCredits($user, -$carpool->getCredits());
       // Sauvegarder les changements
       $this->entityManager->flush();
       $this->addFlash('success', 'Vous avez rejoint le covoiturage avec succès !');
@@ -233,15 +229,11 @@ class CovoiturageController extends AbstractController
 
   //Route pour démarer un covoiturage
   #[Route('/{id}/start', name: 'app_covoiturage_start', requirements: ['id' => '\d+'])]
-  public function start(Carpool $carpool, CarpoolRepository $carpoolRepository): Response
+  #[IsGranted('ROLE_USER')]
+  public function start(Carpool $carpool, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
   {
-    $user = $this->security->getUser();
 
-    //Vérifie si l'user est connecté
-    if (!$user) {
-      $this->addFlash('error', 'Vous devez être connecté pour annuler un covoiturage.');
-      return $this->redirectToRoute('app_login');
-    }
+    $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
 
     //vérifie si c'est bien le conducteur qui démare
     if ($carpool->getUser() !== $user) {
@@ -267,15 +259,10 @@ class CovoiturageController extends AbstractController
 
   //Route pour supprimer un covoiturage
   #[Route('/{id}/cancel', name: 'app_covoiturage_cancel', requirements: ['id' => '\d+'])]
+  #[IsGranted('ROLE_USER')]
   public function cancel(Carpool $carpool, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
   {
-      $user = $this->security->getUser();
-      
-      // Vérifier si l'utilisateur est connecté
-      if (!$user) {
-          $this->addFlash('error', 'Vous devez être connecté pour annuler un covoiturage.');
-          return $this->redirectToRoute('app_login');
-      }
+      $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
       
       // Vérifier si c'est bien le conducteur qui annule
       if ($carpool->getUser() !== $user) {
@@ -302,15 +289,10 @@ class CovoiturageController extends AbstractController
 
   //Route pour finir un covoiturage
   #[Route('/{id}/finish', name: 'app_covoiturage_finish', requirements: ['id' => '\d+'])]
+  #[IsGranted('ROLE_USER')]
   public function finish(Carpool $carpool, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
   {
-      $user = $this->security->getUser();
-      
-      // Vérifier si l'utilisateur est connecté
-      if (!$user) {
-          $this->addFlash('error', 'Vous devez être connecté pour terminer un covoiturage.');
-          return $this->redirectToRoute('app_login');
-      }
+      $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
       
       // Vérifier si c'est bien le conducteur qui termine le trajet
       if ($carpool->getUser() !== $user) {

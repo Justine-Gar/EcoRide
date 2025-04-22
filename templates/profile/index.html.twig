@@ -380,71 +380,140 @@
 									<!--TRAJET EN COURS-->
 									<div class="mb-4">
 										<h6 class="mb-3 text-muted">Trajets en cours</h6>
-										{% if activeCarpoolsAsDriver|length == 0 and activeCarpoolsAsPassenger|length == 0 %}
-											<div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>Vous n'avez pas de trajet en cours
-                    	</div>
+										{% if waitingCarpoolsAsDriver|length == 0 and activeCarpoolsAsDriver|length == 0 and waitingCarpoolsAsPassenger|length == 0 and activeCarpoolsAsPassenger|length == 0 %}
+												<div class="alert alert-info">
+														<i class="fas fa-info-circle me-2"></i>Vous n'avez pas de trajet en cours
+												</div>
 										{% else %}
-											<!--Trajet en cours conducteur-->
-											{% for carpool in activeCarpoolsAsDriver %}
-												<div class="card mb-3 driver-carpool">
-													<div class="card-body">
-														<div class="d-flex justify-content-between align-items-start">
-															<div>
-																<span class="badge badge-driver mb-2">Conducteur</span>
-																<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
-																<p class="text-muted mb-2">
-																	<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
-																	<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
-																</p>
-																<p class="text-muted mb-2">
-																	<i class="fas fa-users me-2"></i>{{ carpool.getPassengers()|length }}/{{ carpool.getNbrPlaces() }} passagers
-																	<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
-																</p>
-															</div>
-															<div class="text-end">
-																<a href="#" class="btn btn-green mb-2">
-																	Départ
-																</a>
-																<a href="#" class="btn btn-green mb-2">
-																	Arrivée
-																</a>
-																<a href="{{ path('app_covoiturage_cancel', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-danger mb-2" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce trajet ?')">
-																	Annulé
-																</a>
-															</div>
-														</div>
-													</div>
-												</div>
-											{% endfor %}
-											<!--Trajet en cour possager-->
-											{% for carpool in activeCarpoolsAsPassenger %}
-												<div class="card mb-3 passenger-carpool">
-													<div class="card-body">
-														<div class="d-flex justify-content-between align-items-start">
-															<div>
-																<span class="badge badge-passenger mb-2">Passager</span>
-																<h5 class="mb-1">{{ carpool.getLocationStart() }} → {{ carpool.getLocationReach() }}</h5>
-																<p class="text-muted mb-2">
-																	<i class="fas fa-calendar me-2"></i>{{ carpool.dateStart|date('d/m/Y') }}
-																	<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
-																</p>
-																<p class="text-muted mb-2">
-																	<i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
-																	<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} créditS
-																</p>
-															</div>
-															<div class="text-end">
-																<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																	<i class="fas fa-info-circle me-2"></i>Détails
-																</a>
-															</div>
-														</div>
-													</div>
-												</div>
-                    	{% endfor %}
+												<!-- Trajets en tant que conducteur -->
+												{% if waitingCarpoolsAsDriver|length > 0 or activeCarpoolsAsDriver|length > 0 %}
+														<h6 class="mt-3 mb-2"><i class="fas fa-car me-2"></i>En tant que conducteur</h6>
+														
+														<!-- Trajets en attente conducteur -->
+														{% for carpool in waitingCarpoolsAsDriver %}
+																<div class="card mb-3 driver-carpool">
+																		<div class="card-body">
+																				<div class="d-flex justify-content-between align-items-start">
+																						<div>
+																								<span class="badge badge-driver mb-2">Conducteur</span>
+																								<span class="badge bg-warning text-dark mb-2 ms-2">En attente</span>
+																								<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																										<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
+																								</p>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-users me-2"></i>{{ carpool.getPassengers()|length }}/{{ carpool.getNbrPlaces() }} passagers
+																										<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																								</p>
+																						</div>
+																						<div class="text-end">
+																								<a href="{{ path('app_covoiturage_start', {'id': carpool.getIdCarpool() }) }}" class="btn btn-green mb-2">
+																										Départ
+																								</a>
+																								<a href="{{ path('app_covoiturage_cancel', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-danger mb-2" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce trajet ?')">
+																										Annuler
+																								</a>
+																						</div>
+																				</div>
+																		</div>
+																</div>
+														{% endfor %}
+														
+														<!-- Trajets actifs conducteur -->
+														{% for carpool in activeCarpoolsAsDriver %}
+																<div class="card mb-3 driver-carpool">
+																		<div class="card-body">
+																				<div class="d-flex justify-content-between align-items-start">
+																						<div>
+																								<span class="badge badge-driver mb-2">Conducteur</span>
+																								<span class="badge bg-success text-white mb-2 ms-2">En cours</span>
+																								<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																										<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
+																								</p>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-users me-2"></i>{{ carpool.getPassengers()|length }}/{{ carpool.getNbrPlaces() }} passagers
+																										<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																								</p>
+																						</div>
+																						<div class="text-end">
+																								<a href="{{ path('app_covoiturage_finish', {'id': carpool.getIdCarpool() }) }}" class="btn btn-green mb-2">
+																										Arrivée
+																								</a>
+																								<a href="{{ path('app_covoiturage_cancel', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-danger mb-2" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce trajet ?')">
+																										Annuler
+																								</a>
+																						</div>
+																				</div>
+																		</div>
+																</div>
+														{% endfor %}
+												{% endif %}
+												
+												<!-- Trajets en tant que passager -->
+												{% if waitingCarpoolsAsPassenger|length > 0 or activeCarpoolsAsPassenger|length > 0 %}
+														<h6 class="mt-3 mb-2"><i class="fas fa-user me-2"></i>En tant que passager</h6>
+														
+														<!-- Trajets en attente passager -->
+														{% for carpool in waitingCarpoolsAsPassenger %}
+																<div class="card mb-3 passenger-carpool">
+																		<div class="card-body">
+																				<div class="d-flex justify-content-between align-items-start">
+																						<div>
+																								<span class="badge badge-passenger mb-2">Passager</span>
+																								<span class="badge bg-warning text-dark mb-2 ms-2">En attente</span>
+																								<h5 class="mb-1">{{ carpool.getLocationStart() }} → {{ carpool.getLocationReach() }}</h5>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																										<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
+																								</p>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
+																										<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																								</p>
+																						</div>
+																						<div class="text-end">
+																								<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
+																										<i class="fas fa-info-circle me-2"></i>Détails
+																								</a>
+																						</div>
+																				</div>
+																		</div>
+																</div>
+														{% endfor %}
+														
+														<!-- Trajets actifs passager -->
+														{% for carpool in activeCarpoolsAsPassenger %}
+																<div class="card mb-3 passenger-carpool">
+																		<div class="card-body">
+																				<div class="d-flex justify-content-between align-items-start">
+																						<div>
+																								<span class="badge badge-passenger mb-2">Passager</span>
+																								<span class="badge bg-success text-white mb-2 ms-2">En cours</span>
+																								<h5 class="mb-1">{{ carpool.getLocationStart() }} → {{ carpool.getLocationReach() }}</h5>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																										<i class="fas fa-clock ms-3 me-2"></i>{{ carpool.getHourStart()|date('H:i') }} - {{ carpool.getHourReach()|date('H:i') }}
+																								</p>
+																								<p class="text-muted mb-2">
+																										<i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
+																										<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																								</p>
+																						</div>
+																						<div class="text-end">
+																								<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
+																										<i class="fas fa-info-circle me-2"></i>Détails
+																								</a>
+																						</div>
+																				</div>
+																		</div>
+																</div>
+														{% endfor %}
+												{% endif %}
 										{% endif %}
-									</div>
+								</div>
 
 
 									<!--TRAJET TERMINES-->
