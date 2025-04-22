@@ -12,6 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'carpools')]
 class Carpool
 {
+    public const STATUS_WAITING = 'attente';
+    public const STATUS_ACTIVE = 'actif';
+    public const STATUS_COMPLETED = 'terminé';
+    public const STATUS_CANCELED = 'annulé';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -302,4 +307,35 @@ class Carpool
         return 1 + $this->passengers->count();
     }
 
+    /**
+     * Vérifie si le covoiturage est en attente
+     */
+    public function isWaitingCarpool(): bool
+    {
+        return $this->statut === self::STATUS_WAITING;
+    }
+
+    /**
+     * Vérifie si le covoiturage est actif
+     */
+    public function isActiveCarpool(): bool
+    {
+        return $this->statut === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Vérifie si le covoiturage est terminé
+     */
+    public function isCompletedCarpool(): bool
+    {
+        return $this->statut === self::STATUS_COMPLETED;
+    }
+
+    /**
+     * Vérifie si le covoiturage est annulé
+     */
+    public function isCanceledCarpool(): bool
+    {
+        return $this->statut === self::STATUS_CANCELED;
+    }
 }
