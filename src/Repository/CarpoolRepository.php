@@ -309,6 +309,21 @@ class CarpoolRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * Recupérer les covoiturage "annuler" user = conducteur
+     */
+    public function findCanceledCarpoolsAsDriver(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', Carpool::STATUS_CANCELED)
+            ->orderBy('c.date_start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
     /**
      * Recupérer les covoiturage "actifs" user = passager
@@ -354,6 +369,22 @@ class CarpoolRepository extends ServiceEntityRepository
             ->setParameter('userId', $user->getIdUser())
             ->setParameter('statut', Carpool::STATUS_WAITING)
             ->orderBy('c.date_start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recupérer les covoiturage "annulés" user = passager
+     */
+    public function findCanceledCarpoolsAsPassenger(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.passengers', 'p')
+            ->where('p.id_user = :userId')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('userId', $user->getIdUser())
+            ->setParameter('statut', Carpool::STATUS_CANCELED)
+            ->orderBy('c.date_start', 'DESC')
             ->getQuery()
             ->getResult();
     }
