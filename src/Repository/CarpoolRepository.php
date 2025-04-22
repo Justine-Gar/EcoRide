@@ -82,7 +82,7 @@ class CarpoolRepository extends ServiceEntityRepository
         $carpool->setHourReach(new \DateTime($data['hour_reach']));
         $carpool->setNbrPlaces((int)$data['nbr_places']);
         $carpool->setCredits((int)$data['credits']);
-        $carpool->setStatut('actif');
+        $carpool->setStatut(Carpool::STATUS_WAITING);
 
         // Coordonnées géographiques si fournies
         if (isset($data['lat_start']) && isset($data['lng_start'])) {
@@ -134,7 +134,7 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('c.statut = :status')
             ->andWhere('c.nbr_places > 0')
             ->andWhere('c.date_start >= :today')
-            ->setParameter('status', 'actif')
+            ->setParameter('status', Carpool::STATUS_WAITING)
             ->setParameter('today', new DateTime('today'))
             ->orderBy('c.date_start', 'ASC')
             ->getQuery()
@@ -165,13 +165,49 @@ class CarpoolRepository extends ServiceEntityRepository
     }
 
     /**
+     * Démarrer un covoiturage
+     */
+    public function startCarpool(Carpool $carpool): void
+    {
+        if (!$carpool->isWaitingCarpool()) {
+            throw new \LogicException('Ce covoiturage ne peut etre démarer car il n\'est pas en attente');
+        }
+        $carpool->setStatut(Carpool::STATUS_ACTIVE);
+        $this->save($carpool, true);
+    }
+
+    /**
+     * Terminer un covoiturage
+     */
+    public function finishCarpool(Carpool $carpool): void
+    {
+        if (!$carpool->isActiveCarpool()) {
+            throw new \LogicException(' Ce covoiturage ne peut etre terminé car il n\'est pas actif');
+        }
+        $carpool->setStatut(Carpool::STATUS_COMPLETED);
+        $this->save($carpool, true);
+    }
+
+    /**
+     * Annuler un covoiturage
+     */
+    public function cancelCarpool(Carpool $carpool): void
+    {
+        if ($carpool->isCompletedCarpool()) {
+            throw new \LogicException('Ce covoiturage ne peut pas être annulé car il est déjà terminé');
+        }
+        $carpool->setStatut(Carpool::STATUS_CANCELED);
+        $this->save($carpool, true); 
+    }
+
+    /**
     * Rechercher des covoiturages par termes simples
     */
     public function search(?string $depart = null, ?string $arrivee = null, ?string $date = null): array
     {
         $qb = $this->createQueryBuilder('c')
             ->where('c.statut = :status')
-            ->setParameter('status', 'actif');
+            ->setParameter('status', Carpool::STATUS_WAITING);
         
         if ($depart) {
             $qb->andWhere('c.location_start LIKE :depart')
@@ -201,7 +237,7 @@ class CarpoolRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->where('c.statut = :status')
-            ->setParameter('status', 'actif');
+            ->setParameter('status', Carpool::STATUS_WAITING);
 
         if (isset($criteria['date_start'])) {
             $qb->andWhere('c.date_start = :date_start')
@@ -238,7 +274,7 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('c.user = :user')
             ->andWhere('c.statut = :statut')
             ->setParameter('user', $user)
-            ->setParameter('statut', 'actif')
+            ->setParameter('statut', Carpool::STATUS_ACTIVE)
             ->orderBy('c.date_start', 'ASC')
             ->getQuery()
             ->getResult();
@@ -253,13 +289,28 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('c.user = :user')
             ->andWhere('c.statut = :statut')
             ->setParameter('user', $user)
-            ->setParameter('statut', 'terminé')
+            ->setParameter('statut', Carpool::STATUS_COMPLETED)
             ->orderBy('c.date_start', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
-        /**
+    /**
+     * Récupérer les covoiturage "attente" user = conducteur
+     */
+    public function findWaitingCarpoolAsDriver(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', Carpool::STATUS_WAITING)
+            ->orderBy('c.date_start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Recupérer les covoiturage "actifs" user = passager
      */
     public function findActiveCarpoolsAsPassenger(User $user): array
@@ -269,7 +320,7 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('p.id_user = :userId')
             ->andWhere('c.statut = :statut')
             ->setParameter('userId', $user->getIdUser())
-            ->setParameter('statut', 'actif')
+            ->setParameter('statut', Carpool::STATUS_ACTIVE)
             ->orderBy('c.date_start', 'ASC')
             ->getQuery()
             ->getResult();
@@ -285,8 +336,24 @@ class CarpoolRepository extends ServiceEntityRepository
             ->where('p.id_user = :userId')
             ->andWhere('c.statut = :statut')
             ->setParameter('userId', $user->getIdUser())
-            ->setParameter('statut', 'terminé')
+            ->setParameter('statut', Carpool::STATUS_COMPLETED)
             ->orderBy('c.date_start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recupérer les covoiturage "attente" user = passager
+     */
+    public function findWaitingCarpoolsAsPassenger(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.passengers', 'p')
+            ->where('p.id_user = :userId')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('userId', $user->getIdUser())
+            ->setParameter('statut', Carpool::STATUS_WAITING)
+            ->orderBy('c.date_start', 'ASC')
             ->getQuery()
             ->getResult();
     }

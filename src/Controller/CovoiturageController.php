@@ -225,6 +225,16 @@ class CovoiturageController extends AbstractController
     
   }
 
+  //Route pour démarer un covoiturage
+  #[Route('/{id}/start', name: 'app_covoiturage_start', requirements: ['id' => '\d+'])]
+  public function start(Carpool $carpool, CarpoolRepository $carpoolRepository): Response
+  {
+    $user = $this->security->getUser();
+
+    //Vérifie si l'user est connecté
+
+    //vérifier
+  }
 
   //Route pour supprimer un covoiturage
   #[Route('/{id}/cancel', name: 'app_covoiturage_cancel', requirements: ['id' => '\d+'])]
