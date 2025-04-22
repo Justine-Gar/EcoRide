@@ -175,6 +175,7 @@ class CovoiturageController extends AbstractController
     ]);
   }
 
+  
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
   public function join(Carpool $carpool, UserRepository $userRepository): Response
@@ -210,17 +211,22 @@ class CovoiturageController extends AbstractController
       $this->addFlash('error', 'Vous n\'avez pas assez de crédits pour rejoindre ce covoiturage.');
       return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
     }
-    
-    // Ajouter l'utilisateur comme passager
-    $carpool->addPassenger($user);
-    
-    // Déduire les crédits de l'utilisateur
-    $userRepository->upddateCredits($user, -$carpool->getCredits());
-        
-    // Sauvegarder les changements
-    $this->entityManager->flush();
-        
-    $this->addFlash('success', 'Vous avez rejoint le covoiturage avec succès !');
+
+    try {
+
+      // Ajouter l'utilisateur comme passager
+      $carpool->addPassenger($user);
+      // Déduire les crédits de l'utilisateur
+      $userRepository->upddateCredits($user, -$carpool->getCredits());
+      // Sauvegarder les changements
+      $this->entityManager->flush();
+      $this->addFlash('success', 'Vous avez rejoint le covoiturage avec succès !');
+
+    } catch(\Exception $e) {
+
+      $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.');
+    }
+
     return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
     
   }
@@ -232,8 +238,31 @@ class CovoiturageController extends AbstractController
     $user = $this->security->getUser();
 
     //Vérifie si l'user est connecté
+    if (!$user) {
+      $this->addFlash('error', 'Vous devez être connecté pour annuler un covoiturage.');
+      return $this->redirectToRoute('app_login');
+    }
 
-    //vérifier
+    //vérifie si c'est bien le conducteur qui démare
+    if ($carpool->getUser() !== $user) {
+      $this->addFlash('error', 'Vous ne pouvez pas démarrer un covoiturage dont vous n\'êtes pas le conducteur.');
+      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+    }
+
+    //vérifie si le covoiturage et bien en attente
+    if (!$carpool->isWaitingCarpool()) {
+      $this->addFlash('error', 'Ce covoiturage ne peut etre démarer car il n\'est pas en attente');
+      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+    }
+
+    try {
+      $carpoolRepository->startCarpool($carpool);
+      $this->addFlash('succes', 'le covoiturage a été démarré avec succes.');
+    } catch (\Exception $e) {
+      $this->addFlash('error', $e->getMessage());
+    }
+
+    return $this->redirectToRoute('app_profile');
   }
 
   //Route pour supprimer un covoiturage
@@ -254,17 +283,21 @@ class CovoiturageController extends AbstractController
           return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
       }
       
-      // Rembourser les crédits aux passagers
-      foreach ($carpool->getPassengers() as $passenger) {
-        $userRepository->updateCredits($passenger, $carpool->getCredits());
+      try {
+
+        // Rembourser les crédits aux passagers
+        foreach ($carpool->getPassengers() as $passenger) {
+          $userRepository->updateCredits($passenger, $carpool->getCredits());
+        }
+
+        $carpoolRepository->cancelCarpool($carpool);
+        $this->addFlash('success', 'Le covoiturage à été annulé et les passager ont été remboursés.');
+
+      } catch (\Exception $e) {
+        $this->addFlash('error', $e->getMessage());
       }
-      
-      // Changer le statut du covoiturage
-      $carpoolRepository->updateStatus($carpool, 'annulé');
-      
-      
-      $this->addFlash('success', 'Le covoiturage a été annulé et les passagers ont été remboursés.');
-      return $this->redirectToRoute('app_covoiturage');
+
+      return $this->redirectToRoute('app_profile');
   }
 
   //Route pour finir un covoiturage
@@ -285,16 +318,28 @@ class CovoiturageController extends AbstractController
           return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
       }
       
-      // Changer le statut du covoiturage
-      $carpoolRepository->updateStatus($carpool, 'terminé');
+      //Vérifier si le covoiturage et actif
+      if (!$carpool->isActiveCarpool()) {
+          $this->addFlash('error', 'Ce covoiturage ne peut pas être terminé car il n\'est pas actif.');
+          return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      }
+
+      try {
+
+        $carpoolRepository->finishCarpool($carpool);
+
+        // Créditer le conducteur
+        $userRepository->updateCredits($user, $carpool->getCredits());
+
+        // Envoyer un email aux passagers pour qu'ils puissent laisser un avis
+        // configuration d'envoi d'emails
+        
+        $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés.');
+
+      } catch (\Exception $e) {
+        $this->addFlash('error', $e->getMessage());
+      }
       
-      // Créditer le conducteur
-      $userRepository->updateCredits($user, $carpool->getCredits());
-      
-      // Envoyer un email aux passagers pour qu'ils puissent laisser un avis
-      // Cette partie dépend de votre configuration d'envoi d'emails
-      
-      $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés.');
       return $this->redirectToRoute('app_profile');
   }
 }
