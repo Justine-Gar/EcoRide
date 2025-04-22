@@ -60,10 +60,12 @@ class ProfileController extends AbstractController
         $waitinCarpoolAsDriver = $carpoolRepository->findWaitingCarpoolAsDriver($user);
         $activeCarpoolAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
         $completedCarpoolAsDriver = $carpoolRepository->findCompletedCarpoolsAsDriver($user);
+        $canceledCarpoolAsDriver = $carpoolRepository->findCanceledCarpoolsAsDriver($user);
         // Récupérer les covoiturage en tant que passager
         $waitingCarpoolAsPassenger = $carpoolRepository->findWaitingCarpoolsAsPassenger($user);
         $activeCarpoolAsPassenger = $carpoolRepository->findActiveCarpoolsAsPassenger($user);
         $completedCarpoolAsPassenger = $carpoolRepository->findCompletedCarpoolsAsPassenger($user);
+        $canceledCarpoolsAsPassenger = $carpoolRepository->findCanceledCarpoolsAsPassenger($user);
 
         //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [
@@ -87,9 +89,11 @@ class ProfileController extends AbstractController
             'waitingCarpoolAsDriver' => $waitinCarpoolAsDriver,
             'activeCarpoolAsDriver' => $activeCarpoolAsDriver,
             'completedCarpoolAsDriver' => $completedCarpoolAsDriver,
+            'canceledCarpoolAsDriver' => $canceledCarpoolAsDriver,
             'waitingCarpoolAsPassenger' => $waitingCarpoolAsPassenger,
             'activeCarpoolAsPassenger' => $activeCarpoolAsPassenger,
             'completedCarpoolAsPassenger' => $completedCarpoolAsPassenger,
+            'canceledCarpoolAsPassenger' => $canceledCarpoolsAsPassenger,
         ]);
     }
 
