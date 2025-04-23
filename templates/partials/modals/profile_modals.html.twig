@@ -97,3 +97,35 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal pour ajouter une préférence personnalisée -->
+<div class="modal fade" id="addPreferenceModal" tabindex="-1" aria-labelledby="addPreferenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPreferenceModalLabel">Ajouter une préférence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ path('app_profile_add_preference') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="preference_name" class="form-label">Nom de la préférence</label>
+                        <input type="text" class="form-control" id="preference_name" name="preference_name" 
+                               placeholder="Ex: Musique pendant le trajet" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="preference_value" class="form-label">Valeur</label>
+                        <input type="text" class="form-control" id="preference_value" name="preference_value" 
+                               placeholder="Ex: Rock, Jazz, Pop" required>
+                        <div class="form-text">Précisez votre préférence (ex: oui, non, détails spécifiques)</div>
+                    </div>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('add_preference') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-green">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

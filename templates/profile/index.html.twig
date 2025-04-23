@@ -328,28 +328,54 @@
 									<!-- Préférences système -->
 									<div class="mb-4">
 										<h6 class="fw-bold mb-3">Préférences système</h6>
-										<div class="form-check mb-2">
-											<input class="form-check-input" type="checkbox" id="smokingAllowed">
-											<label class="form-check-label" for="smokingAllowed">
-												Accepte les fumeurs (pauses)
-											</label>
-										</div>
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" id="petsAllowed">
-											<label class="form-check-label" for="petsAllowed">
-												Accepte les animaux
-											</label>
-										</div>
+										<form id="systemPreferencesForm" method="post" action="{{ path('app_profile_toggle_system_preference') }}">
+											<div class="row">
+													{% for preference in systemPreferences %}
+															<div class="col-md-6 col-lg-4 mb-2">
+																	<div class="form-check">
+																			<input class="form-check-input" type="checkbox" id="pref_{{ preference.idPreferenceType }}" 
+																						name="system_preferences[]" value="{{ preference.idPreferenceType }}"
+																						{% if userHasPreference(preference.idPreferenceType) %}checked{% endif %}>
+																			<label class="form-check-label" for="pref_{{ preference.idPreferenceType }}">
+																					{{ preference.name|capitalize }}
+																			</label>
+																	</div>
+															</div>
+													{% endfor %}
+											</div>
+											<button type="submit" class="btn btn-sm btn-green mt-3">
+													<i class="fas fa-save me-1"></i> Enregistrer mes préférences
+											</button>
+											<input type="hidden" name="_csrf_token" value="{{ csrf_token('toggle_preferences') }}">
+										</form>
 									</div>
 									<!-- Préférences utilisateur -->
 									<div class="mb-4">
-										<h6 class="fw-bold mb-3">Préférences de (nom de l'utilisateur)</h6>
+										<h6 class="fw-bold mb-3">Préférences de {{user.firstname}}</h6>
+
+										{% if userCustomPreferences is empty %}
+                    	<p class="text-muted">Vous n'avez pas encore ajouté de préférences personnalisées.</p>
+                		{% else %}
+												<div class="list-group">
+												{% for preference in userCustomPreferences %}
+													<div class="list-group-item d-flex justify-content-between align-items-center">
+														<div>
+														<strong>{{ preference.preferenceType.name|capitalize }}:</strong>
+														{{ preference.chooseValue }}
+														</div>
+														<form method="post" action="{{ path('app_profile_delete_preference', {'id': preference.idUserPreference}) }}" class="d-inline">
+																<button type="submit" class="btn btn-sm btn-outline-danger">
+																		<i class="fas fa-trash-alt"></i>
+																</button>
+																<input type="hidden" name="_csrf_token" value="{{ csrf_token('delete_preference') }}">
+														</form>
+													</div>
+												{% endfor %}
+											</div>	
+										{% endif %}
 									</div>
 								</div>
-
 							</div>
-
-
 						</div>
 
 						<!-- Contenu Trajets -->
