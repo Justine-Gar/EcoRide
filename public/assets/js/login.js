@@ -2,15 +2,52 @@
 
 //Affiche un message d'erreur
 function showError(message) {
-    const errorDiv = document.getElementById('loginError');
+    // Supprime tout message existant
+    const existingAlert = document.querySelector('#loginModal .alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    // Crée la nouvelle alerte d'erreur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger mb-3';
     errorDiv.textContent = message;
-    errorDiv.classList.remove('d-none');
+    
+    // Trouve le modal-body et insère l'alerte au début
+    const loginModalBody = document.querySelector('#loginModal .modal-body');
+    if (loginModalBody) {
+        loginModalBody.insertBefore(errorDiv, loginModalBody.firstChild);
+    }
 }
+
+// Affiche un message de succès
+function showSuccess(message) {
+    // Supprime tout message existant
+    const existingAlert = document.querySelector('#loginModal .alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    // Crée la nouvelle alerte de succès
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success mb-3';
+    successDiv.textContent = message;
+    
+    // Trouve le modal-body et insère l'alerte au début
+    const loginModalBody = document.querySelector('#loginModal .modal-body');
+    if (loginModalBody) {
+        loginModalBody.insertBefore(successDiv, loginModalBody.firstChild);
+    }
+}
+
 //Masque le message erreur
-function hideError() {
-    const errorDiv = document.getElementById('loginError');
-    errorDiv.classList.add('d-none');
+function hideMessages() {
+    const alertDiv = document.querySelector('#loginModal .alert');
+    if (alertDiv) {
+        alertDiv.remove();
+    }
 }
+
 //Vérifie si email a un format valide
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -32,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         
         //Reinitialise l'interface (modal)
-        hideError();
+        hideMessages();
         submitButton.disabled = true;
         submitButton.textContent = 'Connexion en cours...';
 
@@ -60,35 +97,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            //console.log('Status de la réponse:', response.status);
-            
             // == ETAPE 2 : Analyse de la repônse
             const responseText = await response.text();
-            //console.log('Réponse brute:', responseText);
             
             // == ETAPE 3: Conversion de la réponse en objet JSON
             let data;
             try {
                 data = JSON.parse(responseText);
-                //console.log('Données parsées:', data);
             } catch (e) {
-                //console.error('Erreur de parsing JSON:', e);
                 showError('Erreur de format de réponse');
                 return;
             }
 
             // == ETAPE 4 : Traitement de la reponse
             if (data.success) {
+                //Message de succès
+                showSuccess('Connexion réussie ! Redirection en cours...');
                 //si connexion ok, redirection
-                //console.log('Redirection vers:', data.redirect);
-                window.location.href = data.redirect;
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 4000);
+
             } else {
                 //si echec, afficher message erreur
                 showError(data.message || 'Erreur de connexion');
             }
         } catch (error) {
             //Gestion des erreurs
-            //console.error('Erreur complète:', error);
             showError('Une erreur est survenue. Veuillez réessayer.');
         } finally {
             //Reactive le bouton dans tous els cas
@@ -104,6 +139,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginModal = document.getElementById('loginModal');
     loginModal.addEventListener('hidden.bs.modal', function () {
         loginForm.reset();
-        hideError();
+        hideMessages();
     });
 });

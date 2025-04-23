@@ -2,15 +2,52 @@
 
 //Affiche un message d'erreur
 function showError(message) {
-    const errorDiv = document.getElementById('registerError');
+    // Supprime tout message existant
+    const existingAlert = document.querySelector('#registerModal .alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    // Crée la nouvelle alerte d'erreur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger mb-3';
     errorDiv.textContent = message;
-    errorDiv.classList.remove('d-none');
+    
+    // Trouve le modal-body et insère l'alerte au début
+    const registerModalBody = document.querySelector('#registerModal .modal-body');
+    if (registerModalBody) {
+        registerModalBody.insertBefore(errorDiv, registerModalBody.firstChild);
+    }
 }
+
+// Affiche un message de succès
+function showSuccess(message) {
+    // Supprime tout message existant
+    const existingAlert = document.querySelector('#registerModal .alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    // Crée la nouvelle alerte de succès
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success mb-3';
+    successDiv.textContent = message;
+    
+    // Trouve le modal-body et insère l'alerte au début
+    const registerModalBody = document.querySelector('#registerModal .modal-body');
+    if (registerModalBody) {
+        registerModalBody.insertBefore(successDiv, registerModalBody.firstChild);
+    }
+}
+
 //Masque le message erreur
-function hideError() {
-    const errorDiv = document.getElementById('registerError');
-    errorDiv.classList.add('d-none');
+function hideMessages() {
+    const alertDiv = document.querySelector('#registerModal .alert');
+    if (alertDiv) {
+        alertDiv.remove();
+    }
 }
+
 //Vérifie si email a un format valide
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -34,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
 
         //Réinitialise l'interface (modal)
-        hideError();
+        hideMessages();
         submitButton.disabled = true;
         submitButton.textContent = 'Inscription en cours...';
 
@@ -87,13 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
             confirm_password, terms, role
         };
 
-        // Affiche les données pour le débogage (sans les mots de passe)
-        /*console.log('Données du formulaire :', {
-            ...formData,
-            password: '[PRÉSENT]',
-            confirm_password: '[PRÉSENT]'
-        });*/
-
         try {
             // == Etape 3 : Envoie des données au serveur
             const response = await fetch('/register', {
@@ -105,17 +135,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(formData)
             });
 
-            //console.log('Status de la réponse:', response.status);
-
             // == Etape 4 : Récuperer et analyser la réponse
             const responseText = await response.text();
-            //console.log('Réponse brute:', responseText);
+
             let data;
             try {
                 data = JSON.parse(responseText);
-                //console.log('Données parsées:', data);
             } catch (e) {
-                //console.error('Erreur de parsing JSON:', e);
                 showError('Erreur de format de réponse');
                 submitButton.disabled = false;
                 submitButton.textContent = 'S\'inscrire';
@@ -124,38 +150,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // == Etape 5 :  Traitement de la réponse
             if (data.success) {
-                //Ferme la modal d'inscription
-                const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
-                registerModal.hide();
-
-                //Réinitialise le formulaire d'inscription
-                registerForm.reset();
-
-                // == Etape 6 : Aller ver la modal de connexion 
-                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-
-                //Message de succès pour la modal de connexion
-                const loginMessageElement = document.createElement('div');
-                loginMessageElement.className = 'alert alert-success mb-3';
-                loginMessageElement.textContent = 'Inscription réussie ! Vous pouvez maintenant vous connecter avec vos identifiants.';
-
-                //Trouver modal-body de la modal de connexion
-                const loginModalBody = document.querySelector('#loginModal .modal-body');
-
-                //Vérifie si un message existe déjà et le supprime
-                const existingMessage = loginModalBody.querySelector('.alert');
-                if (existingMessage) {
-                    existingMessage.remove();
-                }
-
-                //Insère le nouveau message au début de la modal
-                if (loginModalBody) {
-                    loginModalBody.insertBefore(loginMessageElement, loginModalBody.firstChild);
-                }
-
-                //Affiche la modal de connexion
-                loginModal.show();
-
+                // Affiche message de succès
+                showSuccess('Inscription réussie ! Vous allez être redirigé vers la page de connexion.');
+                // Attendre un court délai pour que l'utilisateur voie le message
+                setTimeout(() => {
+                    // Ferme la modal d'inscription
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    registerModal.hide();
+                    
+                    // Réinitialise le formulaire d'inscription
+                    registerForm.reset();
+                    
+                    // Prépare le message pour la modal de connexion
+                    const loginMessageElement = document.createElement('div');
+                    loginMessageElement.className = 'alert alert-success mb-3';
+                    loginMessageElement.textContent = 'Inscription réussie ! Vous pouvez maintenant vous connecter avec vos identifiants.';
+                    
+                    // Trouve modal-body de la modal de connexion
+                    const loginModalBody = document.querySelector('#loginModal .modal-body');
+                    
+                    // Vérifie si un message existe déjà et le supprime
+                    const existingMessage = loginModalBody.querySelector('.alert');
+                    if (existingMessage) {
+                        existingMessage.remove();
+                    }
+                    
+                    // Insère le nouveau message au début de la modal
+                    if (loginModalBody) {
+                        loginModalBody.insertBefore(loginMessageElement, loginModalBody.firstChild);
+                    }
+                    
+                    // Affiche la modal de connexion
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                }, 4000); // 4 secondes
             } else {
                 //Affiche erreur si inscription a échoué
                 showError(data.error || 'Une erreur est survenue lors de l\'inscription');
@@ -179,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (registerModal) {
         registerModal.addEventListener('hidden.bs.modal', function () {
             registerForm.reset();
-            hideError();
+            hideMessages();
         });
     }
 });
