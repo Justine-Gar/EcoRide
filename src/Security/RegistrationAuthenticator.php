@@ -86,7 +86,7 @@ class RegistrationAuthenticator extends AbstractAuthenticator
     $user->setName($formData['name']);
     $user->setEmail($formData['email']);
     $user->setPhoneNumber($formData['phone_number']);
-    $user->setCredits(0); // Par défaut, l'utilisateur commence avec 0 crédit
+    $user->setCredits(20); // Par défaut, l'utilisateur commence avec 20 crédit
 
     // Hachage du mot de passe pour sécuriser le stockage
     $hashedPassword = $this->passwordHasher->hashPassword($user, $formData['password']);
