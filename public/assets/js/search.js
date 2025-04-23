@@ -579,65 +579,67 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (event) {
       const linkTarget = event.target.closest('a[href^="?id="]');
 
-      if (linkTarget) {
-
-        event.preventDefault();
-        const href = linkTarget.getAttribute('href');
-        const id = href.replace('?id=', '');
-
-        // Je mets à jour l'URL
-        const newUrl = window.location.pathname + '?id=' + id;
-        window.history.pushState({ path: newUrl }, '', newUrl);
-
-        // J'affiche un indicateur de chargement
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'loading-overlay';
-        loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div>';
-        loadingDiv.style.position = 'fixed';
-        loadingDiv.style.top = '0';
-        loadingDiv.style.left = '0';
-        loadingDiv.style.width = '100%';
-        loadingDiv.style.height = '100%';
-        loadingDiv.style.backgroundColor = 'rgba(255,255,255,0.7)';
-        loadingDiv.style.display = 'flex';
-        loadingDiv.style.justifyContent = 'center';
-        loadingDiv.style.alignItems = 'center';
-        loadingDiv.style.zIndex = '9999';
-        document.body.appendChild(loadingDiv);
-
-        // Je charge les détails du covoiturage
-        fetch(`/covoiturage/details/${id}`)
-          .then(response => response.text())
-          .then(html => {
-            // Je supprime l'indicateur de chargement
-            document.body.removeChild(loadingDiv);
-
-            // Je mets à jour la partie des résultats
-            const resultsContainer = document.querySelector('.resultats');
-            if (resultsContainer) {
-              resultsContainer.innerHTML = html;
-              // J'initialise les boutons de détails après mise à jour du contenu
-              if (window.initDetailButtons) {
-                window.initDetailButtons();
-              }
-            }
-
-            // Je charge les détails pour la carte
-            fetch(`/covoiturage/details-json/${id}`)
-              .then(response => response.json())
-              .then(data => {
-                showSelectedCarpoolOnMap(data.carpool);
-              })
-              .catch(error => {
-                console.error('Erreur lors du chargement des détails pour la carte:', error);
-              });
-          })
-          .catch(error => {
-            console.error('Erreur lors du chargement des détails:', error);
-            document.body.removeChild(loadingDiv);
-            window.location.href = href; // En cas d'erreur, je fais le comportement par défaut
-          });
+      if (!linkTarget) {
+        return;
       }
+
+      event.preventDefault();
+      const href = linkTarget.getAttribute('href');
+      const id = href.replace('?id=', '');
+
+      // Je mets à jour l'URL
+      const newUrl = window.location.pathname + '?id=' + id;
+      window.history.pushState({ path: newUrl }, '', newUrl);
+
+      // J'affiche un indicateur de chargement
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'loading-overlay';
+      loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div>';
+      loadingDiv.style.position = 'fixed';
+      loadingDiv.style.top = '0';
+      loadingDiv.style.left = '0';
+      loadingDiv.style.width = '100%';
+      loadingDiv.style.height = '100%';
+      loadingDiv.style.backgroundColor = 'rgba(255,255,255,0.7)';
+      loadingDiv.style.display = 'flex';
+      loadingDiv.style.justifyContent = 'center';
+      loadingDiv.style.alignItems = 'center';
+      loadingDiv.style.zIndex = '9999';
+      document.body.appendChild(loadingDiv);
+
+      // Je charge les détails du covoiturage
+      fetch(`/covoiturage/details/${id}`)
+        .then(response => response.text())
+        .then(html => {
+          // Je supprime l'indicateur de chargement
+          document.body.removeChild(loadingDiv);
+
+          // Je mets à jour la partie des résultats
+          const resultsContainer = document.querySelector('.resultats');
+          if (resultsContainer) {
+            resultsContainer.innerHTML = html;
+            // J'initialise les boutons de détails après mise à jour du contenu
+            if (window.initDetailButtons) {
+              window.initDetailButtons();
+            }
+          }
+
+          // Je charge les détails pour la carte
+          fetch(`/covoiturage/details-json/${id}`)
+            .then(response => response.json())
+            .then(data => {
+              showSelectedCarpoolOnMap(data.carpool);
+            })
+            .catch(error => {
+              console.error('Erreur lors du chargement des détails pour la carte:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des détails:', error);
+          document.body.removeChild(loadingDiv);
+          window.location.href = href; // En cas d'erreur, je fais le comportement par défaut
+        });
+      
     });
 
     // Ma fonction pour afficher un covoiturage sélectionné sur la carte
