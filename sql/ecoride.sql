@@ -28,7 +28,8 @@ CREATE TABLE `user_roles` (
 CREATE TABLE `preference_types` (
     id_preference_types INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
-    is_systeme BOOLEAN NOT NULL
+    is_systeme BOOLEAN NOT NULL,
+    id_user INT NULL
 );
 
 --Table pour les Préférence créer par utilisateur
@@ -188,3 +189,10 @@ INSERT INTO `reviews` (`id_user`, `id_sender`, `id_recipient`, `id_carpool`, `co
 (5, 7, 5, 15, 'Un peu de retard au départ mais bonne communication. Conduite prudente.', 4.0, 'publié'),
 (6, 8, 6, 16, 'Parfait ! Marie est très sympa et conduit prudemment. Horaires respectés.', 5.0, 'publié'),
 (7, 3, 7, 17, 'Robert est ponctuel et courtois. Véhicule propre et confortable.', 4.0, 'publié');
+
+INSERT INTO `preference_types` (`name`, `is_systeme`, `id_user`) VALUES
+('non_fumeur', TRUE, NULL),
+('animaux de compagnie', TRUE, NULL),
+('discussion', TRUE, NULL),
+('silence', TRUE, NULL),
+
