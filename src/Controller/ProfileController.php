@@ -10,7 +10,9 @@ use App\Repository\CarRepository;
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
 use App\Repository\ReviewRepository;
 use App\Repository\CarpoolRepository;
+use App\Repository\PreferenceTypeRepository;
 use App\Repository\RoleRepository;
+use App\Repository\UserPreferenceRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,7 +52,7 @@ class ProfileController extends AbstractController
     // Accessible uniquement aux utilisateurs connectés (ROLE_USER)
     #[Route('/profile', name: 'app_profile')]
     #[IsGranted('ROLE_USER')]
-    public function index(CarpoolRepository $carpoolRepository, RoleRepository $roleRepository): Response
+    public function index(CarpoolRepository $carpoolRepository, PreferenceTypeRepository $preferenceTypeRepo, UserPreferenceRepository $userPreferenceRepo): Response
     {
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
@@ -66,6 +68,19 @@ class ProfileController extends AbstractController
         $activeCarpoolAsPassenger = $carpoolRepository->findActiveCarpoolsAsPassenger($user);
         $completedCarpoolAsPassenger = $carpoolRepository->findCompletedCarpoolsAsPassenger($user);
         $canceledCarpoolsAsPassenger = $carpoolRepository->findCanceledCarpoolsAsPassenger($user);
+
+        // Récupérer les données pour l'onglet des préférences
+        $systemPreferences = $preferenceTypeRepo->findSystemPreferences(); //le types de preference du system
+        $userCustomPreferences = $userPreferenceRepo->findUserCustomPreferences($user); //toute les prefs de user
+        $userPreferences = $userPreferenceRepo->findUserPreferences($user); // les prefs perso des user
+        $userHasPreference = $userPreferenceRepo->userHasPreference($user); // bool si user à prefs
+        
+        //Facilite la vérification dans le profil
+        $userPreferenceMap = [];
+        foreach ($systemPreferences as $preference) {
+            $preferenceId = $preference->getIdPreferenceType();
+            $userPreferenceMap[$preferenceId] = $userPreferenceRepo->userHasPreference($user, $preferenceId);
+        }
 
         //creation formulaire user
         $form = $this->createForm(UserProfileType::class, $user, [
@@ -94,6 +109,10 @@ class ProfileController extends AbstractController
             'activeCarpoolAsPassenger' => $activeCarpoolAsPassenger,
             'completedCarpoolAsPassenger' => $completedCarpoolAsPassenger,
             'canceledCarpoolAsPassenger' => $canceledCarpoolsAsPassenger,
+            'systemPreferences' => $systemPreferences,
+            'userCustomPreferences' => $userCustomPreferences,
+            'userPreferences' => $userPreferences,
+            'userPreferenceMap' => $userPreferenceMap
         ]);
     }
 

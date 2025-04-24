@@ -70,6 +70,21 @@ class UserPreferenceRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupérer les préférences personnalisées d'un utilisateur
+     */
+    public function findUserCustomPreferences(User $user): array
+    {
+        return $this->createQueryBuilder('up')
+            ->join('up.preferenceType', 'pt')
+            ->where('pt.is_systeme = :isSystem')
+            ->andWhere('up.user = :user')
+            ->setParameter('isSystem', false)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Supprimer une préférence utilisateur
      */
     public function deleteUserPreference(User $user, PreferenceType $preferenceType): void
@@ -97,5 +112,26 @@ class UserPreferenceRepository extends ServiceEntityRepository
         }
         
         $this->_em->flush();
+    }
+
+    /**
+     * Vérifie si un utilisateur possède une préférence spécifique ou n'importe quelle préférence
+     */
+    public function userHasPreference(User $user, ?int $preferenceTypeId = null): bool
+    {
+        $qb = $this->createQueryBuilder('up')
+            ->where('up.user = :user')
+            ->setParameter('user', $user);
+        
+        if ($preferenceTypeId !== null) {
+            $qb->andWhere('up.preferenceType = :prefId')
+            ->setParameter('prefId', $preferenceTypeId);
+        }
+        
+        $count = $qb->select('COUNT(up.id_user_preference)')
+                ->getQuery()
+                ->getSingleScalarResult();
+        
+        return $count > 0;
     }
 }

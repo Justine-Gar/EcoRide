@@ -20,7 +20,7 @@ class PreferenceType
     private ?string $name = null;
 
     #[ORM\Column(name: "is_systeme")]
-    private ?bool $is_system = null;
+    private ?bool $is_systeme = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: true)]
@@ -38,8 +38,6 @@ class PreferenceType
     {
         $this->userPreferences = new ArrayCollection();
     }
-
-
 
 
     
@@ -62,16 +60,27 @@ class PreferenceType
 
     public function isSystem(): ?bool
     {
-        return $this->is_system;
+        return $this->is_systeme;
     }
 
-    public function setSystem(bool $is_system): static
+    public function setSystem(bool $is_systeme): static
     {
-        $this->is_system = $is_system;
+        $this->is_systeme = $is_systeme;
 
         return $this;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, UserPreference>
