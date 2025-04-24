@@ -53,14 +53,20 @@ class CarpoolRepository extends ServiceEntityRepository
             }
         }
 
+        
         // Définir les données obligatoires
         if (!isset($data['date_start']) || !isset($data['date_reach']) || 
-            !isset($data['location_start']) || !isset($data['location_reach']) ||
-            !isset($data['hour_start']) || !isset($data['hour_reach']) ||
-            !isset($data['nbr_places']) || !isset($data['credits'])) {
+        !isset($data['location_start']) || !isset($data['location_reach']) ||
+        !isset($data['hour_start']) || !isset($data['hour_reach']) ||
+        !isset($data['nbr_places']) || !isset($data['credits'])) {
             throw new \Exception('Toutes les informations requises doivent être fournies');
         }
 
+        // Si des préférences sont fournies 
+        if (isset($data['preferences'])) {
+            $carpool->setPreferences($data['preferences']);
+        }
+        
         // Vérifier la cohérence des dates
         $dateStart = new \DateTime($data['date_start'] . ' ' . $data['hour_start']);
         $dateReach = new \DateTime($data['date_reach'] . ' ' . $data['hour_reach']);

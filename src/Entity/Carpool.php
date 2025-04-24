@@ -49,6 +49,9 @@ class Carpool
     #[ORM\Column]
     private ?int $nbr_places = null;
 
+    #[ORM\Column]
+    private ?string $preferences = null;
+
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
     private ?string $lat_start = null;
 
@@ -189,6 +192,17 @@ class Carpool
     {
         $this->nbr_places = $nbr_places;
 
+        return $this;
+    }
+
+    public function getPreferences(): ?string
+    {
+        return $this->preferences;
+    }
+
+    public function setPreferences(?string $preferences): static
+    {
+        $this->preferences = $preferences;
         return $this;
     }
 
