@@ -242,7 +242,7 @@ class ProfileController extends AbstractController
     // Accessible uniquement aux utilisateurs connectés
     #[Route('/profile/new-carpool', name: 'app_profile_new_carpool', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function newCarpool(Request $request, CarpoolRepository $carpoolRepository, UserPreferenceRepository $userPreferenceRepo): Response
+    public function newCarpool(Request $request, CarpoolRepository $carpoolRepository): Response
     {
         $user = $this->security->getUser();
         if (!$user) {
@@ -307,6 +307,15 @@ class ProfileController extends AbstractController
 
 
             $carpool = $carpoolRepository->createCarpool($user, $data);
+
+            // Récupérer les préférences sélectionnées dans le formulaire
+            $selectedPreferences = $request->request->all('preferences');
+            
+            // Enregistrer les préférences dans le covoiturage
+            if (!empty($selectedPreferences)) {
+                $carpool->setPreferences(json_encode($selectedPreferences));
+                $carpoolRepository->save($carpool, true);
+            }
 
             $this->addFlash('success', 'Votre covoiturage a été créé avec succès !');
 
