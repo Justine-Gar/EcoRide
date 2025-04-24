@@ -26,7 +26,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
+
 
 
 class ProfileController extends AbstractController
@@ -241,7 +242,7 @@ class ProfileController extends AbstractController
     // Accessible uniquement aux utilisateurs connectés
     #[Route('/profile/new-carpool', name: 'app_profile_new_carpool', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function newCarpool(Request $request, CarpoolRepository $carpoolRepository): Response
+    public function newCarpool(Request $request, CarpoolRepository $carpoolRepository, UserPreferenceRepository $userPreferenceRepo): Response
     {
         $user = $this->security->getUser();
         if (!$user) {
