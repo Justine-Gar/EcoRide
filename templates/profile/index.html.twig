@@ -399,7 +399,7 @@
 								</div>
 
 								<div class="card-body">
-									<!--TRAJET EN COURS-->
+									<!--TRAJET EN ATTENTE-->
 									<div class="mt-4">
 										<h6 class="mb-3 text-muted">Trajets en cours</h6>
 										{% if waitingCarpoolAsDriver|length == 0 and waitingCarpoolAsPassenger|length == 0 %}											<div class="text-center py-4">
@@ -595,7 +595,19 @@
 																	<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
 																</p>
 																<div class="d-flex align-items-center">
-                                    <small class="text-muted">Aucun avis</small>
+                                  {% set reviewsFound = false %}
+																	{% for review in user.getRecipientReviews() %}
+																			{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
+																					{% set reviewsFound = true %}
+																					<div class="mb-1">
+																							<small>{{ review.getComment() }}</small>
+																							<strong class="me-2">Note: {{ review.getNote() }}/5</strong>
+																					</div>
+																			{% endif %}
+																	{% endfor %}
+																	{% if not reviewsFound %}
+																			<small class="text-muted">Aucun avis</small>
+																	{% endif %}
 																</div>
 															</div>
 															<div class="text-end">
