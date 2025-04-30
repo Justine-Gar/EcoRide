@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Form\CarpoolType;
 use App\Repository\CarpoolRepository;
+use App\Repository\UserPreferenceRepository;
+use App\Repository\PreferenceTypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +31,7 @@ class CovoiturageController extends AbstractController
   }
 
   #[Route('/', name: 'app_covoiturage')]
-  public function index(Request $request, CarpoolRepository $carpoolRepository): Response
+  public function index(Request $request, CarpoolRepository $carpoolRepository, PreferenceTypeRepository $preferenceTypeRepo, UserPreferenceRepository $userPreferenceRepo): Response
   {
     $depart = $request->query->get('depart');
     $arrivee = $request->query->get('arrivee');
@@ -52,18 +54,44 @@ class CovoiturageController extends AbstractController
       $selectedCarpool = $carpoolRepository->find($carpoolId);
     }
 
+    // Récupérer les préférences système
+    $systemPreferences = $preferenceTypeRepo->findSystemPreferences();
+
+    // Initialiser la carte des préférences utilisateur
+    $userPreferenceMap = [];
+    $userCustomPreferences = [];
+
+    // Si l'utilisateur est connecté, récupérer ses préférences
+    $user = $this->getUser();
+    if ($user) {
+      foreach ($systemPreferences as $preference) {
+        $preferenceId = $preference->getIdPreferenceType();
+        $userPreferenceMap[$preferenceId] = $userPreferenceRepo->userHasPreference($user, $preferenceId);
+      }
+
+      $userPreferences = $userPreferenceRepo->findUserPreferences($user);
+      $userCustomPreferences = $userPreferenceRepo->findUserCustomPreferences($user);
+    } else {
+      $userPreferences = [];
+    }
+
+
     return $this->render('covoiturage/index.html.twig', [
       'depart' => $depart,
       'arrivee' => $arrivee,
       'date' => $date,
       'carpools' => $carpools,
-      'selectedCarpool' => $selectedCarpool
+      'selectedCarpool' => $selectedCarpool,
+      'systemPreferences' => $systemPreferences,
+      'userCustomPreferences' => $userCustomPreferences,
+      'userPreferenceMap' => $userPreferenceMap,
+      'userPreferences' => $userPreferences ?? []
     ]);
   }
 
   
   #[Route('/search', name: 'app_covoiturage_search')]
-  public function search(Request $request, CarpoolRepository $carpoolRepository): Response
+  public function search(Request $request, CarpoolRepository $carpoolRepository, PreferenceTypeRepository $preferenceTypeRepo, UserPreferenceRepository $userPreferenceRepo): Response
   {
     $depart = $request->query->get('depart');
     $arrivee = $request->query->get('arrivee');
@@ -80,6 +108,23 @@ class CovoiturageController extends AbstractController
         $arrivee = trim($arriveeParts[0]);
     }
 
+    // Ajout de la récupération des préférences
+    $systemPreferences = $preferenceTypeRepo->findSystemPreferences();
+    $userPreferenceMap = [];
+    $userCustomPreferences = [];
+    $user = $this->getUser();
+    if ($user) {
+      foreach ($systemPreferences as $preference) {
+        $preferenceId = $preference->getIdPreferenceType();
+        $userPreferenceMap[$preferenceId] = $userPreferenceRepo->userHasPreference($user, $preferenceId);
+      }
+      $userPreferences = $userPreferenceRepo->findUserPreferences($user);
+      $userCustomPreferences = $userPreferenceRepo->findUserCustomPreferences($user);
+    } else {
+      $userPreferences = [];
+    }
+
+
     // Effectuer la recherche
     $carpools = $carpoolRepository->search($depart, $arrivee, $date);
 
@@ -87,7 +132,11 @@ class CovoiturageController extends AbstractController
         'carpools' => $carpools,
         'depart' => $depart,
         'arrivee' => $arrivee,
-        'date' => $date
+        'date' => $date,
+        'systemPreferences' => $systemPreferences,
+        'userCustomPreferences' => $userCustomPreferences,
+        'userPreferenceMap' => $userPreferenceMap,
+        'userPreferences' => $userPreferences ?? []
     ]);
   }
 

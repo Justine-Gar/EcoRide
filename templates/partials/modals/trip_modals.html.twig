@@ -130,26 +130,30 @@
 							<div class="mb-3">
 								<label class="form-label">Préférences</label>
 								<div class="d-flex flex-wrap gap-2">
-									{% for preference in systemPreferences %}
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="checkbox" id="preference_{{ preference.idPreferenceType }}" 
-														name="preferences[{{ preference.idPreferenceType }}]" value="oui"
-														{% if userPreferenceMap[preference.idPreferenceType] is defined and userPreferenceMap[preference.idPreferenceType] == 'oui' %}checked{% endif %}>
-											<label class="form-check-label" for="preference_{{ preference.idPreferenceType }}">
-													{{ preference.name }}
-											</label>
-										</div>
-									{% endfor %}
+									{% if systemPreferences is defined %}
+										{% for preference in systemPreferences %}
+											<div class="form-check form-check-inline">
+												<input class="form-check-input" type="checkbox" id="preference_{{ preference.idPreferenceType }}"
+															name="preferences[{{ preference.idPreferenceType }}]" value="oui"
+															{% if userPreferenceMap is defined and userPreferenceMap[preference.idPreferenceType] is defined and userPreferenceMap[preference.idPreferenceType] %}checked{% endif %}>
+												<label class="form-check-label" for="preference_{{ preference.idPreferenceType }}">
+														{{ preference.name }}
+												</label>
+											</div>
+										{% endfor %}
+									{% endif %}
 								</div>
 								<label class="form-label mt-3">Mes préférences personnelles</label>
 								<div class="d-flex flex-wrap gap-2">
-									{% for preference in userCustomPreferences %}
-										<div class="list-group-item d-flex justify-content-between align-items-center">
-											<div>
-											<strong>{{ preference.preferenceType.name|capitalize }}:</strong> {{ preference.chooseValue }}
+									{% if userCustomPreferences is defined %}
+										{% for preference in userCustomPreferences %}
+											<div class="list-group-item d-flex justify-content-between align-items-center">
+												<div>
+													<strong>{{ preference.preferenceType.name|capitalize }}:</strong> {{ preference.chooseValue }}
+												</div>
 											</div>
-										</div>
-									{% endfor %}
+										{% endfor %}
+									{% endif %}
 								</div>
 							</div>
 
