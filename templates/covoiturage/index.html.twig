@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block stylesheets %}
+	{{ parent() }}
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturage.css') }}">
 	<link rel="stylesheet" href="{{asset('assets/css/pages/covoiturage/covoiturageResponsive.css') }}">
@@ -94,6 +95,7 @@
 {% endblock %}
 
 {% block javascripts %}
+	{{ parent() }}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     {% if carpools is defined and carpools|length > 0 %}

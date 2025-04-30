@@ -151,6 +151,12 @@
   background: transparent;
 }
 
+.card.active {
+  box-shadow: 0 0 5px #313A50;
+  border-color: #4DBC84;
+}
+
+
 .nom-pseudo {
   font-family: 'PoppinsR';
   font-size: 16px;
@@ -269,14 +275,13 @@ ul, ol {
   overflow: hidden;
   transition: max-height 0.3s ease-out;
   opacity: 0;
-  visibility: hidden;
+  display: none;
 }
 
 .detailsContent.visible {
+  display: block;
   max-height: 2000px; /* Ajustez selon vos besoins */
   opacity: 1;
-  visibility: visible;
-  transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
 }
 
 .filter-menu {
