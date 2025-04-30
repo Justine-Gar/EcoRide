@@ -611,7 +611,7 @@
 																</div>
 															</div>
 															<div class="text-end">
-																<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
                                   <i class="fas fa-info-circle me-2"></i>Détails
                                 </a>
 															</div>
@@ -1364,4 +1364,6 @@
     <script src="{{ asset('assets/js/profile.js') }}"></script>
 		<script src="{{ asset('assets/js/btnSwitch.js') }}"></script>
 		<script src="{{ asset('assets/js/addCarpool.js') }}"></script>
+		<script src="{{ asset('assets/js/profileCarpoolDetails.js') }}"></script>
+
 {% endblock %}

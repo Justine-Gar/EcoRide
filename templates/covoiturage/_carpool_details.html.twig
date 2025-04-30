@@ -1,0 +1,95 @@
+<div class="row">
+	<div class="col-md-6">
+		<h5>Informations sur le trajet</h5>
+		<ul class="list-group list-group-flush mb-3">
+			<li class="list-group-item">
+				<strong>Départ :</strong>
+				{{ carpool.getLocationStart() }}</li>
+			<li class="list-group-item">
+				<strong>Arrivée :</strong>
+				{{ carpool.getLocationReach() }}</li>
+			<li class="list-group-item">
+				<strong>Date de départ :</strong>
+				{{ carpool.getDateStart()|date('d/m/Y') }}</li>
+			<li class="list-group-item">
+				<strong>Heure de départ :</strong>
+				{{ carpool.getHourStart()|date('H:i') }}</li>
+			<li class="list-group-item">
+				<strong>Date d'arrivée :</strong>
+				{{ carpool.getDateReach()|date('d/m/Y') }}</li>
+			<li class="list-group-item">
+				<strong>Heure d'arrivée :</strong>
+				{{ carpool.getHourReach()|date('H:i') }}</li>
+			<li class="list-group-item">
+				<strong>Places disponibles :</strong>
+				{{ carpool.getAvailablePlace() }}/{{ carpool.getNbrPlaces() }}</li>
+			<li class="list-group-item">
+				<strong>Crédits :</strong>
+				{{ carpool.getCredits() }}</li>
+			<li class="list-group-item">
+				<strong>Statut :</strong>
+				{{ carpool.getStatut() }}</li>
+		</ul>
+	</div>
+	<div class="col-md-6">
+		<h5>Informations sur le conducteur</h5>
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item">
+				<strong>Conducteur :</strong>
+				{{ carpool.getUser().getFirstname() }}
+				{{ carpool.getUser().getName() }}
+			</li>
+			<li class="list-group-item">
+				<strong>Note :</strong>
+				{% if carpool.getUser().getRating() %}
+					<span class="text-warning">
+						{% for i in 1..5 %}
+							{% if i <= carpool.getUser().getRating() %}
+								<i class="fas fa-star"></i>
+							{% elseif i <= carpool.getUser().getRating() + 0.5 %}
+								<i class="fas fa-star-half-alt"></i>
+							{% else %}
+								<i class="far fa-star"></i>
+							{% endif %}
+						{% endfor %}
+						({{ carpool.getUser().getRating() }}/5)
+					</span>
+				{% else %}
+					<span class="text-muted">Aucune note</span>
+				{% endif %}
+			</li>
+			{% if carpool.getUser().getPhoneNumber() %}
+				<li class="list-group-item">
+					<strong>Téléphone :</strong>
+					{{ carpool.getUser().getPhoneNumber() }}</li>
+			{% endif %}
+		</ul>
+
+		{% if app.user and app.user != carpool.getUser() and carpool.isWaitingCarpool() and not carpool.isFull() %}
+			<div class="d-grid gap-2 mt-3">
+				<a href="{{ path('app_covoiturage_join', {'id': carpool.getIdCarpool()}) }}" class="btn btn-success">
+					<i class="fas fa-sign-in-alt me-2"></i>Rejoindre ce trajet
+				</a>
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+<!-- Liste des passagers si l'utilisateur est connecté -->
+{% if app.user and carpool.getPassengers().count() > 0 %}
+	<div class="mt-4">
+		<h5>Passagers ({{ carpool.getPassengers().count() }})</h5>
+		<div class="row">
+			{% for passenger in carpool.getPassengers() %}
+				<div class="col-md-4 mb-2">
+					<div class="card">
+						<div class="card-body p-2">
+							<h6 class="mb-0">{{ passenger.getFirstname() }}
+								{{ passenger.getName() }}</h6>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endif %}

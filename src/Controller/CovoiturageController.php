@@ -176,6 +176,15 @@ class CovoiturageController extends AbstractController
     ]);
   }
 
+
+  #[Route('/{id}/details-modal', name: 'app_covoiturage_details_modal')]
+  public function getDetailsModal(Carpool $carpool): Response
+  {
+      return $this->render('covoiturage/_carpool_details.html.twig', [
+          'carpool' => $carpool
+      ]);
+  }
+  
   
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
