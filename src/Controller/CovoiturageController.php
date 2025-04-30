@@ -128,6 +128,47 @@ class CovoiturageController extends AbstractController
     // Effectuer la recherche
     $carpools = $carpoolRepository->search($depart, $arrivee, $date);
 
+    // Initialiser manuellement les objets pour éviter les problèmes de lazy loading
+    foreach ($carpools as $carpool) {
+      // Initialiser l'utilisateur et ses relations
+      $user = $carpool->getUser();
+      $this->entityManager->initializeObject($user);
+      
+      // Initialiser les voitures de l'utilisateur
+      if ($user) {
+          $cars = $user->getCars();
+          $this->entityManager->initializeObject($cars);
+          
+          // Initialiser les avis reçus
+          $reviews = $user->getRecipientReviews();
+          $this->entityManager->initializeObject($reviews);
+          
+          // Pour chaque avis, initialiser l'expéditeur
+          foreach ($reviews as $review) {
+              $sender = $review->getSender();
+              if ($sender) {
+                  $this->entityManager->initializeObject($sender);
+              }
+          }
+          
+          // Initialiser les préférences utilisateur
+          $userPrefs = $user->getUserPreferences();
+          $this->entityManager->initializeObject($userPrefs);
+          
+          // Pour chaque préférence, initialiser le type
+          foreach ($userPrefs as $pref) {
+              $prefType = $pref->getPreferenceType();
+              if ($prefType) {
+                  $this->entityManager->initializeObject($prefType);
+              }
+          }
+      }
+      
+      // Initialiser les passagers
+      $passengers = $carpool->getPassengers();
+      $this->entityManager->initializeObject($passengers);
+    }
+
     return $this->render('covoiturage/_search_results.html.twig', [
         'carpools' => $carpools,
         'depart' => $depart,

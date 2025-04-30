@@ -34,7 +34,7 @@
 									</div>
 									<div class="role-note d-flex align-items-center gap-2">
 										<span>Rôle : conducteur</span>
-										<span>5,0</span>
+										<span>{{ carpool.user.rating ?? '0.0'|number_format(1, ',', ' ') }}</span>
 										<span class="etoile">★</span>
 									</div>
 								</div>
@@ -96,30 +96,34 @@
 								<div class="détail-conducteur border-top">
 									<div class="detail-voiture border-bottom p-2">
 										<h6>Votre conducteur roule en:</h6>
-										<p>{{ carpool.vehicle ?? 'Non spécifié' }}</p>
+										{% if carpool.user.cars is not empty %}
+											{% set car = carpool.user.cars|first %}
+											<p>{{ car.marque }} {{ car.modele }} ({{ car.color }})</p>
+										{% else %}
+											<p>Non spécifié</p>
+										{% endif %}
 									</div>
 									<div class="detail-preferences border-bottom p-2">
 										<h6>Préférences du conducteur</h6>
 										<ul>
-											{% if carpool.user.preferences is defined and carpool.user.preferences|length > 0 %}
-												{% for preference in carpool.user.preferences %}
-													<li>{{ preference.name }}</li>
+											{% if carpool.user.userPreferences is defined and carpool.user.userPreferences|length > 0 %}
+												{% for userPreference in carpool.user.userPreferences %}
+													<li>{{ userPreference.preferenceType.name }}: {{ userPreference.chooseValue }}</li>
 												{% endfor %}
 											{% else %}
-												<li>Aucune préférence spécifiée</li>
+													<li>Aucune préférence spécifiée</li>
 											{% endif %}
-										</ul>
+											</ul>
 									</div>
 									<div class="detail-avis border-bottom p-2">
 										<h6>Avis sur le conducteur</h6>
 										<div>
-											{% if carpool.user.reviews is defined and carpool.user.reviews|length > 0 %}
-												{% for review in carpool.user.reviews %}
+											{% if carpool.user.recipientReviews is defined and carpool.user.recipientReviews|length > 0 %}
+												{% for review in carpool.user.recipientReviews %}
 													<div class="{% if not loop.last %}border-bottom{% endif %} pt-3 pb-3">
 														<div>
-															<span>{{ review.reviewer.firstname }}
-																{{ review.reviewer.name }}</span>
-															<span>{{ review.rating }}</span>
+															<span>{{ review.sender.firstname }} {{ review.sender.name }}</span>
+															<span>{{ review.note }}</span>
 															<span class="etoile">★</span>
 														</div>
 														<div>
@@ -128,9 +132,9 @@
 													</div>
 												{% endfor %}
 											{% else %}
-												<div class="pt-3 pb-3">
-													<p>Aucun avis pour le moment.</p>
-												</div>
+													<div class="pt-3 pb-3">
+															<p>Aucun avis pour le moment.</p>
+													</div>
 											{% endif %}
 										</div>
 									</div>
