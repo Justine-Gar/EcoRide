@@ -1,6 +1,13 @@
-<div class="container">
-	{% if carpools|length > 0 %}
+<div class="container" id="alert_results_search">
 
+	{% if message is defined and message %}
+		<!-- Message d'erreur -->
+		<div class="alert mb-4">
+			<p class="mb-0">{{ message }}</p>
+		</div>
+	{% endif %}
+
+	{% if carpools is not null and carpools|length > 0 %}
 		<!-- Résumé de la recherche -->
 		<div class="alert alert-info mb-4">
 			<p class="mb-0">
@@ -141,9 +148,8 @@
 
 
 									<div class="detail-participer d-flex justify-content-between align-items-center p-2">
-										<span>{{ carpool.credits }}
-											crédits</span>
-										<a href="#" class="btn-participer btn">Participer</a>
+										<span>{{ carpool.credits }} crédits</span>
+										<a class="btn-participer btn join-carpool-btn" data-carpool-id="{{ carpool.idCarpool }}">Participer</a>
 									</div>
 
 								</div>
@@ -159,10 +165,7 @@
 		<!-- Aucun résultat -->
 		<div class="alert alert-warning">
 			<p>Aucun trajet ne correspond à votre recherche. Veuillez essayer avec d'autres critères ou
-				<strong>
-					<a href="{{ path('app_login') }}">connectez-vous</a>
-				</strong>
-				pour proposer un trajet.</p>
+				<strong><a href="{{ path('app_login') }}">connectez-vous</a></strong> pour proposer un trajet.</p>
 		</div>
 	{% endif %}
 </div>

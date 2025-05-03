@@ -90,6 +90,7 @@
 
 	</main>
 	
+	{% include 'partials/modals/auth_modals.html.twig' %}
 	{% include 'partials/modals/trip_modals.html.twig' with {'cars': cars is defined ? cars : []} %}
 	
 {% endblock %}
@@ -106,7 +107,7 @@
       var selectedCarpool = {{ selectedCarpool|json_encode|raw }};
     {% endif %}
   </script>
-
+	<script src="{{ asset('assets/js/joinCarpool.js') }}"></script>
 	<script src="{{ asset('assets/js/btnDetail.js') }}"></script>
   <script src="{{ asset('assets/js/search.js') }}"></script>
 

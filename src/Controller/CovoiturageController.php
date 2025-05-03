@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Carpool;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Repository\RoleRepository;
 use App\Form\CarpoolType;
 use App\Repository\CarpoolRepository;
 use App\Repository\UserPreferenceRepository;
@@ -189,80 +190,150 @@ class CovoiturageController extends AbstractController
     $depart = $request->query->get('depart');
     $arrivee = $request->query->get('arrivee');
     $date = $request->query->get('date');
+
     //Recupère parametre de filtre 
     $vehiculeType = $request->query->get('vehicleType', 'allVehicles');
     $passagerCount = (int) $request->query->get('passengerCount', 1);
     $maxCredits = (int) $request->query->get('maxCredits', 50);
-    $driverRating = (float) $request->query->get('driverRating', 5.0);
+    $driverRating = (float) $request->query->get('driverRating', 0.0);
 
     // Effectuer d'abord la recherche standard
     $carpools = $carpoolRepository->search($depart, $arrivee, $date);
     
+    if (empty($carpools)) {
+      return $this->render('covoiturage/_search_results.html.twig', [
+          'carpools' => [],
+          'depart' => $depart,
+          'arrivee' => $arrivee,
+          'date' => $date,
+          'message' => 'Aucun covoiturage trouvé pour cette recherche.'
+      ]);
+    }
+
     // Filtrer les résultats avec les critères supplémentaires
     $filteredCarpools = [];
-    
+    $filterReasons = [];
+
+    // Mapper les IDs des inputs aux valeurs en base de données
+    $fuelTypeMap = [
+      'essence' => 'essence',
+      'diesel' => 'diesel',
+      'hybrid' => 'hybride',
+      'electric' => 'electrique'
+    ];
+
     foreach ($carpools as $carpool) {
-        // Filtrer par nombre de places disponibles
-        if (!$carpool->canAccomodate($passagerCount)) {
-          continue;
-        }
+      $carpoolId = $carpool->getIdCarpool();
+      $filterReasons[$carpoolId] = [];
+      $passes = true;
+
+       // Filtrer par nombre de places disponibles
+      if (!$carpool->canAccomodate($passagerCount)) {
+        $filterReasons[$carpoolId][] = 'places_insuffisantes';
+        $passes = false;
+      }
+      // Filtrer par crédits
+      if ($carpool->getCredits() > $maxCredits) {
+        $filterReasons[$carpoolId][] = 'credits_trop_eleves';
+        $passes = false;
+      }
+      // Filtrer par note du conducteur
+      $driver = $carpool->getUser();
+      $driverRatingValue = $driver->getRating() ?? 0;
+      if ($driverRating > 0 && $driverRatingValue < $driverRating) {
+        $filterReasons[$carpoolId][] = 'note_conducteur_insuffisante';
+        $passes = false;
+      }
+      // Filtrer par type de véhicule (si spécifié et différent de "tous")
+      if ($vehiculeType !== 'allVehicles') {
+        // Récupérer le véhicule du conducteur
+        $cars = $driver->getCars();
         
-        // Filtrer par crédits
-        if ($carpool->getCredits() > $maxCredits) {
-            continue;
-        }
-        
-        // Filtrer par note du conducteur
-        $driver = $carpool->getUser();
-        $driverRatingValue = $driver->getRating() ?? 0; // Utiliser 5 comme valeur par défaut si pas de note
-        
-        if ($driverRatingValue < $driverRating) {
-            continue;
-        }
-        
-        // Filtrer par type de véhicule (si spécifié et différent de "tous")
-        if ($vehiculeType !== 'allVehicles') {
-            // Récupérer le véhicule du conducteur
-            $cars = $driver->getCars();
+        if ($cars->isEmpty()) {
+            $filterReasons[$carpoolId][] = 'aucun_vehicule';
+            $passes = false;
+        } else {
+          // Vérifier si au moins une voiture correspond au type de carburant
+          $hasMatchingVehicle = false;
+          $fuelTypeToCheck = $fuelTypeMap[$vehiculeType] ?? null;
+          // Debug pour vérifier les valeurs
+          error_log("Filtering carpool #$carpoolId for fuel type: $fuelTypeToCheck");
+
+          foreach ($cars as $car) {
+            // Récupérer l'énergie de la voiture et la convertir en minuscules pour comparaison
+            $carFuelType = strtolower($car->getEnergie());
+            error_log("Car fuel type: $carFuelType");
             
-            if ($cars->isEmpty()) {
-                continue; // Pas de véhicule
+            // Comparer les types de carburant (insensible à la casse)
+            if ($carFuelType === $fuelTypeToCheck) {
+                $hasMatchingVehicle = true;
+                error_log("Match found!");
+                break;
             }
-            
-            // Vérifier si au moins une voiture correspond au type de carburant
-            $hasMatchingVehicle = false;
-            
-            foreach ($cars as $car) {
-                // Mapper les IDs des inputs aux valeurs en base de données
-                $fuelTypeMap = [
-                    'essence' => 'Essence',
-                    'diesel' => 'Diesel',
-                    'hybrid' => 'Hybride',
-                    'electric' => 'Électrique'
-                ];
-                
-                $fuelTypeToCheck = $fuelTypeMap[$vehiculeType] ?? null;
-                
-                if ($car->getFuelType() === $fuelTypeToCheck) {
-                    $hasMatchingVehicle = true;
-                    break;
-                }
-            }
-            
-            if (!$hasMatchingVehicle) {
-                continue;
-            }
+          }
+          
+          if (!$hasMatchingVehicle) {
+              $filterReasons[$carpoolId][] = 'type_carburant_incompatible';
+              $passes = false;
+          }
         }
-        
-        // Ce covoiturage a passé tous les filtres
+      }
+
+      // Ce covoiturage a passé tous les filtres
+      if ($passes) {
         $filteredCarpools[] = $carpool;
+      }
+    }
+
+    // Message spécifique en fonction des résultats
+    $message = null;
+    if (empty($filteredCarpools)) {
+      // Analyser les raisons de filtrage pour donner un message pertinent
+      $reasonCounts = [];
+      foreach ($filterReasons as $carpoolId => $reasons) {
+        foreach ($reasons as $reason) {
+          if (!isset($reasonCounts[$reason])) {
+            $reasonCounts[$reason] = 0;
+          }
+          $reasonCounts[$reason]++;
+        }
+      }
+
+      // Trouver la raison la plus fréquente
+      arsort($reasonCounts);
+      $topReason = key($reasonCounts);
+
+      switch ($topReason) {
+        case 'places_insuffisantes':
+          $message = 'Aucun covoiturage ne dispose de suffisamment de places pour le nombre de passagers demandé.';
+          break;
+        case 'credits_trop_eleves':
+          $message = 'Aucun covoiturage ne correspond à votre budget maximum de ' . $maxCredits . ' crédits.';
+          break;
+        case 'note_conducteur_insuffisante':
+          $message = 'Aucun conducteur n\'a une note égale ou supérieure à ' . $driverRating . '.';
+          break;
+        case 'type_carburant_incompatible':
+          $typeLabel = match ($vehiculeType) {
+            'essence' => 'Essence',
+            'diesel' => 'Diesel',
+            'hybrid' => 'Hybride',
+            'electric' => 'Électrique',
+            default => $vehiculeType
+          };
+          $message = 'Aucun covoiturage n\'est disponible avec un véhicule de type ' . $typeLabel . '.';
+          break;
+        default:
+          $message = 'Aucun covoiturage ne correspond aux critères de filtrage sélectionnés.';
+      }
     }
     
     return $this->render('covoiturage/_search_results.html.twig', [
         'carpools' => $filteredCarpools,
         'depart' => $depart,
         'arrivee' => $arrivee,
-        'date' => $date
+        'date' => $date,
+        'message' => $message
     ]);
   }
 
@@ -278,52 +349,116 @@ class CovoiturageController extends AbstractController
   
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
-  #[IsGranted('ROLE_USER')]
-  public function join(Carpool $carpool, UserRepository $userRepository): Response
+  public function join(Request $request, Carpool $carpool, UserRepository $userRepository): Response
   {
+    $joinAjax = $request->isXmlHttpRequest();
+    //verifier si user connecter
+    if (!$this->getUser()) {
+      if ($joinAjax) {
+        // Retourner une réponse JSON pour déclencher l'ouverture de la modal
+        return new JsonResponse([
+            'success' => false,
+            'auth_required' => true,
+            'message' => 'Vous devez être connecté pour rejoindre ce covoiturage'
+        ], 401);
+      }
+      return $this->redirectToRoute('app_login');
+    }
 
     $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
 
-    //Vérifier si ce n'est pas le conducteur qui essaie de rejoindre
+    // Vérifier que l'utilisateur a le rôle PASSAGER et non CONDUCTEUR
+    if (!$user->hasRoleByName('Passager')) {
+      if ($joinAjax) {
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.'
+        ], 403);
+      }
+      $this->addFlash('error', 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.');
+      return $this->redirectToRoute('app_covoiturage_search');
+    }
+    
+    //verifier si c'est pas le conducteur qui essaie de joindre
     if ($carpool->getUser() === $user) {
+      if ($joinAjax) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Vous ne pouvez pas rejoindre votre propre covoiturage.'
+        ], 400);
+      }
       $this->addFlash('error', 'Vous ne pouvez pas rejoindre votre propre covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
     }
 
-    // Vérifier si l'utilisateur n'est pas déjà inscrit
+    //verifier si pas dejà inscrit dans le covoiturage
     if ($carpool->getPassengers()->contains($user)) {
+      if ($joinAjax) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Vous êtes déjà inscrit à ce covoiturage.'
+        ], 400);
+      }
       $this->addFlash('warning', 'Vous êtes déjà inscrit à ce covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
     }
 
-    //Vérifié le nbr_place restant
+    //vérifier le nbr_place restant
     if ($carpool->getPassengers()->count() >= $carpool->getNbrPlaces()) {
-        $this->addFlash('error', 'Il n\'y a plus de places disponibles pour ce covoiturage.');
-        return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      if ($joinAjax) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Il n\'y a plus de places disponibles pour ce covoiturage.'
+        ], 400);
+      }
+      $this->addFlash('error', 'Il n\'y a plus de places disponibles pour ce covoiturage.');
+      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
     }
-    //Vérifier si user a assez de crédits
+
+    //verifier si assez de credits
     if ($user->getCredits() < $carpool->getCredits()) {
+      if ($joinAjax) {
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Vous n\'avez pas assez de crédits pour rejoindre ce covoiturage.'
+        ], 400);
+      }
       $this->addFlash('error', 'Vous n\'avez pas assez de crédits pour rejoindre ce covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
     }
 
     try {
-
-      // Ajouter l'utilisateur comme passager
+      //ajouter  user comme passager
       $carpool->addPassenger($user);
-      // Déduire les crédits de l'utilisateur
-      $userRepository->updateCredits($user, -$carpool->getCredits());
-      // Sauvegarder les changements
+      //déduire les crédits de user
+      $userRepository->updateCredits($user, - $carpool->getCredits());
+      //sauvegarder les changement
       $this->entityManager->flush();
+
+      if ($joinAjax) {
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Vous avez rejoint le covoiturage avec succès !'
+        ]);
+      }
       $this->addFlash('success', 'Vous avez rejoint le covoiturage avec succès !');
 
-    } catch(\Exception $e) {
+      //redirection ver le profil trajet
+      return $this->redirectToRoute('app_profile');
 
+    } catch (\Exception $e) {
+      //erreur
+      if ($joinAjax) {
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.'
+        ], 500);
+      }
       $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.');
+      return $this->redirectToRoute('app_covoiturage_search');
     }
 
-    return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
-    
+
   }
 
   //Route pour démarer un covoiturage
