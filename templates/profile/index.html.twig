@@ -53,7 +53,7 @@
 
 						<!-- Bouton en fonction du role -->
 						<div class="mb-2 buttons-container">
-							<button id="btn-recherche" class="btn btn-green" style="display: {% if activeRole == 'Passager' %}inline-block{% else %}none{% endif %}">Recherche covoiturage</button>
+							<a href="{{ path('app_covoiturage') }}" id="btn-recherche" class="btn btn-green" style="display: {% if activeRole == 'Passager' %}inline-block{% else %}none{% endif %}">Recherche covoiturage</a>
 							<button id="btn-trajet" class="btn btn-green" style="display: {% if activeRole == 'Conducteur' %}inline-block{% else %}none{% endif %}" data-bs-toggle="modal" data-bs-target="#createTripModal">Créer un trajet</button>
 						</div>
 					</div>
