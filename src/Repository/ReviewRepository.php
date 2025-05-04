@@ -162,15 +162,17 @@ class ReviewRepository extends ServiceEntityRepository
     /**
      * Obtenir la note moyenne d'un utilisateur
      */
-    public function getAverageRating(User $user): ?float
+    public function getAverageDriverRating(User $user): ?float
     {
         try {
             return $this->createQueryBuilder('r')
                 ->select('AVG(r.note) as average')
-                ->andWhere('r.user = :user')
+                ->andWhere('r.recipient = :user')
                 ->andWhere('r.statut = :status')
+                ->join('r.carpool', 'c')
+                ->andWhere('c.user = :user')  // L'utilisateur est conducteur du covoiturage
                 ->setParameter('user', $user)
-                ->setParameter('status', 'approved')
+                ->setParameter('status', 'publié')
                 ->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {

@@ -58,7 +58,8 @@ class ProfileController extends AbstractController
         // Récupère
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
-
+        //met a jour la note du conducteur
+        $this->userRepository->updateDriverRating($user);
         // Détermine si l'utilisateur est conducteur ou passager
         $isDriver = $this->userRepository->isDriver($user);
         $activeRole = $isDriver ? 'Conducteur' : 'Passager';

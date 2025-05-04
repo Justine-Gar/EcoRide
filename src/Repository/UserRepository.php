@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Role;
+use App\Repository\ReviewRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,9 +15,12 @@ use Doctrine\ORM\QueryBuilder;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private ReviewRepository $reviewRepository;
+
+    public function __construct(ManagerRegistry $registry, ReviewRepository $reviewRepository)
     {
         parent::__construct($registry, User::class);
+        $this->reviewRepository = $reviewRepository;
     }
 
     /**
@@ -90,7 +94,6 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-
     /**
      * Calcule la note moyenne d'un User
      */
@@ -123,18 +126,44 @@ class UserRepository extends ServiceEntityRepository
         $this->save($user, true);
     }
 
+    
     /**
-     * Calcule le total des crédits d'un user
+     * Calcule la note moyenne d'un User en tant que conducteur
      */
-    private function calculateTotalCredits(User $user): int
+    private function calculateDriverRating(User $user): float
     {
+        // On récupère les avis où l'utilisateur est le destinataire
+        $recipientReviews = $user->getRecipientReviews();
+        if ($recipientReviews->isEmpty()) {
+            return 0.0;
+        }
+
         $total = 0;
-        foreach ($user->getCarpools() as $carpool) {
-            if ($carpool->getStatut() === 'completed') {
-                $total += $carpool->getCredits();
+        $count = 0;
+        
+        foreach ($recipientReviews as $review) {
+            // Vérifier si l'avis est approuvé/publié
+            if ($review->getStatut() === 'publié') {
+                // Vérifier si l'avis concerne un covoiturage où l'utilisateur était conducteur
+                $carpool = $review->getCarpool();
+                if ($carpool && $carpool->getUser() === $user) {
+                    $total += floatval($review->getNote());
+                    $count++;
+                }
             }
         }
-        return $total;
+
+        return $count > 0 ? round($total / $count, 1) : 0.0;
+    }
+
+    /**
+     * Met à jour la note moyenne d'un User en tant que conducteur
+     */
+    public function updateDriverRating(User $user): void
+    {
+        $rating = $this->calculateDriverRating($user);
+        $user->setRating($rating);
+        $this->save($user, true);
     }
 
     /**
