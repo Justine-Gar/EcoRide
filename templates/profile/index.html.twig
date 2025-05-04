@@ -33,17 +33,17 @@
 							<div class="flash-messages">
 								<!-- Les messages flash seront insérés ici dynamiquement -->
 							</div>
-							<div class="switch-container conducteur-active">
+							<div class="switch-container {{ switchMode }}">
 								<div class="switch-background">
 										<div class="bg-conducteur"></div>
 										<div class="bg-passager"></div>
 								</div>
 								<div class="switch-options">
-										<div class="option option-conducteur option-active" onclick="activateOption('conducteur')">
+										<div class="option option-conducteur {% if activeRole == 'Conducteur' %}option-active{% endif %}" onclick="activateOption('conducteur')">
 											<i class="fas fa-car"></i>
 											Conducteur
 										</div>
-										<div class="option option-passager" onclick="activateOption('passager')">
+										<div class="option option-passager {% if activeRole == 'Passager' %}option-active{% endif %}" onclick="activateOption('passager')">
 											Passager
 											<i class="fas fa-hand-paper"></i>
 										</div>
@@ -53,8 +53,8 @@
 
 						<!-- Bouton en fonction du role -->
 						<div class="mb-2 buttons-container">
-							<button id="btn-recherche" class="btn btn-green" style="display: none;">Recherche covoiturage</button>
-							<button id="btn-trajet" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createTripModal">Créer un trajet</button>
+							<button id="btn-recherche" class="btn btn-green" style="display: {% if activeRole == 'Passager' %}inline-block{% else %}none{% endif %}">Recherche covoiturage</button>
+							<button id="btn-trajet" class="btn btn-green" style="display: {% if activeRole == 'Conducteur' %}inline-block{% else %}none{% endif %}" data-bs-toggle="modal" data-bs-target="#createTripModal">Créer un trajet</button>
 						</div>
 					</div>
 				</div>

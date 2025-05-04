@@ -59,6 +59,11 @@ class ProfileController extends AbstractController
         $user = $this->userRepository->getUser($this->getUser());
         $usersCars = $this->carRepository->findByUser($user);
 
+        // Détermine si l'utilisateur est conducteur ou passager
+        $isDriver = $this->userRepository->isDriver($user);
+        $activeRole = $isDriver ? 'Conducteur' : 'Passager';
+        $switchMode = $isDriver ? 'conducteur-active' : 'passager-active';
+
         // Récupérer les covoiturages en tant que conducteur
         $waitinCarpoolAsDriver = $carpoolRepository->findWaitingCarpoolAsDriver($user);
         $activeCarpoolAsDriver = $carpoolRepository->findActiveCarpoolsAsDriver($user);
@@ -102,6 +107,8 @@ class ProfileController extends AbstractController
             'form' => $form->createView(),
             'cars' => $usersCars,
             'carForm' => $carForm->createView(),
+            'activeRole' => $activeRole,
+            'switchMode' => $switchMode,
             'waitingCarpoolAsDriver' => $waitinCarpoolAsDriver,
             'activeCarpoolAsDriver' => $activeCarpoolAsDriver,
             'completedCarpoolAsDriver' => $completedCarpoolAsDriver,
