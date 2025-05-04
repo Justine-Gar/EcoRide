@@ -62,6 +62,14 @@ function scrollWithOffset(element, offset = 100) {
   });
 }
 
+function displayMessage(message, type = 'warning') {
+  if (type === 'success') {
+    displaySuccessMessage(message);
+  } else {
+    displayErrorMessage(message);
+  }
+}
+
 function joinCarpool(carpoolId) {
   displayMessage('Traitement en cours...', 'warning');
 
@@ -124,15 +132,6 @@ function joinCarpool(carpoolId) {
       hideMessages();
       displayErrorMessage('Une erreur de communication est survenue');
     });
-}
-
-
-function displayMessage(message, type = 'warning') {
-  if (type === 'success') {
-    displaySuccessMessage(message);
-  } else {
-    displayErrorMessage(message);
-  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

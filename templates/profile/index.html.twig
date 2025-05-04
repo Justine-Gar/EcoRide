@@ -473,10 +473,13 @@
 																	crédits
 																</p>
 															</div>
-															<div class="text-end">
+															<div class="d-flex justify-content-end align-items-center">
 																<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																	<i class="fas fa-info-circle me-2"></i>Détails
+																	<i class="fas fa-info-circle"></i>Détails
 																</a>
+																<form action="{{ path('app_covoiturage_leave', {'id': carpool.getIdCarpool() }) }}" method="POST">
+																		<button type="submit" class="btn btn-outline-danger">Quitter</button>
+																</form>															
 															</div>
 														</div>
 													</div>
@@ -1062,10 +1065,13 @@
 																				</p>
 																			</div>
 																		</div>
-																		<div class="text-end">
+																		<div class="d-flex justify-content-end align-items-center">
 																			<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																				<i class="fas fa-info-circle me-2"></i>Détails
+																				<i class="fas fa-info-circle"></i>Détails
 																			</a>
+																			<form action="{{ path('app_covoiturage_leave', {'id': carpool.getIdCarpool() }) }}" method="POST">
+																				<button type="submit" class="btn btn-outline-danger ">Quitter</button>
+																			</form>		
 																		</div>
 																	</div>
 																</div>

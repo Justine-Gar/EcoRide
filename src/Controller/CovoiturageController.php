@@ -184,7 +184,7 @@ class CovoiturageController extends AbstractController
 
   
   #[Route('/filter', name: 'app_covoiturage_filter', methods: ['GET', 'POST'])]
-  public function filter(Request $request, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
+  public function filter(Request $request, CarpoolRepository $carpoolRepository): Response
   {
     //Recupere paramatre de recherche covoit
     $depart = $request->query->get('depart');
@@ -346,12 +346,11 @@ class CovoiturageController extends AbstractController
       ]);
   }
   
-  
   //Route pour joindre un covoiturage
   #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'], methods: ['POST'])]
-  public function join(Request $request, Carpool $carpool, UserRepository $userRepository, CarpoolRepository $carpoolRepository): Response
+  public function joinCarpool(Carpool $carpool, UserRepository $userRepository, CarpoolRepository $carpoolRepository): Response
   {
-    //verifier si user connecter
+    // Vérifier si user connecté
     if (!$this->getUser()) {
       // Retourner une réponse JSON pour déclencher l'ouverture de la modal
       return new JsonResponse([
@@ -365,65 +364,86 @@ class CovoiturageController extends AbstractController
 
     // Vérifier que l'utilisateur a le rôle PASSAGER et non CONDUCTEUR
     if (!$userRepository->isPassenger($user)) {
-      return new JsonResponse([
-          'success' => false,
-          'message' => 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.'
-      ], 403);
-      
-    }
-
-    //verifier si  l'utilisateur est pas déjà inscrit à un covoiturage actif
-    $joinCheck = $carpoolRepository->canUserJoinCarpool($user, $carpool);
-    if (!$joinCheck['can_join']) {
-      $responseData = [
-        'success' => false,
-        'message' => $joinCheck['message']
-      ];
-
-      // Ajouter les infos supplémentaires si disponibles
-      if (isset($joinCheck['credits_required'])) {
-        $responseData['credits_required'] = $joinCheck['credits_required'];
-      }
-      if (isset($joinCheck['user_credits'])) {
-        $responseData['user_credits'] = $joinCheck['user_credits'];
-      }
-      if (isset($joinCheck['existing_carpool'])) {
-        $existingCarpool = $joinCheck['existing_carpool'];
-        $responseData['existing_carpool'] = [
-          'id' => $existingCarpool->getIdCarpool(),
-          'status' => $existingCarpool->getStatut(),
-          'start_location' => $existingCarpool->getLocationStart(),
-          'end_location' => $existingCarpool->getLocationReach()
-        ];
-      }
-
-      return new JsonResponse($responseData, 400);
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.'
+        ], 403);
     }
 
     try {
-      //ajouter  user comme passager
-      $carpool->addPassenger($user);
-      //déduire les crédits de user
-      $userRepository->updateCredits($user, - $carpool->getCredits());
-      //sauvegarder les changement
-      $this->entityManager->flush();
+        $result = $carpoolRepository->addPassengerToCarpool($user, $carpool);
+        
+        // Si l'utilisateur peut rejoindre le covoiturage
+        if (isset($result['can_join']) && $result['can_join']) {
+            // Déduire les crédits de l'utilisateur
+            $userRepository->updateCredits($user, -$carpool->getCredits());
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Vous avez rejoint le covoiturage avec succès !'
+            ]);
 
-      return new JsonResponse([
-          'success' => true,
-          'message' => 'Vous avez rejoint le covoiturage avec succès !'
-      ]);
-
+        } else {
+            // L'utilisateur ne peut pas rejoindre le covoiturage
+            $responseData = [
+                'success' => false,
+                'message' => $result['message'] ?? 'Impossible de rejoindre ce covoiturage.'
+            ];
+            
+            // Ajouter les infos supplémentaires si disponibles
+            if (isset($result['credits_required'])) {
+                $responseData['credits_required'] = $result['credits_required'];
+            }
+            if (isset($result['user_credits'])) {
+                $responseData['user_credits'] = $result['user_credits'];
+            }
+            if (isset($result['existing_carpool'])) {
+                $existingCarpool = $result['existing_carpool'];
+                $responseData['existing_carpool'] = [
+                    'id' => $existingCarpool->getIdCarpool(),
+                    'status' => $existingCarpool->getStatut(),
+                    'start_location' => $existingCarpool->getLocationStart(),
+                    'end_location' => $existingCarpool->getLocationReach()
+                ];
+            }
+            
+            return new JsonResponse($responseData, 400);
+        }
     } catch (\Exception $e) {
-      //erreur
-      return new JsonResponse([
-          'success' => false,
-          'message' => 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.'
-      ], 500);
-      
-      $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.');
-      return $this->redirectToRoute('app_covoiturage_search');
+        // Erreur
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.'
+        ], 500);
     }
 
+  }
+
+  //Route pour quitter un covoiturage en attente
+  #[Route('/{id}/leave', name: 'app_covoiturage_leave', requirements: ['id' => '\d+'], methods: ['POST'])]
+  #[IsGranted('ROLE_USER')]
+  public function leaveCarpool(Carpool $carpool, CarpoolRepository $carpoolRepository, UserRepository $userRepository): Response
+  {
+      try {
+        $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
+        
+        // Utiliser la méthode du repository pour retirer le passager
+        $result = $carpoolRepository->removePassengerToCarpool($user, $carpool);
+        
+        if ($result['can_leave']) {
+            // Restituer les crédits à l'utilisateur
+            $userRepository->updateCredits($user, $carpool->getCredits());
+            
+            $this->addFlash('success', $result['message'] . ' Vos crédits ont été restitués.');
+        } else {
+            $this->addFlash('error', $result['message']);
+        }
+    } catch (\Exception $e) {
+        // Gérer les exceptions imprévues
+        $this->addFlash('error', 'Une erreur est survenue lors de la désinscription au covoiturage : ' . $e->getMessage());
+    }
+    
+    return $this->redirectToRoute('app_profile');
   }
 
   //Route pour démarer un covoiturage

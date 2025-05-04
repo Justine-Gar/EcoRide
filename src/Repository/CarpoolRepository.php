@@ -130,7 +130,6 @@ class CarpoolRepository extends ServiceEntityRepository
         }
     }
 
-
     /**
      * Trouver un covoiturage disponible
      */
@@ -190,10 +189,11 @@ class CarpoolRepository extends ServiceEntityRepository
         return !empty($result) ? $result[0] : null;
     }
 
+
     /**
-    * Vérifie si un utilisateur peut rejoindre un covoiturage
-    */
-    public function canUserJoinCarpool(User $user, Carpool $carpool): array
+     * Ajouter un passager à un covoiturage
+     */
+    public function addPassengerToCarpool(User $user, Carpool $carpool): array
     {
         // Vérifier si l'utilisateur est le conducteur
         if ($carpool->getUser() === $user) {
@@ -239,10 +239,49 @@ class CarpoolRepository extends ServiceEntityRepository
             ];
         }
         
-        // Toutes les vérifications ont été passées
+        // Ajouter l'utilisateur comme passager
+        $carpool->addPassenger($user);
+        
+        // Sauvegarder les changements
+        $this->save($carpool, true);
+
         return [
             'can_join' => true,
             'message' => ''
+        ];
+    }
+
+    /**
+     * Retirer un passager d'un covoiturage
+     */
+    public function removePassengerToCarpool(User $user, Carpool $carpool): array
+    {
+        // Vérifier que l'utilisateur est bien un passager de ce covoiturage
+        if (!$carpool->getPassengers()->contains($user)) {
+            return [
+                'can_leave' => false,
+                'message' => 'Vous n\'êtes pas inscrit à ce covoiturage.'
+            ];
+        }
+        
+        // Vérifier que le covoiturage est bien en attente
+        if (!$carpool->isWaitingCarpool()) {
+            return [
+                'can_leave' => false,
+                'message' => 'Vous ne pouvez pas quitter un covoiturage qui n\'est plus en attente.'
+            ];
+        }
+        
+        // Retirer l'utilisateur de la liste des passagers
+        $carpool->removePassenger($user);
+        
+        // Sauvegarder les changements
+        $this->save($carpool, true);
+        
+        return [
+            'can_leave' => true,
+            'message' => 'Vous avez quitté le covoiturage avec succès.',
+            'credits_returned' => $carpool->getCredits()
         ];
     }
 
