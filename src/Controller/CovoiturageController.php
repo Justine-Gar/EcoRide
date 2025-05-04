@@ -348,83 +348,56 @@ class CovoiturageController extends AbstractController
   
   
   //Route pour joindre un covoiturage
-  #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'])]
-  public function join(Request $request, Carpool $carpool, UserRepository $userRepository): Response
+  #[Route('/{id}/join', name: 'app_covoiturage_join', requirements: ['id' => '\d+'], methods: ['POST'])]
+  public function join(Request $request, Carpool $carpool, UserRepository $userRepository, CarpoolRepository $carpoolRepository): Response
   {
-    $joinAjax = $request->isXmlHttpRequest();
     //verifier si user connecter
     if (!$this->getUser()) {
-      if ($joinAjax) {
-        // Retourner une réponse JSON pour déclencher l'ouverture de la modal
-        return new JsonResponse([
-            'success' => false,
-            'auth_required' => true,
-            'message' => 'Vous devez être connecté pour rejoindre ce covoiturage'
-        ], 401);
-      }
-      return $this->redirectToRoute('app_login');
+      // Retourner une réponse JSON pour déclencher l'ouverture de la modal
+      return new JsonResponse([
+          'success' => false,
+          'auth_required' => true,
+          'message' => 'Vous devez être connecté pour rejoindre ce covoiturage'
+      ], 401);
     }
 
     $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
 
     // Vérifier que l'utilisateur a le rôle PASSAGER et non CONDUCTEUR
-    if (!$user->hasRoleByName('Passager')) {
-      if ($joinAjax) {
-        return new JsonResponse([
-            'success' => false,
-            'message' => 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.'
-        ], 403);
-      }
-      $this->addFlash('error', 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_search');
-    }
-    
-    //verifier si c'est pas le conducteur qui essaie de joindre
-    if ($carpool->getUser() === $user) {
-      if ($joinAjax) {
-        return new JsonResponse([
+    if (!$userRepository->isPassenger($user)) {
+      return new JsonResponse([
           'success' => false,
-          'message' => 'Vous ne pouvez pas rejoindre votre propre covoiturage.'
-        ], 400);
-      }
-      $this->addFlash('error', 'Vous ne pouvez pas rejoindre votre propre covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
+          'message' => 'Vous devez avoir le rôle Passager pour rejoindre un covoiturage.'
+      ], 403);
+      
     }
 
-    //verifier si pas dejà inscrit dans le covoiturage
-    if ($carpool->getPassengers()->contains($user)) {
-      if ($joinAjax) {
-        return new JsonResponse([
-          'success' => false,
-          'message' => 'Vous êtes déjà inscrit à ce covoiturage.'
-        ], 400);
-      }
-      $this->addFlash('warning', 'Vous êtes déjà inscrit à ce covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
-    }
+    //verifier si  l'utilisateur est pas déjà inscrit à un covoiturage actif
+    $joinCheck = $carpoolRepository->canUserJoinCarpool($user, $carpool);
+    if (!$joinCheck['can_join']) {
+      $responseData = [
+        'success' => false,
+        'message' => $joinCheck['message']
+      ];
 
-    //vérifier le nbr_place restant
-    if ($carpool->getPassengers()->count() >= $carpool->getNbrPlaces()) {
-      if ($joinAjax) {
-        return new JsonResponse([
-          'success' => false,
-          'message' => 'Il n\'y a plus de places disponibles pour ce covoiturage.'
-        ], 400);
+      // Ajouter les infos supplémentaires si disponibles
+      if (isset($joinCheck['credits_required'])) {
+        $responseData['credits_required'] = $joinCheck['credits_required'];
       }
-      $this->addFlash('error', 'Il n\'y a plus de places disponibles pour ce covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
-    }
+      if (isset($joinCheck['user_credits'])) {
+        $responseData['user_credits'] = $joinCheck['user_credits'];
+      }
+      if (isset($joinCheck['existing_carpool'])) {
+        $existingCarpool = $joinCheck['existing_carpool'];
+        $responseData['existing_carpool'] = [
+          'id' => $existingCarpool->getIdCarpool(),
+          'status' => $existingCarpool->getStatut(),
+          'start_location' => $existingCarpool->getLocationStart(),
+          'end_location' => $existingCarpool->getLocationReach()
+        ];
+      }
 
-    //verifier si assez de credits
-    if ($user->getCredits() < $carpool->getCredits()) {
-      if ($joinAjax) {
-        return new JsonResponse([
-            'success' => false,
-            'message' => 'Vous n\'avez pas assez de crédits pour rejoindre ce covoiturage.'
-        ], 400);
-      }
-      $this->addFlash('error', 'Vous n\'avez pas assez de crédits pour rejoindre ce covoiturage.');
-      return $this->redirectToRoute('app_covoiturage_search', ['id' => $carpool->getIdCarpool()]);
+      return new JsonResponse($responseData, 400);
     }
 
     try {
@@ -435,29 +408,21 @@ class CovoiturageController extends AbstractController
       //sauvegarder les changement
       $this->entityManager->flush();
 
-      if ($joinAjax) {
-        return new JsonResponse([
-            'success' => true,
-            'message' => 'Vous avez rejoint le covoiturage avec succès !'
-        ]);
-      }
-      $this->addFlash('success', 'Vous avez rejoint le covoiturage avec succès !');
-
-      //redirection ver le profil trajet
-      return $this->redirectToRoute('app_profile');
+      return new JsonResponse([
+          'success' => true,
+          'message' => 'Vous avez rejoint le covoiturage avec succès !'
+      ]);
 
     } catch (\Exception $e) {
       //erreur
-      if ($joinAjax) {
-        return new JsonResponse([
-            'success' => false,
-            'message' => 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.'
-        ], 500);
-      }
+      return new JsonResponse([
+          'success' => false,
+          'message' => 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.'
+      ], 500);
+      
       $this->addFlash('error', 'Une erreur est survenue lors de l\'inscription au covoiturage. Veuillez réessayer.');
       return $this->redirectToRoute('app_covoiturage_search');
     }
-
 
   }
 

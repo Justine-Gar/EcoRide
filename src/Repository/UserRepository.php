@@ -148,4 +148,27 @@ class UserRepository extends ServiceEntityRepository
         $user->setCredits($newCredits);
         $this->save($user, true);
     }
+
+
+    /**
+     * Vérifie si l'utilisateur possède un rôle spécifique
+     */
+    public function hasRole(User $user, string $roleName): bool
+    {
+        return $user->hasRoleByName($roleName);
+    }
+    /**
+     * Vérifie si l'utilisateur est un passager
+     */
+    public function isPassenger(User $user): bool
+    {
+        return $this->hasRole($user, 'Passager');
+    }
+    /**
+     * Vérifie si l'utilisateur est un conducteur
+     */
+    public function isDriver(User $user): bool
+    {
+        return $this->hasRole($user, 'Conducteur');
+    }
 }

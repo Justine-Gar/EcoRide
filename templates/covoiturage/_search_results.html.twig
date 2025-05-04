@@ -7,6 +7,14 @@
 		</div>
 	{% endif %}
 
+	{% for label, messages in app.flashes %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : 'success') }} mb-4">
+        <p class="mb-0">{{ msg }}</p>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
 	{% if carpools is not null and carpools|length > 0 %}
 		<!-- Résumé de la recherche -->
 		<div class="alert alert-info mb-4">

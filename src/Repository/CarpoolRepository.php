@@ -147,6 +147,7 @@ class CarpoolRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+
     /**
      * Trouver les covoiturage auxquels un user participe
      */
@@ -159,6 +160,90 @@ class CarpoolRepository extends ServiceEntityRepository
             ->orderBy('c.date_start', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Vérifie si un user participe deja à un covoitrage en actif ou attente
+     */
+    public function findActiveOrWaitingParticipation(User $user, ?int $excludeCarpoolId = null): ?array
+    {
+        $qb = $this->createQueryBuilder('c')
+        ->join('c.passengers', 'p')
+        ->where('p.id_user = :userId')
+        ->andWhere('c.statut IN (:statuses)')
+        ->setParameter('userId', $user->getIdUser())
+        ->setParameter('statuses', [Carpool::STATUS_ACTIVE, Carpool::STATUS_WAITING])
+        ->orderBy('c.date_start', 'ASC');
+    
+        // Si un ID de covoiturage est fourni, l'exclure de la recherche
+        if ($excludeCarpoolId !== null) {
+            $qb->andWhere('c.id_carpool != :excludeId')
+            ->setParameter('excludeId', $excludeCarpoolId);
+        }
+        
+        // Limiter à un seul résultat
+        $qb->setMaxResults(1);
+        
+        $result = $qb->getQuery()->getResult();
+        
+        // Retourner le premier covoiturage trouvé, ou null
+        return !empty($result) ? $result[0] : null;
+    }
+
+    /**
+    * Vérifie si un utilisateur peut rejoindre un covoiturage
+    */
+    public function canUserJoinCarpool(User $user, Carpool $carpool): array
+    {
+        // Vérifier si l'utilisateur est le conducteur
+        if ($carpool->getUser() === $user) {
+            return [
+                'can_join' => false,
+                'message' => 'Vous ne pouvez pas rejoindre votre propre covoiturage.'
+            ];
+        }
+        
+        // Vérifier si l'utilisateur est déjà inscrit à ce covoiturage
+        if ($carpool->getPassengers()->contains($user)) {
+            return [
+                'can_join' => false,
+                'message' => 'Vous êtes déjà inscrit à ce covoiturage.'
+            ];
+        }
+        
+        // Vérifier s'il reste des places disponibles
+        if ($carpool->getPassengers()->count() >= $carpool->getNbrPlaces()) {
+            return [
+                'can_join' => false,
+                'message' => 'Il n\'y a plus de places disponibles pour ce covoiturage.'
+            ];
+        }
+        
+        // Vérifier si l'utilisateur participe déjà à un autre covoiturage
+        $existingParticipation = $this->findActiveOrWaitingParticipation($user, $carpool->getIdCarpool());
+        if ($existingParticipation !== null) {
+            return [
+                'can_join' => false,
+                'message' => "Vous êtes déjà inscrit à un covoiturage. Vous ne pouvez rejoindre qu'un seul covoiturage à la fois.",
+                'existing_carpool' => $existingParticipation
+            ];
+        }
+
+        // Vérifier si l'utilisateur a assez de crédits
+        if ($user->getCredits() < $carpool->getCredits()) {
+            return [
+                'can_join' => false,
+                'message' => "Vous n'avez pas assez de crédits pour rejoindre ce covoiturage.",
+                'credits_required' => $carpool->getCredits(),
+                'user_credits' => $user->getCredits()
+            ];
+        }
+        
+        // Toutes les vérifications ont été passées
+        return [
+            'can_join' => true,
+            'message' => ''
+        ];
     }
 
     /**
