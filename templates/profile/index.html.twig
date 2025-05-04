@@ -565,9 +565,9 @@
 																</p>
 															</div>
 															<div class="text-end">
-																<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																	<i class="fas fa-info-circle me-2"></i>Détails
-																</a>
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+                                  <i class="fas fa-info-circle me-2"></i>Détails
+                                </a>
 															</div>
 														</div>
 													</div>
@@ -1151,8 +1151,8 @@
 																				</p>
 																			</div>
 																			<div class="text-end">
-																				<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																						<i class="fas fa-info-circle me-2"></i>Détails
+																				<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																					<i class="fas fa-info-circle me-2"></i>Détails
 																				</a>
 																			</div>
 																		</div>
