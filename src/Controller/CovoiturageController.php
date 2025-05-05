@@ -446,6 +446,8 @@ class CovoiturageController extends AbstractController
     return $this->redirectToRoute('app_profile');
   }
 
+
+  
   //Route pour démarer un covoiturage
   #[Route('/{id}/start', name: 'app_covoiturage_start', requirements: ['id' => '\d+'])]
   #[IsGranted('ROLE_USER')]
@@ -457,13 +459,13 @@ class CovoiturageController extends AbstractController
     //vérifie si c'est bien le conducteur qui démare
     if ($carpool->getUser() !== $user) {
       $this->addFlash('error', 'Vous ne pouvez pas démarrer un covoiturage dont vous n\'êtes pas le conducteur.');
-      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
     }
 
     //vérifie si le covoiturage et bien en attente
     if (!$carpool->isWaitingCarpool()) {
       $this->addFlash('error', 'Ce covoiturage ne peut etre démarer car il n\'est pas en attente');
-      return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+      return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
     }
 
     try {
@@ -486,7 +488,7 @@ class CovoiturageController extends AbstractController
       // Vérifier si c'est bien le conducteur qui annule
       if ($carpool->getUser() !== $user) {
           $this->addFlash('error', 'Vous ne pouvez pas annuler un covoiturage dont vous n\'êtes pas le conducteur.');
-          return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+          return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
       }
       
       try {
@@ -516,13 +518,13 @@ class CovoiturageController extends AbstractController
       // Vérifier si c'est bien le conducteur qui termine le trajet
       if ($carpool->getUser() !== $user) {
           $this->addFlash('error', 'Vous ne pouvez pas terminer un covoiturage dont vous n\'êtes pas le conducteur.');
-          return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+          return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
       }
       
       //Vérifier si le covoiturage et actif
       if (!$carpool->isActiveCarpool()) {
           $this->addFlash('error', 'Ce covoiturage ne peut pas être terminé car il n\'est pas actif.');
-          return $this->redirectToRoute('app_covoiturage_show', ['id' => $carpool->getIdCarpool()]);
+          return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
       }
 
       try {
