@@ -4,7 +4,7 @@ namespace App\Controller;
 
 // Imports nécessaires pour le contrôleur
 use App\Form\UserProfileType;         // Type de formulaire pour le profil
-use App\Form\CarType;                  ///Type forme pour voiture
+use App\Form\CarType;                ///Type forme pour voiture
 use App\Entity\Car;
 use App\Repository\CarRepository;                  
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
