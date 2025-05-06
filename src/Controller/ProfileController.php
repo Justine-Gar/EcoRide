@@ -4,7 +4,7 @@ namespace App\Controller;
 
 // Imports nécessaires pour le contrôleur
 use App\Form\UserProfileType;         // Type de formulaire pour le profil
-use App\Form\CarType;                  ///Type forme pour voiture
+use App\Form\CarType;                ///Type forme pour voiture
 use App\Entity\Car;
 use App\Repository\CarRepository;                  
 use App\Repository\UserRepository;     // Repository pour les opérations sur les utilisateurs
@@ -312,7 +312,12 @@ class ProfileController extends AbstractController
                 'car_id' => $carId
             ];
 
-
+            // Comission pour la functionnement de la plateforme ^^
+            $adminUser = $this->userRepository->findOneById(1);
+            if ($adminUser) {
+                // Ajouter 4 crédits à l'administrateur
+                $this->userRepository->updateCredits($adminUser, 4);
+            }
 
             $carpool = $carpoolRepository->createCarpool($user, $data);
 
@@ -325,7 +330,7 @@ class ProfileController extends AbstractController
                 $carpoolRepository->save($carpool, true);
             }
 
-            $this->addFlash('success', 'Votre covoiturage a été créé avec succès !');
+            $this->addFlash('success', 'Votre covoiturage a été créé avec succès ! Une commission de 4 crédits a été prélevée pour la plateforme.');
 
             return new JsonResponse([
                 'success' => true,

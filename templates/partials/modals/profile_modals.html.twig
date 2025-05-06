@@ -100,32 +100,73 @@
 
 <!-- Modal pour ajouter une préférence personnalisée -->
 <div class="modal fade" id="addPreferenceModal" tabindex="-1" aria-labelledby="addPreferenceModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="addPreferenceModalLabel">Ajouter une préférence</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" action="{{ path('app_user_preference_add') }}">
+				<div class="modal-body">
+					<div class="mb-3">
+						<label for="preference_name" class="form-label">Nom de la préférence</label>
+						<input type="text" class="form-control" id="preference_name" name="preference_name" placeholder="Ex: Musique pendant le trajet" required>
+					</div>
+					<div class="mb-3">
+						<label for="preference_value" class="form-label">Valeur</label>
+						<input type="text" class="form-control" id="preference_value" name="preference_value" placeholder="Ex: Rock, Jazz, Pop" required>
+						<div class="form-text">Précisez votre préférence (ex: oui, non, détails spécifiques)</div>
+					</div>
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('add_preference') }}">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+					<button type="submit" class="btn btn-green">Ajouter</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Modal pour ajouter un avis sur un covoiturage terminés -->
+<div class="modal fade" id="addReviewCarpoolModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addPreferenceModalLabel">Ajouter une préférence</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="addReviewModalLabel">Laisser un avis</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{{ path('app_user_preference_add') }}">
-                <div class="modal-body">
+            <div class="modal-body" id="reviewModalContent">
+                <form action="{{ path('app_review_submit', {'carpoolId': 0}) }}" method="post" id="review-form">
                     <div class="mb-3">
-                        <label for="preference_name" class="form-label">Nom de la préférence</label>
-                        <input type="text" class="form-control" id="preference_name" name="preference_name" 
-                               placeholder="Ex: Musique pendant le trajet" required>
+                        <label for="review_note" class="form-label">Note</label>
+                        <select name="review[note]" id="review_note" class="form-select" required>
+                            <option value="">Choisir une note</option>
+                            <option value="5.0">5 - Excellent</option>
+                            <option value="4.5">4.5 - Très bien</option>
+                            <option value="4.0">4 - Bien</option>
+                            <option value="3.5">3.5 - Assez bien</option>
+                            <option value="3.0">3 - Moyen</option>
+                            <option value="2.5">2.5 - Passable</option>
+                            <option value="2.0">2 - Médiocre</option>
+                            <option value="1.5">1.5 - Mauvais</option>
+                            <option value="1.0">1 - Très mauvais</option>
+                        </select>
                     </div>
+                    
                     <div class="mb-3">
-                        <label for="preference_value" class="form-label">Valeur</label>
-                        <input type="text" class="form-control" id="preference_value" name="preference_value" 
-                               placeholder="Ex: Rock, Jazz, Pop" required>
-                        <div class="form-text">Précisez votre préférence (ex: oui, non, détails spécifiques)</div>
+                        <label for="review_comment" class="form-label">Commentaire</label>
+                        <textarea name="review[comment]" id="review_comment" class="form-control" rows="4" required minlength="10" maxlength="250" placeholder="Partagez votre expérience pendant ce trajet..."></textarea>
+                        <div class="form-text">Entre 10 et 250 caractères</div>
                     </div>
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('add_preference') }}">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-green">Ajouter</button>
-                </div>
-            </form>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-green">Envoyer</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
