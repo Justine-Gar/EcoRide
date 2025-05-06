@@ -529,13 +529,10 @@ class CovoiturageController extends AbstractController
 
         $carpoolRepository->finishCarpool($carpool);
 
-        // Créditer le conducteur
-        $userRepository->updateCredits($user, $carpool->getCredits());
-
         // Envoyer un email aux passagers pour qu'ils puissent laisser un avis
         // configuration d'envoi d'emails
         
-        $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés.');
+        $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés apres modération des avis.');
 
       } catch (\Exception $e) {
         $this->addFlash('error', $e->getMessage());

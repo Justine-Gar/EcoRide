@@ -600,7 +600,7 @@
 																<div class="d-flex align-items-center">
                                   {% set reviewsFound = false %}
 																	{% for review in user.getRecipientReviews() %}
-																			{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
+																			{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() and review.getStatut() == 'publié' %}
 																					{% set reviewsFound = true %}
 																					<div class="mb-1">
 																							<small>{{ review.getComment() }}</small>
@@ -623,53 +623,55 @@
 												</div>
 											{% endfor %}
 
-											<!-- Trajhet terminé passager-->
+											<!-- Trajet terminé passager-->
 											{% for carpool in completedCarpoolAsPassenger %}
-                        <div class="card mb-3 passenger-carpool">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <span class="badge badge-passenger mb-2">Passager</span>
-                                        <h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
-                                        <p class="text-muted mb-2">
-                                            <i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
-                                            <i class="fas fa-check-circle ms-3 me-2"></i>Terminé
-                                        </p>
-                                        <p class="text-muted mb-2">
-                                            <i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
-                                            <i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
-                                        </p>
-                                        
-                                        {% set hasReviewed = false %}
-                                        {% if user.getSenderReviews() is defined %}
-                                            {% for review in user.getSenderReviews() %}
-                                                {% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
-                                                    {% set hasReviewed = true %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                        
-                                        {% if not hasReviewed %}
-                                            <div class="mt-2">
-                                              <button type="button" class="btn btn-sm btn-outline-warning show-review-modal" data-bs-toggle="modal" data-bs-target="#addReviewCarpoolModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
-																								<i class="fas fa-star me-2"></i>Laisser un avis
-																							</button>
-                                            </div>
-                                        {% else %}
-                                            <div class="badge bg-light text-dark">
-                                                <i class="fas fa-check me-1"></i>Avis déjà envoyé
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-end">
-                                      <a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
-																				<i class="fas fa-info-circle me-2"></i>Détails
-																			</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    	{% endfor %}
+												<div class="card mb-3 passenger-carpool">
+													<div class="card-body">
+														<div class="d-flex justify-content-between align-items-start">
+															<div>
+																<span class="badge badge-passenger mb-2">Passager</span>
+																<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
+																<p class="text-muted mb-2">
+																	<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																	<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
+																</p>
+																<p class="text-muted mb-2">
+																	<i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
+																	<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																</p>
+
+																{% set hasReviewed = false %}
+																{% if user.getSenderReviews() is defined %}
+																	{% for review in user.getSenderReviews() %}
+																		{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
+																			{% set hasReviewed = true %}
+																		{% endif %}
+																	{% endfor %}
+																{% endif %}
+
+																{% if not hasReviewed %}
+																	<div class="mt-2">
+																		<button type="button" class="btn btn-sm btn-outline-warning show-review-modal" data-bs-toggle="modal" data-bs-target="#addReviewCarpoolModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
+																			<i class="fas fa-star me-2"></i>Laisser un avis
+																		</button>
+																	</div>
+																{% else %}
+																	<div class="badge bg-light text-dark">
+																		<i class="fas fa-check me-1"></i>Avis déjà envoyé
+																	</div>
+																{% endif %}
+															</div>
+															<div class="text-end">
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																	<i class="fas fa-info-circle me-2"></i>Détails
+																</a>
+															</div>
+														</div>
+													</div>
+												</div>
+											{% endfor %}
+
+
 										{% endif %}
 									</div>
 
@@ -1183,7 +1185,7 @@
 													<!-- Trajet terminé conducteur -->
 													{% if completedCarpoolAsDriver|length > 0 %}
 														<h6 class="mt-3 mb-2"><i class="fas fa-car me-2"></i>En tant que conducteur</h6>
-														
+
 														{% for carpool in completedCarpoolAsDriver %}
 															<div class="card mb-3 driver-carpool">
 																<div class="card-body">
@@ -1191,13 +1193,76 @@
 																		<div>
 																			<span class="badge badge-driver mb-2">Conducteur</span>
 																			<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
-																			<p class="text-muted mb-2">
-																					<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
-																					<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
+																			<p class="text-muted mb-2"><i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																				<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
 																			</p>
 																			<div class="d-flex align-items-center">
+																				{% set reviewsFound = false %}
+																				{% for review in user.getRecipientReviews() %}
+																					{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() and review.getStatut() == 'publié' %}
+																						{% set reviewsFound = true %}
+																						<div class="mb-1">
+																							<small>{{ review.getComment() }}</small>
+																							<strong class="me-2">Note: {{ review.getNote() }}/5</strong>
+																						</div>
+																					{% endif %}
+																				{% endfor %}
+																				{% if not reviewsFound %}
 																					<small class="text-muted">Aucun avis</small>
+																				{% endif %}
 																			</div>
+																		</div>
+																	</div>
+																	<div class="text-end">
+																		<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																			<i class="fas fa-info-circle me-2"></i>Détails
+																		</a>
+																	</div>
+																</div>
+															</div>
+														{% endfor %}
+													{% endif %}
+
+													<!-- Trajet terminé passager -->
+													{% if completedCarpoolAsPassenger|length > 0 %}
+														<h6 class="mt-3 mb-2"><i class="fas fa-user me-2"></i>En tant que passager</h6>
+
+														{% for carpool in completedCarpoolAsPassenger %}
+															<div class="card mb-3 passenger-carpool">
+																<div class="card-body">
+																	<div class="d-flex justify-content-between align-items-start">
+																		<div>
+																			<span class="badge badge-passenger mb-2">Passager</span>
+																			<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
+																			<p class="text-muted mb-2">
+																				<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
+																				<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
+																			</p>
+																			<p class="text-muted mb-2">
+																				<i class="fas fa-user me-2"></i>Conducteur:{{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
+																				<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
+																			</p>
+
+																			{% set hasReviewed = false %}
+																			{% if user.getSenderReviews() is defined %}
+																				{% for review in user.getSenderReviews() %}
+																					{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
+																						{% set hasReviewed = true %}
+																					{% endif %}
+																				{% endfor %}
+																			{% endif %}
+
+																			{% if not hasReviewed %}
+																				<div class="mt-2">
+																					<button type="button" class="btn btn-sm btn-outline-warning show-review-modal" data-bs-toggle="modal" data-bs-target="#addReviewCarpoolModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
+																						<i class="fas fa-star me-2"></i>Laisser un avis
+																					</button>
+																				</div>
+																			{% else %}
+																				<div class="badge bg-light text-dark">
+																					<i class="fas fa-check me-1"></i>Avis déjà envoyé
+																				</div>
+																			{% endif %}
 																		</div>
 																		<div class="text-end">
 																			<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
@@ -1208,59 +1273,9 @@
 																</div>
 															</div>
 														{% endfor %}
+
 													{% endif %}
 
-													<!-- Trajet terminé passager -->
-													{% if completedCarpoolAsPassenger|length > 0 %}
-															<h6 class="mt-3 mb-2"><i class="fas fa-user me-2"></i>En tant que passager</h6>
-															
-															{% for carpool in completedCarpoolAsPassenger %}
-																	<div class="card mb-3 passenger-carpool">
-																			<div class="card-body">
-																					<div class="d-flex justify-content-between align-items-start">
-																							<div>
-																									<span class="badge badge-passenger mb-2">Passager</span>
-																									<h5 class="mb-1">{{ carpool.getLocationStart() }} -> {{ carpool.getLocationReach() }}</h5>
-																									<p class="text-muted mb-2">
-																											<i class="fas fa-calendar me-2"></i>{{ carpool.getDateStart()|date('d/m/Y') }}
-																											<i class="fas fa-check-circle ms-3 me-2"></i>Terminé
-																									</p>
-																									<p class="text-muted mb-2">
-																											<i class="fas fa-user me-2"></i>Conducteur: {{ carpool.getUser().getFirstname() }} {{ carpool.getUser().getName() }}
-																											<i class="fas fa-coins ms-3 me-2"></i>{{ carpool.getCredits() }} crédits
-																									</p>
-																									
-																									{% set hasReviewed = false %}
-																									{% if user.getSenderReviews() is defined %}
-																											{% for review in user.getSenderReviews() %}
-																													{% if review.getCarpool() and review.getCarpool().getIdCarpool() == carpool.getIdCarpool() %}
-																															{% set hasReviewed = true %}
-																													{% endif %}
-																											{% endfor %}
-																									{% endif %}
-																									
-																									{% if not hasReviewed %}
-																											<div class="mt-2">
-																												<button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#addReviewCarpoolModal" data-action="openReviewModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
-																													Laisser un avis
-																												</button>
-																											</div>
-																									{% else %}
-																											<div class="badge bg-light text-dark">
-																													<i class="fas fa-check me-1"></i>Avis déjà envoyé
-																											</div>
-																									{% endif %}
-																							</div>
-																							<div class="text-end">
-																								<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
-																									<i class="fas fa-info-circle me-2"></i>Détails
-																								</a>
-																							</div>
-																					</div>
-																			</div>
-																	</div>
-															{% endfor %}
-													{% endif %}
 												{% endif %}
 											</div>
 										</div>
