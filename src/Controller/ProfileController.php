@@ -365,18 +365,5 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    // Route pour l'interface staff
-    // Accessible uniquement aux membres du staff
-    #[Route('/staff', name: 'app_staff')]
-    #[IsGranted('ROLE_STAFF')]
-    public function staff(): Response
-    {
-        // Récupère le membre du staff connecté
-        $user = $this->userRepository->getUser($this->getUser());
-        
-        // Rend la vue staff
-        return $this->render('profile/staff.html.twig', [
-            'user' => $user
-        ]);
-    }
+
 }
