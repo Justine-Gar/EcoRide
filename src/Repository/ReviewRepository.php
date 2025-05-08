@@ -97,6 +97,43 @@ class ReviewRepository extends ServiceEntityRepository
     }
 
     /**
+     * Modérer un report
+     */
+    public function moderateReport(Review $report, string $status): void
+    {
+        if (!in_array($status, ['validé', 'rejeté'])) {
+            throw new \InvalidArgumentException('Statut invalide');
+        }
+
+        $report->setStatut($status);
+    
+        // Si le signalement est validé, gérer les crédits
+        if ($status === 'validé') {
+            $passager = $report->getSender();
+            $conducteur = $report->getRecipient();
+            $carpool = $report->getCarpool();
+            
+            // Remboursement au passager
+            if ($passager) {
+                $passagerRefund = $carpool->getCredits();
+                $passager->setCredits($passager->getCredits() + $passagerRefund);
+                
+            }
+            // Pénalité au conducteur
+            if ($conducteur) {
+                $conducteurPenalty = 10;
+                $conducteur->setCredits($conducteur->getCredits() - $conducteurPenalty);
+            }
+        }
+        
+        //enregistre les modif
+        $this->getEntityManager()->flush();
+        //Supprime le signalement apres traitment
+        $this->getEntityManager()->remove($report);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
      * Récupérer tous les avis en attente de modération
      */
     public function findPendingReviews(): array
