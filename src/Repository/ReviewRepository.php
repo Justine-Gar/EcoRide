@@ -40,9 +40,44 @@ class ReviewRepository extends ServiceEntityRepository
         $review->setStatut('attente'); // Par défaut en attente de modération
         $review->setUser($user);
 
-        $this->_em->persist($review);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($review);
+        $this->getEntityManager()->flush();
 
+        return $review;
+    }
+
+    /**
+     * Créer un nouvel signalement
+     */
+    public function createReport(array $data, User $user, Carpool $carpool): Review 
+    {
+        $review = new Review();
+
+        //verifie si les donné sont la 
+        if (!isset($data['report_type']) || !isset($data['description']) || !isset($data['severity'])) {
+            throw new \InvalidArgumentException('le type, la description et mla gravité sont requis');
+        }
+        
+        //Avis spécial
+        $review->setComment($data['description']);
+        $review->setNote((float)$data['severity']);
+        $review->setStatut('signalé');
+        $review->setUser($user);
+        $review->setSender($user);
+        $review->setRecipient($carpool->getUser());
+        $review->setCarpool($carpool);
+
+        $reportDetails = [
+            'type' => $data['report_type'],
+            'report' => true
+        ];
+
+        $reviewComment = json_encode($reportDetails) . "||" . $data['description'];
+        $review->setComment($reviewComment);
+
+        $this->getEntityManager()->persist($review);
+        $this->getEntityManager()->flush();
+        
         return $review;
     }
 
@@ -51,8 +86,8 @@ class ReviewRepository extends ServiceEntityRepository
      */
     public function deleteReview(Review $review): void
     {
-        $this->_em->remove($review);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($review);
+        $this->getEntityManager()->flush();
     }
 
 
@@ -66,7 +101,44 @@ class ReviewRepository extends ServiceEntityRepository
         }
 
         $review->setStatut($status);
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Modérer un report
+     */
+    public function moderateReport(Review $report, string $status): void
+    {
+        if (!in_array($status, ['validé', 'rejeté'])) {
+            throw new \InvalidArgumentException('Statut invalide');
+        }
+
+        $report->setStatut($status);
+    
+        // Si le signalement est validé, gérer les crédits
+        if ($status === 'validé') {
+            $passager = $report->getSender();
+            $conducteur = $report->getRecipient();
+            $carpool = $report->getCarpool();
+            
+            // Remboursement au passager
+            if ($passager) {
+                $passagerRefund = $carpool->getCredits();
+                $passager->setCredits($passager->getCredits() + $passagerRefund);
+                
+            }
+            // Pénalité au conducteur
+            if ($conducteur) {
+                $conducteurPenalty = 10;
+                $conducteur->setCredits($conducteur->getCredits() - $conducteurPenalty);
+            }
+        }
+        
+        //enregistre les modif
+        $this->getEntityManager()->flush();
+        //Supprime le signalement apres traitment
+        $this->getEntityManager()->remove($report);
+        $this->getEntityManager()->flush();
     }
 
     /**
@@ -139,7 +211,7 @@ class ReviewRepository extends ServiceEntityRepository
         // Après modification, l'avis repasse en statut "pending"
         $review->setStatut('attente');
 
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
 
         return $review;
     }

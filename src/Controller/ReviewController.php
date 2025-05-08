@@ -66,6 +66,10 @@ class ReviewController extends AbstractController
         return new JsonResponse(['success' => false, 'message' => 'Vous avez déjà laissé un avis pour ce covoiturage'], 400);
     }
 
+    if (!$carpool->isCompleted()) {
+      return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez évaluer que des covoiturages terminés.'], 403);
+    }
+
     try {
         // Récupération correcte des données du formulaire
         $reviewData = $request->request->all();
@@ -113,5 +117,67 @@ class ReviewController extends AbstractController
             'message' => 'Une erreur est survenue: ' . $e->getMessage()
         ], 500);
     }
+  }
+
+  /**
+   * Traiter le signalement
+   */
+  #[Route('/review/report/{carpoolId}', name: 'app_report_add', requirements: ['carpoolId' => '\d+'], methods: ['POST'])]
+  #[isGranted('ROLE_USER')]
+  public function addReport(Request $request, int $carpoolId): Response
+  {
+    $user = $this->getUser();
+
+    try {      
+      //récupérer le covoiturage
+      $carpool = $this->carpoolRepository->find($carpoolId);
+      if (!$carpool) {
+        throw new \Exception('Covoiturage introuvable');
+      }
+
+      //vérifie que user est bien un passager de ce carpool
+      if (!$carpool->getPassengers()->contains($user)) {
+        throw new \Exception('Vous n\'avez pas participé à ce covoiturage');
+      }
+
+      //vérifie que le covoiturage est terminé
+      if (!$carpool->isCompletedCarpool()) {
+        throw new \Exception('Vous ne pouvez signaler que le ');
+      }
+
+      $reportType = $request->request->get('report_type');
+      $description = $request->request->get('description');
+      $severity = $request->request->get('severity');
+
+      if (!$reportType || !$description || !$severity) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Tous les champs sont obligatoires.'
+      ], 400);
+      }
+
+      $data = [
+        'report_type' => $reportType,
+        'description' => $description,
+        'severity' => $severity
+      ];
+      
+      $this->reviewRepository->createReport($data, $user, $carpool);
+
+      return new JsonResponse([
+          'success' => true,
+          'message' => 'Votre signalement a été enregistré et sera examiné par notre équipe.'
+      ]);
+
+    } catch(\Exception $e) {
+
+
+      return new JsonResponse([
+        'success' => false,
+        'message' => 'Une erreur est survenue: ' . $e->getMessage()
+      ], 500);
+    }
+
+    return $this->redirectToRoute('app_profile');
   }
 }
