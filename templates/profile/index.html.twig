@@ -654,6 +654,9 @@
 																		<button type="button" class="btn btn-sm btn-outline-warning show-review-modal" data-bs-toggle="modal" data-bs-target="#addReviewCarpoolModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
 																			<i class="fas fa-star me-2"></i>Laisser un avis
 																		</button>
+																		<button type="button" class="btn btn-sm btn-outline-danger show-report-modal" data-bs-toggle="modal" data-bs-target="#reportCarpoolModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
+																				<i class="fas fa-flag me-2"></i>Signaler
+																		</button>
 																	</div>
 																{% else %}
 																	<div class="badge bg-light text-dark">

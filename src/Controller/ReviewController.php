@@ -114,4 +114,48 @@ class ReviewController extends AbstractController
         ], 500);
     }
   }
+
+  /**
+   * Traiter le signalement
+   */
+  #[Route('/review/report/{carpoolId}', name: 'app_report_add', requirements: ['carpoolId'=> '\d+'])]
+  #[isGranted('ROLE_USER')]
+  public function addReport(Request $request, CarpoolRepository $carpoolRepository): Response
+  {
+    $user = $this->getUser();
+
+    $carpoolId = $request->request->get('carpool_id');
+    $reportType = $request->request->get('report_type');
+    $description = $request->request->get('description');
+    $severity = $request->request->get('severity');
+    $anonymous = $request->request->get('anonymous', 0);
+
+    if (!$carpoolId || !$reportType || !$description || !$severity) {
+      $this->addFlash('error', 'Tous les champs sont obligatoires.');
+      return $this->redirectToRoute('app_profile');
+    }
+
+    try {
+      //récupérer le covoiturage
+      $carpool = $carpoolRepository->find($carpoolId);
+      if (!$carpool) {
+        throw new \Exception('Covoiturage introuvable');
+      }
+
+      //vérifie que user est bien un passager de ce carpool
+      if (!$carpool->getPassengers()->countains($user)) {
+        throw new \Exception('Vous n\'avez pas participé à ce covoiturage');
+      }
+
+      //vérifie que le covoiturage est terminé
+      if (!$carpool->isCompletedCarpool()) {
+        throw new \Exception('Vous ne pouvez signaler que le ');
+      }
+
+    } catch(\Exception $e) {
+      $this->addFlash('error', $e->getMessage());
+    }
+
+    return $this->redirectToRoute('app_profile');
+  }
 }

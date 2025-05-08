@@ -47,6 +47,42 @@ class ReviewRepository extends ServiceEntityRepository
     }
 
     /**
+     * Créer un nouvel signalement
+     */
+    public function createReport(array $data, User $user, Carpool $carpool): Review 
+    {
+        $review = new Review();
+
+        //verifie si les donné sont la 
+        if (!isset($data['report_type']) || !isset($data['description']) || !isset($data['severity'])) {
+            throw new \InvalidArgumentException('le type, la description et mla gravité sont requis');
+        }
+        
+        //Avis spécial
+        $review->setComment($data['description']);
+        $review->setNote((float)$data['severity']);
+        $review->setStatut('signalé'); // Statut spécial pour les signalements
+        $review->setUser($user);
+        $review->setSender($user);
+        $review->setRecipient($carpool->getUser());
+        $review->setCarpool($carpool);
+
+        $reportDetails = [
+            'type' => $data['report_type'],
+            'anonymous' => $data['anonymous'] ?? false,
+            'report' => true // Marquer qu'il s'agit d'un signalement
+        ];
+
+        $reviewComment = json_encode($reportDetails) . "||" . $data['description'];
+        $review->setComment($reviewComment);
+
+        $this->_em->persist($review);
+        $this->_em->flush();
+        
+        return $review;
+    }
+
+    /**
      * Supprimer un avis
      */
     public function deleteReview(Review $review): void

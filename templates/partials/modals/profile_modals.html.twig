@@ -170,3 +170,76 @@
     </div>
 </div>
 
+<!-- Modal pour signaler le covoiturage -->
+<div class="modal fade" id="reportCarpoolModal" tabindex="-1" aria-labelledby="reportCarpoolModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="reportCarpoolModalLabel">Signaler un problème</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form id="reportForm" method="post" action="{{ path('app_report_add') }}">
+					<input type="hidden" name="carpool_id" id="reportCarpoolId">
+
+					<div class="mb-3">
+						<label for="reportType" class="form-label">Type de problème</label>
+						<select class="form-select" id="reportType" name="report_type" required>
+							<option value="" selected disabled>Sélectionnez un type</option>
+							<option value="conducteur_absent">Conducteur absent</option>
+							<option value="comportement_inapproprie">Comportement inapproprié</option>
+							<option value="vehicule_dangereux">Véhicule en mauvais état/dangereux</option>
+							<option value="trajet_modifie">Trajet modifié sans accord</option>
+							<option value="autre">Autre problème</option>
+						</select>
+					</div>
+
+					<div class="mb-3">
+						<label for="reportDescription" class="form-label">Description détaillée</label>
+						<textarea class="form-control" id="reportDescription" name="description" rows="4" required></textarea>
+					</div>
+
+					<div class="mb-3">
+						<label for="reportSeverity" class="form-label">Gravité</label>
+						<div class="rating-stars">
+							<span class="rating-text me-2">Mineure</span>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="severity" id="severity1" value="1" required>
+								<label class="form-check-label" for="severity1">1</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="severity" id="severity2" value="2">
+								<label class="form-check-label" for="severity2">2</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="severity" id="severity3" value="3">
+								<label class="form-check-label" for="severity3">3</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="severity" id="severity4" value="4">
+								<label class="form-check-label" for="severity4">4</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="severity" id="severity5" value="5">
+								<label class="form-check-label" for="severity5">5</label>
+							</div>
+							<span class="rating-text ms-2">Grave</span>
+						</div>
+					</div>
+
+					<div class="form-check mb-3">
+						<input class="form-check-input" type="checkbox" id="reportAnonymous" name="anonymous" value="1">
+						<label class="form-check-label" for="reportAnonymous">
+							Rester anonyme
+						</label>
+					</div>
+
+					<div class="d-flex justify-content-end">
+						<button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+						<button type="submit" class="btn btn-danger">Envoyer le signalement</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
