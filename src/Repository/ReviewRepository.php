@@ -37,11 +37,11 @@ class ReviewRepository extends ServiceEntityRepository
         // Configuration de l'avis
         $review->setComment($data['comment']);
         $review->setNote($data['note']);
-        $review->setStatut('pending'); // Par défaut en attente de modération
+        $review->setStatut('attente'); 
         $review->setUser($user);
 
-        $this->_em->persist($review);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($review);
+        $this->getEntityManager()->flush();
 
         return $review;
     }
@@ -61,23 +61,14 @@ class ReviewRepository extends ServiceEntityRepository
         //Avis spécial
         $review->setComment($data['description']);
         $review->setNote((float)$data['severity']);
-        $review->setStatut('signalé'); // Statut spécial pour les signalements
+        $review->setStatut('signalé');
         $review->setUser($user);
         $review->setSender($user);
         $review->setRecipient($carpool->getUser());
         $review->setCarpool($carpool);
 
-        $reportDetails = [
-            'type' => $data['report_type'],
-            'anonymous' => $data['anonymous'] ?? false,
-            'report' => true // Marquer qu'il s'agit d'un signalement
-        ];
-
-        $reviewComment = json_encode($reportDetails) . "||" . $data['description'];
-        $review->setComment($reviewComment);
-
-        $this->_em->persist($review);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($review);
+        $this->getEntityManager()->flush();
         
         return $review;
     }
@@ -87,8 +78,8 @@ class ReviewRepository extends ServiceEntityRepository
      */
     public function deleteReview(Review $review): void
     {
-        $this->_em->remove($review);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($review);
+        $this->getEntityManager()->flush();
     }
 
 
@@ -97,12 +88,12 @@ class ReviewRepository extends ServiceEntityRepository
      */
     public function moderateReview(Review $review, string $status): void
     {
-        if (!in_array($status, ['approved', 'rejected'])) {
+        if (!in_array($status, ['approuvé', 'rejeté'])) {
             throw new \InvalidArgumentException('Statut invalide');
         }
 
         $review->setStatut($status);
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
     /**
@@ -112,7 +103,7 @@ class ReviewRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->where('r.statut = :status')
-            ->setParameter('status', 'pending')
+            ->setParameter('status', 'attente')
             ->orderBy('r.id_review', 'DESC')
             ->getQuery()
             ->getResult();
@@ -127,7 +118,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.statut = :status')
             ->setParameter('user', $user)
-            ->setParameter('status', 'approved')
+            ->setParameter('status', 'approuvé')
             ->orderBy('r.id_review', 'DESC')
             ->getQuery()
             ->getResult();
@@ -172,10 +163,10 @@ class ReviewRepository extends ServiceEntityRepository
             $review->setNote($data['note']);
         }
 
-        // Après modification, l'avis repasse en statut "pending"
-        $review->setStatut('pending');
+        // Après modification, l'avis repasse en statut "attente"
+        $review->setStatut('attente');
 
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
 
         return $review;
     }
@@ -190,7 +181,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.statut = :status')
             ->setParameter('user', $user)
-            ->setParameter('status', 'approved')
+            ->setParameter('status', 'publié')
             ->getQuery()
             ->getSingleScalarResult();
     }

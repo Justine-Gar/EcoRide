@@ -133,8 +133,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addReviewModalLabel">Laisser un avis</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="addReviewModalLabel">Laisser un avis</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="reviewModalContent">
                 <form action="{{ path('app_review_submit', {'carpoolId': 0}) }}" method="post" id="review-form">
@@ -178,10 +178,9 @@
 				<h5 class="modal-title" id="reportCarpoolModalLabel">Signaler un problème</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-			<div class="modal-body">
-				<form id="reportForm" method="post" action="{{ path('app_report_add') }}">
-					<input type="hidden" name="carpool_id" id="reportCarpoolId">
-
+			<div class="modal-body" id="reportModalContent">
+				<form id="report-form" method="post" action="{{ path('app_report_add', {'carpoolId': 0}) }}">
+					
 					<div class="mb-3">
 						<label for="reportType" class="form-label">Type de problème</label>
 						<select class="form-select" id="reportType" name="report_type" required>
@@ -225,13 +224,6 @@
 							</div>
 							<span class="rating-text ms-2">Grave</span>
 						</div>
-					</div>
-
-					<div class="form-check mb-3">
-						<input class="form-check-input" type="checkbox" id="reportAnonymous" name="anonymous" value="1">
-						<label class="form-check-label" for="reportAnonymous">
-							Rester anonyme
-						</label>
 					</div>
 
 					<div class="d-flex justify-content-end">
