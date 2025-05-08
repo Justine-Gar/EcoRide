@@ -1,0 +1,43 @@
+<!-- Modal pour voir le détail de l'avis -->
+<div class="modal fade" id="reviewModal{{ review.idReview }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ review.idReview }}" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="reviewModalLabel{{ review.idReview }}">Détail de l'avis</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<h6>Covoiturage</h6>
+					<p>{{ review.carpool.locationStart }} → {{ review.carpool.locationReach }}</p>
+					<p>Date : {{ review.carpool.dateStart|date('d/m/Y') }}</p>
+				</div>
+				<div class="mb-3">
+					<h6>Expéditeur</h6>
+					<p>{{ review.sender.firstname }} {{ review.sender.name }}</p>
+				</div>
+				<div class="mb-3">
+					<h6>Destinataire</h6>
+					<p>{{ review.recipient.firstname }} {{ review.recipient.name }}</p>
+				</div>
+				<div class="mb-3">
+					<h6>Note</h6>
+					<p>{{ review.note }}/5</p>
+				</div>
+				<div class="mb-3">
+					<h6>Commentaire</h6>
+					<p>{{ review.comment }}</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<form method="post" action="{{ path('app_staff_approve_review', {'id': review.idReview}) }}" class="d-inline">
+					<button type="submit" class="btn btn-success">Approuver</button>
+				</form>
+				<form method="post" action="{{ path('app_staff_reject_review', {'id': review.idReview}) }}" class="d-inline">
+					<button type="submit" class="btn btn-danger">Rejeter</button>
+				</form>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+			</div>
+		</div>
+	</div>
+</div>

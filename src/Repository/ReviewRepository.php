@@ -37,7 +37,7 @@ class ReviewRepository extends ServiceEntityRepository
         // Configuration de l'avis
         $review->setComment($data['comment']);
         $review->setNote($data['note']);
-        $review->setStatut('pending'); // Par défaut en attente de modération
+        $review->setStatut('attente'); // Par défaut en attente de modération
         $review->setUser($user);
 
         $this->_em->persist($review);
@@ -61,7 +61,7 @@ class ReviewRepository extends ServiceEntityRepository
      */
     public function moderateReview(Review $review, string $status): void
     {
-        if (!in_array($status, ['approved', 'rejected'])) {
+        if (!in_array($status, ['publié', 'rejeté'])) {
             throw new \InvalidArgumentException('Statut invalide');
         }
 
@@ -76,7 +76,7 @@ class ReviewRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->where('r.statut = :status')
-            ->setParameter('status', 'pending')
+            ->setParameter('status', 'attente')
             ->orderBy('r.id_review', 'DESC')
             ->getQuery()
             ->getResult();
@@ -91,7 +91,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.statut = :status')
             ->setParameter('user', $user)
-            ->setParameter('status', 'approved')
+            ->setParameter('status', 'publié')
             ->orderBy('r.id_review', 'DESC')
             ->getQuery()
             ->getResult();
@@ -137,7 +137,7 @@ class ReviewRepository extends ServiceEntityRepository
         }
 
         // Après modification, l'avis repasse en statut "pending"
-        $review->setStatut('pending');
+        $review->setStatut('attente');
 
         $this->_em->flush();
 
@@ -154,7 +154,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.statut = :status')
             ->setParameter('user', $user)
-            ->setParameter('status', 'approved')
+            ->setParameter('status', 'publié')
             ->getQuery()
             ->getSingleScalarResult();
     }

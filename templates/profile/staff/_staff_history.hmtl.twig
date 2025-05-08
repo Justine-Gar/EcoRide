@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des actions{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/profilUser.css') }}">
+{% endblock %}
+
+{% block body %}
+<!--=============START MAIN============-->
+<main class="container profil-staff">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-5">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if user.profilPicture %}
+                            <img src="{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}" alt="Photo de profil" class="rounded-circle profile-pic">
+                        {% else %}
+                            <div class="default-profile-pic">
+                                <i class="fas fa-user fa-3x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">{{ user.firstname }} {{ user.name }}</h5>
+                    <p class="card-text text-muted">Employé EcoRide</p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_staff') }}" class="btn btn-primary btn-sm mb-2">
+                            <i class="fas fa-tachometer-alt me-1"></i>Tableau de bord
+                        </a>
+                        <a href="{{ path('app_staff_history') }}" class="btn btn-outline-primary btn-sm mb-2 active">
+                            <i class="fas fa-history me-1"></i>Historique des actions
+                        </a>
+                        <a href="{{ path('app_staff_report') }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-chart-bar me-1"></i>Rapport d'activité
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 mb-5">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-1"></i>Historique des actions
+                    </h5>
+                    <div>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">Période</span>
+                            <select class="form-select" id="period-filter">
+                                <option value="today">Aujourd'hui</option>
+                                <option value="week" selected>Cette semaine</option>
+                                <option value="month">Ce mois</option>
+                                <option value="all">Tout l'historique</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <!-- Cette section sera remplie avec les données réelles une fois le système d'historique implémenté -->
+                        <div class="timeline-item">
+                            <div class="timeline-date">
+                                <span class="badge bg-primary">Aujourd'hui 10:45</span>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Avis approuvé</h6>
+                                        <p class="card-text">Vous avez approuvé l'avis de <strong>Marie Martin</strong> concernant le covoiturage <strong>Paris → Lyon</strong> du 14/02/2024.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">
+                                <span class="badge bg-primary">Aujourd'hui 10:30</span>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Avis rejeté</h6>
+                                        <p class="card-text">Vous avez rejeté l'avis de <strong>Pierre Dupont</strong> concernant le covoiturage <strong>Marseille → Nice</strong> du 15/02/2024.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">
+                                <span class="badge bg-secondary">Hier 15:20</span>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Signalement résolu</h6>
+                                        <p class="card-text">Vous avez résolu le signalement concernant le covoiturage <strong>Bordeaux → Toulouse</strong> du 13/02/2024.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation example" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Précédent</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Suivant</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div
