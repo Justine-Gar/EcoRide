@@ -67,6 +67,14 @@ class ReviewRepository extends ServiceEntityRepository
         $review->setRecipient($carpool->getUser());
         $review->setCarpool($carpool);
 
+        $reportDetails = [
+            'type' => $data['report_type'],
+            'report' => true
+        ];
+
+        $reviewComment = json_encode($reportDetails) . "||" . $data['description'];
+        $review->setComment($reviewComment);
+
         $this->getEntityManager()->persist($review);
         $this->getEntityManager()->flush();
         
