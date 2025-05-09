@@ -48,7 +48,8 @@ class StaffController extends AbstractController
 
         //Récupérer les avis en attente de modé
         $waitReviews = $this->reviewRepository->findPendingReviews();
-
+        //récupérer les signalement
+        $reportReviews = $this->reviewRepository->findReport();
         //Récupérer les statistque des avis
         $reviewStats = $this->reviewRepository->getReviewStats();
 
@@ -62,6 +63,7 @@ class StaffController extends AbstractController
         return $this->render('profile/staff.html.twig', [
             'user' => $user,
             'pendingReviews' => $waitReviews,
+            'reportReviews' => $reportReviews,
             'pendingCount' => $waitCount,
             'processedCount' => $reviewsCount,
             'reportedCount' => 5,
@@ -89,6 +91,7 @@ class StaffController extends AbstractController
             }
             
             return $this->redirectToRoute('app_staff');
+
         } catch (\Exception $e) {
             $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
             
@@ -128,10 +131,12 @@ class StaffController extends AbstractController
     }
 
 
+
     // Route pour voir les détails d'un covoiturage signalé
     #[Route('/staff/carpools/details/{id}', name: 'app_staff_carpool_details')]
     public function carpoolDetails(Carpool $carpool): Response
     {
+
         return $this->render('profile/staff/_staff_carpool_details.html.twig', [
             'carpool' => $carpool
         ]);
@@ -152,6 +157,15 @@ class StaffController extends AbstractController
         return $this->redirectToRoute('app_staff');
     }
     
+
+
+
+
+
+
+
+
+
     // Route pour afficher l'historique des actions du staff
     #[Route('/staff/history', name: 'app_staff_history')]
     public function actionHistory(): Response
@@ -173,4 +187,6 @@ class StaffController extends AbstractController
             'user' => $this->userRepository->getUser($this->getUser())
         ]);
     }
+
+
 }

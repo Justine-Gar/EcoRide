@@ -155,6 +155,19 @@ class ReviewRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupérer les signalment d'un user
+     */
+    public function findReport(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.statut = :status')
+            ->setParameter('status', 'signalé')
+            ->orderBy('d.id_review', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Récupérer les avis approuvé d'un user
      */
     public function findApprovedReviewsByUser(User $user): array

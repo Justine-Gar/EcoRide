@@ -41,3 +41,46 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal pour voir le signalement du covoiturage -->
+<div class="modal fade" id="reportModal{{ report.idReview }}" tabindex="-1" aria-labelledby="reportModalLabel{{ report.idReview }}" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="reviewModalLabel{{ report.idReview }}">Détail du signalement</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<h6>N° Covoiturage</h6>
+					<p>{{ review.carpool.locationStart }} → {{ review.carpool.locationReach }}</p>
+				</div>
+				<div class="mb-3">
+					<h6>Expéditeur</h6>
+					<p>{{ review.sender.firstname }} {{ review.sender.name }}</p>
+					<p>Email</p>
+				</div>
+				<div class="mb-3">
+					<h6>Destinataire</h6>
+					<p>{{ review.recipient.firstname }} {{ review.recipient.name }}</p>
+					<p>Email</p>
+				</div>
+				<div class="mb-3">
+					<h6>Départ - Arrivé</h6>
+					<p>{{ review.note }}/5</p>
+				</div>
+				<div class="mb-3">
+					<h6>Lieu</h6>
+					<p>{{ review.note }}/5</p>
+				</div>
+				<div class="mb-3">
+					<h6>Commentaire</h6>
+					<p>{{ review.comment }}</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+			</div>
+		</div>
+	</div>
+</div>

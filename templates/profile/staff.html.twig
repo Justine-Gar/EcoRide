@@ -132,59 +132,62 @@
 						<!-- Pour le moment, afficher un message indiquant que cette fonctionnalité sera disponible prochainement -->
 						<div class="text-center text-muted py-3">
 							<i class="fas fa-tools fa-2x mb-2"></i>
-							<p>Cette fonctionnalité sera disponible prochainement</p>
+							<p>Pas de signalements</p>
 						</div>
-						<!-- Quand le système de signalements sera prêt, décommenter et adapter ce code
-														<div class="table-responsive">
-																<table class="table">
-																		<thead>
-																				<tr>
-																						<th>N° Covoiturage</th>
-																						<th>Date</th>
-																						<th>Trajet</th>
-																						<th>Participants</th>
-																						<th>Statut</th>
-																						<th>Actions</th>
-																				</tr>
-																		</thead>
-																		<tbody>
-																				<tr>
-																						<td>#12345</td>
-																						<td>14/02/2024</td>
-																						<td>Paris → Lyon</td>
-																						<td>
-																								<button class="btn btn-link btn-sm p-0" data-bs-toggle="tooltip" title="pierre@email.com">Pierre D.</button>
-																								<span class="text-muted">→</span>
-																								<button class="btn btn-link btn-sm p-0" data-bs-toggle="tooltip" title="sophie@email.com">Sophie M.</button>
-																						</td>
-																						<td>
-																								<span class="badge bg-danger">Non résolu</span>
-																						</td>
-																						<td>
-																								<div class="btn-group">
-																										<button class="btn btn-info btn-sm" data-bs-toggle="tooltip" title="Voir les détails">
-																												<i class="fas fa-eye"></i>
-																										</button>
-																										<button class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Contacter les participants">
-																												<i class="fas fa-envelope"></i>
-																										</button>
-																										<button class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="Marquer comme résolu">
-																												<i class="fas fa-check"></i>
-																										</button>
-																										<button class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Signaler à l'administration">
-																												<i class="fas fa-exclamation-triangle"></i>
-																										</button>
-																								</div>
-																						</td>
-																				</tr>
-																		</tbody>
-																</table>
-														</div>
-														-->
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>N° Covoiturage</th>
+										<th>Participants</th>
+										<th>Date</th>
+										<th>Trajet</th>
+										<th>Statut</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>#12345</td>
+										<td>14/02/2024</td>
+										<td>Paris → Lyon</td>
+										<td>
+											<button class="btn btn-link btn-sm p-0" data-bs-toggle="tooltip" title="pierre@email.com">Pierre D.</button>
+											<span class="text-muted">→</span>
+											<button class="btn btn-link btn-sm p-0" data-bs-toggle="tooltip" title="sophie@email.com">Sophie M.</button>
+										</td>
+										<td>
+											<span class="badge bg-danger">Non résolu</span>
+											<!--span class="badge bg-success">Résolu</span-->
+										</td>
+										<td>
+											<div class="btn-group">
+												<button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal" data-bs-toggle="tooltip" title="Voir les détails">
+														<i class="fas fa-eye"></i>
+												</button>
+												<button class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Contacter les participants">
+														<i class="fas fa-envelope"></i>
+												</button>
+												<button class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="Marquer comme résolu">
+														<i class="fas fa-check"></i>
+												</button>
+												<button class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Signaler à l'administration">
+														<i class="fas fa-exclamation-triangle"></i>
+												</button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</main>
+
+	{% for review in pendingReviews  %}
+		{% include 'partials/modals/profilStaff_modals.html.twig' with {'review': review} %}
+	{% endfor %}
 
 {% endblock %}
