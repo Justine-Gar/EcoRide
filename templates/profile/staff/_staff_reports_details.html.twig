@@ -1,0 +1,19 @@
+<div class="mb-3">
+	<h6>N° Covoiturage : {{ report.carpool.idCarpool }}</h6>
+</div>
+<div class="mb-3">
+	<h6>Expéditeur : {{ report.sender.firstname }} {{ report.sender.name }}</h6>
+	<p>Email : {{ report.sender.email }}</p>
+</div>
+<div class="mb-3">
+	<h6>Destinataire : {{ report.recipient.firstname }} {{ report.recipient.name }}</h6>
+	<p>Email : {{ report.recipient.email }}</p>
+</div>
+<div class="mb-3">
+	<h6>Départ - Arrivé</h6>
+	<p>{{ report.carpool.locationStart }} → {{ report.carpool.locationReach }}</p>
+</div>
+<div class="mb-3">
+	<h6>Commentaire :</h6>
+	<p>{{ report.comment }}</p>
+</div>

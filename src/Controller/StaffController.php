@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\SecurityBundle\Security;
-
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 
 class StaffController extends AbstractController
 {
@@ -46,7 +46,6 @@ class StaffController extends AbstractController
         // Récupère le membre du staff connecté
         $user = $this->userRepository->getUser($this->getUser());
 
-        //Récupérer les avis en attente de modé
         $waitReviews = $this->reviewRepository->findPendingReviews();
         //récupérer les signalement
         $reportReviews = $this->reviewRepository->findReport();
@@ -58,6 +57,7 @@ class StaffController extends AbstractController
 
         //Nombre d'avis traité (approuvé et rejetés)
         $reviewsCount = ($reviewStats['publié']['count'] ?? 0) + ($reviewStats['rejeté']['count'] ?? 0);
+        $reviewsCountReport = ($reviewStats['signalé']['count']);
 
         // Rend la vue staff
         return $this->render('profile/staff.html.twig', [
@@ -66,13 +66,24 @@ class StaffController extends AbstractController
             'reportReviews' => $reportReviews,
             'pendingCount' => $waitCount,
             'processedCount' => $reviewsCount,
-            'reportedCount' => 5,
+            'reportedCount' => $reviewsCountReport,
+        ]);
+    }
+    
+
+    // Route pour voir les avis
+    #[Route('/staff/reviews', name: 'app_staff_reviews')]
+    #[IsGranted('ROLE_STAFF')]
+    public function reviewsPartial(): Response 
+    {
+        $pendingReviews = $this->reviewRepository->findPendingReviews();
+        return $this->render('profile/staff/_staff_reviews.html.twig', [
+        'pendingReviews' => $pendingReviews
         ]);
     }
 
-
     // Route pour approuver un avis
-    #[Route('/staff/reviews/approve/{id}', name: 'app_staff_approve_review', methods: ['POST'])]
+    #[Route('/staff/reviews/{id}/approve', name: 'app_staff_approve_review', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function approveReview(Review $review, Request $request): Response
     {
@@ -87,7 +98,11 @@ class StaffController extends AbstractController
             $this->addFlash('success', 'L\'avis a été approuvé avec succès.');
             
             if ($request->isXmlHttpRequest()) {
-                return new JsonResponse(['success' => true]);
+                return new JsonResponse([
+                    'success' => true,
+                    'flashMessage' => 'L\'avis a été approuvé avec succès.',
+                    'flashType' => 'success'
+                ]);
             }
             
             return $this->redirectToRoute('app_staff');
@@ -104,7 +119,7 @@ class StaffController extends AbstractController
     }
 
     // Route pour rejeter un avis
-    #[Route('/staff/reviews/reject/{id}', name: 'app_staff_reject_review', methods: ['POST'])]
+    #[Route('/staff/reviews/{id}/reject', name: 'app_staff_reject_review', methods: ['POST'])]
     #[IsGranted('ROLE_STAFF')]
     public function rejectReview(Review $review, Request $request): Response
     {
@@ -115,7 +130,11 @@ class StaffController extends AbstractController
             $this->addFlash('success', 'L\'avis a été rejeté.');
             
             if ($request->isXmlHttpRequest()) {
-                return new JsonResponse(['success' => true]);
+                return new JsonResponse([
+                    'success' => true,
+                    'flashMessage' => 'L\'avis a été rejeté.',
+                    'flashType' => 'success'
+                ]);
             }
             
             return $this->redirectToRoute('app_staff');
@@ -130,63 +149,95 @@ class StaffController extends AbstractController
         }
     }
 
-
-
-    // Route pour voir les détails d'un covoiturage signalé
-    #[Route('/staff/carpools/details/{id}', name: 'app_staff_carpool_details')]
-    public function carpoolDetails(Carpool $carpool): Response
+    //Route pour afficher le détails d'un avis
+    #[Route('/staff/reviews/{id}/details', name: 'app_staff_reviews_details')]
+    #[IsGranted('ROLE_STAFF')]
+    public function reviewDetails(Review $review): Response
     {
+        $html = $this->renderView('profile/staff/_staff_reviews_details.html.twig', [
+            'review' => $review
+        ]);
+        
+        return new Response($html);
+    }
 
-        return $this->render('profile/staff/_staff_carpool_details.html.twig', [
-            'carpool' => $carpool
+
+
+    //Route pour voir les signalements
+    #[Route('/staff/reports', name: 'app_staff_reports')]
+    #[IsGranted('ROLE_STAFF')]
+    public function reportsPartial(): Response
+    {
+        $reportReviews = $this->reviewRepository->findReport();
+        return $this->render('profile/staff/_staff_reports.html.twig', [
+            'reportReviews' => $reportReviews
         ]);
     }
-    
+
     // Route pour marquer un signalement comme résolu
-    #[Route('/staff/reports/resolve/{id}', name: 'app_staff_resolve_report', methods: ['POST'])]
-    public function resolveReport(Request $request, int $id): Response
+    #[Route('/staff/reports/{id}/resolve', name: 'app_staff_resolve_report', methods: ['POST'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function resolveReport(Request $request, Review $report): Response
     {
-        // Fonction à implémenter quand le système de signalements sera en place
-        
-        $this->addFlash('success', 'Le signalement a été résolu.');
-        
-        if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(['success' => true]);
+        try {
+            $originalReview = $report->getComment();
+
+            //Nettoyage de l'avis
+            $cleanedReview = preg_replace('/\{.*?\}\|\|/', '', $originalReview);
+            if ($cleanedReview === $originalReview) {
+                $cleanedReview = preg_replace('/\{.*?\}/', '', $originalReview);
+            }
+            $cleanedReview = trim($cleanedReview); 
+
+            $report->setStatut('publié');
+            $report->setComment($cleanedReview);
+
+            $this->entityManager->persist($report);
+            $this->entityManager->flush();
+
+            $driver = $report->getRecipient();
+            if ($driver) {
+                $this->userRepository->updateDriverRating($driver);
+            }
+
+            $this->addFlash('success', 'Le signalement a été résolu et le conducteur a reçu une pénalité.');
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'flashMessage' => 'Le signalement a été résolu et le conducteur a reçu une pénalité.',
+                    'flashType' => 'success'
+                ]);
+            }
+            return $this->redirectToRoute('app_staff');
+
+        } catch (\Exception $e) {
+
+            $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return $this->redirectToRoute('app_staff');
         }
         
-        return $this->redirectToRoute('app_staff');
     }
     
-
-
-
-
-
-
-
-
-
-    // Route pour afficher l'historique des actions du staff
-    #[Route('/staff/history', name: 'app_staff_history')]
-    public function actionHistory(): Response
+    //Route pour afficher le détails d'un sugnalement
+    #[Route('/staff/reports/{id}/details', name: 'app_staff_reports_details')]
+    #[IsGranted('ROLE_STAFF')]
+    public function reportDetails(Review $report): Response
     {
-        // Fonction à implémenter pour afficher l'historique des actions
-        
-        return $this->render('profile/staff/_staff_history.html.twig', [
-            'user' => $this->userRepository->getUser($this->getUser())
+        if (!$report) {
+            throw $this->createNotFoundException('Signalement non trouvé');
+        }
+
+        $html = $this->renderView('profile/staff/_staff_reports_details.html.twig', [
+            'report' => $report
         ]);
-    }
-    
-    // Route pour générer un rapport d'activité
-    #[Route('/staff/report', name: 'app_staff_report')]
-    public function activityReport(): Response
-    {
-        // Fonction à implémenter pour générer un rapport d'activité
         
-        return $this->render('profile/staff/_staff_report.html.twig', [
-            'user' => $this->userRepository->getUser($this->getUser())
-        ]);
+        return new Response($html);
     }
+
+
 
 
 }

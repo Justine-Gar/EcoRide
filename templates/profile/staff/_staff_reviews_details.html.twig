@@ -1,0 +1,21 @@
+<div class="mb-3">
+  <h6>Covoiturage</h6>
+  <p>{{ review.carpool.locationStart }} → {{ review.carpool.locationReach }}</p>
+  <p>Date : {{ review.carpool.dateStart|date('d/m/Y') }}</p>
+</div>
+<div class="mb-3">
+  <h6>Expéditeur</h6>
+  <p>{{ review.sender.firstname }} {{ review.sender.name }}</p>
+</div>
+<div class="mb-3">
+  <h6>Destinataire</h6>
+  <p>{{ review.recipient.firstname }} {{ review.recipient.name }}</p>
+</div>
+<div class="mb-3">
+  <h6>Note</h6>
+  <p>{{ review.note }}/5</p>
+</div>
+<div class="mb-3">
+  <h6>Commentaire</h6>
+  <p>{{ review.comment }}</p>
+</div>

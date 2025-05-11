@@ -159,10 +159,10 @@ class ReviewRepository extends ServiceEntityRepository
      */
     public function findReport(): array
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.statut = :status')
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.statut = :status')
             ->setParameter('status', 'signalé')
-            ->orderBy('d.id_review', 'DESC')
+            ->orderBy('r.id_review', 'DESC')
             ->getQuery()
             ->getResult();
     }
