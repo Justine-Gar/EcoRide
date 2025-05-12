@@ -356,7 +356,83 @@ document.addEventListener('click', function(e) {
     window.location.reload();
   });
 });
-  
+
+//Evenement pour signaler le danger a l'admin
+document.addEventListener('click', function(e) {
+  const button = e.target.closest('.danger-report');
+  if (!button) return;
+
+  e.preventDefault();
+
+  const reportId = button.dataset.reportId;
+  const row = button.closest('tr');
+
+  sessionStorage.setItem('activeSection', 'reports');
+  const originalButtonContent = button.innerHTML;
+  button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+  button.disabled = true;
+
+  fetch(`/staff/reports/${reportId}/danger`, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({})
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('Erreur réseau');
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      // Mettre à jour visuellement la ligne dans le tableau
+      if (row) {
+        // Mettre à jour le statut à "publié"
+        const statusCell = row.querySelector('td:nth-child(5)');
+        if (statusCell) {
+          statusCell.innerHTML = '<span class="badge bg-danger">Danger</span>';
+        }
+        
+        // Désactiver les boutons d'action
+        const actionButtons = row.querySelectorAll('.btn-group .btn');
+        actionButtons.forEach(btn => {
+          btn.disabled = true;
+          btn.classList.add('disabled');
+        });
+      }
+      
+      // Afficher le message du serveur avant de recharger la page
+      showServerMessage({
+        flashMessage: data.flashMessage || "L'utilisateur à été signalé à l'administration.",
+        flashType: "success"
+      });
+      
+    } else {
+      // Restaurer le bouton en cas d'erreur
+      button.innerHTML = originalButtonContent;
+      button.disabled = false;
+      
+      // Si le serveur a renvoyé un message d'erreur, l'afficher
+      if (data.message) {
+        showServerMessage({
+          flashMessage: data.message,
+          flashType: "danger"
+        });
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Erreur:', error);
+    
+    // Restaurer le bouton en cas d'erreur
+    button.innerHTML = originalButtonContent;
+    button.disabled = false;
+    
+    // Recharger la page en cas d'erreur réseau
+    window.location.reload();
+  });
+});
 //Fonction pour changer les sections
 async function loadSection(section) {
   const container = document.getElementById('dynamic-content');

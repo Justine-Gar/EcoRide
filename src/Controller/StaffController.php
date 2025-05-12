@@ -221,7 +221,7 @@ class StaffController extends AbstractController
         
     }
     
-    //Route pour afficher le détails d'un sugnalement
+    //Route pour afficher le détails d'un signalement
     #[Route('/staff/reports/{id}/details', name: 'app_staff_reports_details')]
     #[IsGranted('ROLE_STAFF')]
     public function reportDetails(Review $report): Response
@@ -237,7 +237,38 @@ class StaffController extends AbstractController
         return new Response($html);
     }
 
+    //Route pour signaler user à l'administrateur
+    #[Route('/staff/reports/{id}/danger', name: 'app_staff_reports_danger', methods: ['POST'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function dangerReport(Request $request, Review $report): Response
+    {
+        try {
 
+            $report->setStatut('danger');
 
+            $this->entityManager->persist($report);
+            $this->entityManager->flush();
+
+            //Notification admin ?
+
+            $this->addFlash('success', 'Le signalement a été envoyé a l\'administrateur.');
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'success' => true,
+                    'flashMessage' => 'Le signalement a été envoyé a l\'administrateur.',
+                    'flashType' => 'success'
+                ]);
+            }
+            return $this->redirectToRoute('app_staff');
+
+        } catch (\Exception $e) {
+
+            $this->addFlash('error', 'Une erreur est survenue : ' . $e->getMessage());
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return $this->redirectToRoute('app_staff');
+        }
+    }
 
 }
