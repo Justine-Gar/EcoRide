@@ -1,0 +1,21 @@
+.sidebar {
+  padding-top: 110px;
+  background-color: #4DBC84;
+}
+
+.card {
+  border: 1px solid #3f7b6a8e;
+}
+
+.text-title {
+  font-family: 'PoppinsR';
+  color: #4DBC84;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .profil-admin {
+    padding-top: 120px;
+  }
+}

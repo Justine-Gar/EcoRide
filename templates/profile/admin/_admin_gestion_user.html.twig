@@ -1,0 +1,59 @@
+			<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
+				<div class=" pt-3 pb-2 mb-3 border-bottom">
+					<div class="text-center">
+						<h2>Gestions Utilisateur</h2>
+					</div>
+				</div>
+        
+        <!-- Flash messages -->
+				{% for label, messages in app.flashes %}
+						{% for message in messages %}
+								<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+										{{ message }}
+										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+								</div>
+						{% endfor %}
+				{% endfor %}
+
+				<!-- Users Management -->
+				<div class="card shadow m-3 mb-5">
+					<div class="card-header py-3">
+						<h6 class="m-0 text-title">Gestions des utilisateurs</h6>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th>Nom</th>
+										<th>Email</th>
+										<th>Rôle</th>
+										<th>Statut</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Dupont Jean</td>
+										<td>jean.dupont@example.com</td>
+										<td>Employé</td>
+										<td>
+											<span class="badge bg-success">Actif</span>
+										</td>
+
+									</tr>
+									<tr>
+										<td>Martin Sophie</td>
+										<td>sophie.martin@example.com</td>
+										<td>Utilisateur</td>
+										<td>
+											<span class="badge bg-danger">Suspendu</span>
+										</td>
+
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+			</div>

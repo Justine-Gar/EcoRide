@@ -4,118 +4,22 @@
 {% endblock %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/profilUser.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard/profilAdmin.css') }}">
 
 
 {% endblock %}
 
 {% block body %}
 <!--=============START MAIN============-->
-	<main class="container-fluide profil-admin">
-		<div
-			class="row vh-100">
+	<main class="container-fluide">
+		<div class="row">
 			<!-- Sidebar -->
 			{% block Sidebar %}
 				{% include 'partials/sidebar/_sidebar_admin.html.twig' %}
 			{% endblock %}
+
 			<!-- Main Dashboard -->
-			<div class="col-md-9 ms-sm-auto col-lg-10 ">
-				<div class=" pt-3 pb-2 mb-3 border-bottom">
-					<div class="text-center">
-						<h2>Tableau de bord</h2>
-					</div>
-
-				</div>
-
-				<!-- Stats Cards -->
-				<div class="row m-3">
-					<div class="col-xl-3 col-md-6 mb-4">
-						<div class="card border-left-primary shadow h-100 py-2">
-							<div class="card-body">
-								<div class="row no-gutters align-items-center">
-									<div class="col mr-2">
-										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-											Total Crédits Plateforme</div>
-										<div class="h5 mb-0 font-weight-bold text-gray-800">15,000</div>
-									</div>
-									<div class="col-auto">
-										<i class="fas fa-coins fa-2x text-gray-300"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Charts -->
-				<div class="row m-3">
-					<div class="col-xl-6">
-						<div class="card shadow mb-4">
-							<div class="card-header py-3">
-								<h6 class="m-0 font-weight-bold text-primary">Nombre de covoiturages par jour</h6>
-							</div>
-							<div class="card-body">
-								<div class="chart-area">
-									<canvas id="carpoolChart" height="300"></canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xl-6">
-						<div class="card shadow mb-4">
-							<div class="card-header py-3">
-								<h6 class="m-0 font-weight-bold text-primary">Crédits gagnés par jour</h6>
-							</div>
-							<div class="card-body">
-								<div class="chart-area">
-									<canvas id="creditsChart" height="300"></canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Users Management -->
-				<div class="card shadow m-3 mb-5">
-					<div class="card-header py-3">
-						<h6 class="m-0 font-weight-bold text-primary">Gestion des utilisateurs</h6>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-bordered">
-								<thead>
-									<tr>
-										<th>Nom</th>
-										<th>Email</th>
-										<th>Rôle</th>
-										<th>Statut</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>Dupont Jean</td>
-										<td>jean.dupont@example.com</td>
-										<td>Employé</td>
-										<td>
-											<span class="badge bg-success">Actif</span>
-										</td>
-
-									</tr>
-									<tr>
-										<td>Martin Sophie</td>
-										<td>sophie.martin@example.com</td>
-										<td>Utilisateur</td>
-										<td>
-											<span class="badge bg-danger">Suspendu</span>
-										</td>
-
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
+			<div>
 			</div>
 		</div>
 	</main>
