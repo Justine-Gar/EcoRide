@@ -24,4 +24,10 @@
 		</div>
 	</main>
 
+	{% include 'partials/modals/profilAdmin_modals.html.twig' %}
+
+{% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('assets/js/profilAdmin.js') }}"></script>
 {% endblock %}

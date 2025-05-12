@@ -1,0 +1,118 @@
+<!-- Modal pour ajouter un employé -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="addEmployeeModalLabel">Ajouter un employé</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+        <div id="alert-container"></div>
+				<form id="addEmployeeForm" action="{{ path('app_admin_add_employe') }}" method="post">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token('add_employee') }}">
+					<div class="mb-3">
+						<label for="add_employee_name" class="form-label">Nom</label>
+						<input type="text" class="form-control" id="add_employee_name" name="name" required>
+					</div>
+					<div class="mb-3">
+						<label for="add_employee_firstname" class="form-label">Prénom</label>
+						<input type="text" class="form-control" id="add_employee_firstname" name="firstname" required>
+					</div>
+					<div class="mb-3">
+						<label for="add_employee_email" class="form-label">Email</label>
+						<input type="email" class="form-control" id="add_employee_email" name="email" required>
+					</div>
+					<div class="mb-3">
+						<label for="add_employee_phone" class="form-label">Téléphone</label>
+						<input type="tel" class="form-control" id="add_employee_phone" name="phone_number" required>
+					</div>
+					<div class="mb-3">
+						<label for="add_employee_password" class="form-label">Mot de passe</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="add_employee_password" name="password" required>
+                <button class="btn btn-outline-secondary" type="button" id="toggleAddPassword">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <small class="form-text text-muted">Le mot de passe doit contenir au moins 8 caractères</small>
+					</div>
+					<button type="submit" class="btn btn-primary w-100">Ajouter</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal pour modifier un employé -->
+<div class="modal fade" id="updateEmployeeModal" tabindex="-1" aria-labelledby="updateEmployeeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateEmployeeModalLabel">Modifier un employé</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateEmployeeForm" action="" method="post">
+          <!-- Token CSRF -->
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token('update_employee') }}">
+          <!-- ID employé caché -->
+          <input type="hidden" id="update_employee_id" name="id">
+          
+          <div class="mb-3">
+            <label for="update_employee_name" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="update_employee_name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="update_employee_firstname" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="update_employee_firstname" name="firstname" required>
+          </div>
+          <div class="mb-3">
+            <label for="update_employee_email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="update_employee_email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="update_employee_phone" class="form-label">Téléphone</label>
+            <input type="tel" class="form-control" id="update_employee_phone" name="phone_number" required>
+          </div>
+          <div class="mb-3">
+            <label for="update_employee_password" class="form-label">Mot de passe (laisser vide pour ne pas changer)</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="update_employee_password" name="password">
+                <button class="btn btn-outline-secondary" type="button" id="toggleUpdatePassword">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <small class="form-text text-muted">Si rempli, doit contenir au moins 8 caractères</small>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Mettre à jour</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation pour supprimer un employé -->
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteEmployeeModalLabel">Confirmer la suppression</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Êtes-vous sûr de vouloir supprimer cet employé? Cette action est irréversible.</p>
+				<p><strong>Nom: </strong><span id="delete_employee_name"></span></p>
+			</div>
+			<div class="modal-footer">
+				<form id="deleteEmployeeForm" action="" method="post">
+					<!-- Token CSRF -->
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('delete_employee') }}">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+					<button type="submit" class="btn btn-danger">Supprimer</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+

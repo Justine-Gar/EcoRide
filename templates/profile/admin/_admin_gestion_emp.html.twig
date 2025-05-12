@@ -11,7 +11,7 @@
 		<!-- Flash messages -->
 		{% for label, messages in app.flashes %}
 			{% for message in messages %}
-				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+				<div class="alert alert-{{ label }} alert-dismissible fade show me-3" role="alert">
 					{{ message }}
 					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>
@@ -50,10 +50,10 @@
 										<td>{{ employe.firstname }}</td>
 										<td>{{ employe.email }}</td>
 										<td>
-											<button class="btn btn-sm btn-info edit-employee" data-id="{{ employe.idUser }}">
+											<button class="btn btn-sm btn-green update-employee" data-id="{{ employe.idUser }}" data-bs-toggle="modal" data-bs-target="#updateEmployeeModal">
 												<i class="fas fa-edit"></i>
 											</button>
-											<button class="btn btn-sm btn-danger delete-employee" data-id="{{ employe.idUser }}">
+											<button class="btn btn-sm btn-danger delete-employee" data-id="{{ employe.idUser }}" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
 												<i class="fas fa-trash"></i>
 											</button>
 										</td>
@@ -71,3 +71,6 @@
 		</div>
 	</div>
 {% endblock %}
+
+
+
