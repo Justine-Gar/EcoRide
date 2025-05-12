@@ -350,20 +350,4 @@ class ProfileController extends AbstractController
     }
     
 
-    // Route pour l'interface administrateur
-    // Accessible uniquement aux administrateurs
-    #[Route('/admin', name: 'app_admin')]
-    #[IsGranted('ROLE_ADMINISTRATEUR')]
-    public function admin(): Response
-    {
-        // Récupère l'administrateur connecté
-        $user = $this->userRepository->getUser($this->getUser());
-        
-        // Rend la vue admin
-        return $this->render('profile/admin.html.twig', [
-            'user' => $user
-        ]);
-    }
-
-
 }

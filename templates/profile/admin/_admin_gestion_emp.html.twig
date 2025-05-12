@@ -1,59 +1,73 @@
-			<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
-				<div class=" pt-3 pb-2 mb-3 border-bottom">
-					<div class="text-center">
-						<h2>Gestions Employés</h2>
-					</div>
-				</div>
+{% extends 'profile/admin.html.twig' %}
 
-        <!-- Flash messages -->
-				{% for label, messages in app.flashes %}
-						{% for message in messages %}
-								<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-										{{ message }}
-										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-								</div>
-						{% endfor %}
-				{% endfor %}
-        
-				<!-- Users Management -->
-				<div class="card shadow m-3 mb-5">
-					<div class="card-header py-3">
-						<h6 class="m-0 text-title">Gestions des employés</h6>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-bordered">
-								<thead>
-									<tr>
-										<th>Nom</th>
-										<th>Email</th>
-										<th>Rôle</th>
-										<th>Statut</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>Dupont Jean</td>
-										<td>jean.dupont@example.com</td>
-										<td>Employé</td>
-										<td>
-											<span class="badge bg-success">Actif</span>
-										</td>
-
-									</tr>
-									<tr>
-										<td>Martin Sophie</td>
-										<td>sophie.martin@example.com</td>
-										<td>Utilisateur</td>
-										<td>
-											<span class="badge bg-danger">Suspendu</span>
-										</td>
-
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
+{% block Main %}
+	<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
+		<div class=" pt-3 pb-2 mb-3 border-bottom">
+			<div class="text-center">
+				<h2>Gestions Employés</h2>
 			</div>
+		</div>
+
+		<!-- Flash messages -->
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% endfor %}
+		{% endfor %}
+
+		<!-- Liste des employés-->
+		<div class="card shadow m-3 mb-5">
+			<div class="card-header py-3">
+				<!-- Bouton pour ajouter un nouvel employé -->
+				<div class="d-flex flex-column align-items-center justify-content-between flex-md-row">
+					<h6 class="m-3 m-md-1 text-title">Gestions des employés</h6>
+					<button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+						<i class="fas fa-plus me-2"></i>Ajouter un employé
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nom</th>
+								<th>Prénom</th>
+								<th>Email</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if employes is defined and employes|length > 0 %}
+								{% for employe in employes %}
+									<tr>
+										<td>{{ employe.idUser }}</td>
+										<td>{{ employe.name }}</td>
+										<td>{{ employe.firstname }}</td>
+										<td>{{ employe.email }}</td>
+										<td>
+											<button class="btn btn-sm btn-info edit-employee" data-id="{{ employe.idUser }}">
+												<i class="fas fa-edit"></i>
+											</button>
+											<button class="btn btn-sm btn-danger delete-employee" data-id="{{ employe.idUser }}">
+												<i class="fas fa-trash"></i>
+											</button>
+										</td>
+									</tr>
+								{% endfor %}
+							{% else %}
+								<tr>
+									<td colspan="7" class="text-center">Aucun employé trouvé</td>
+								</tr>
+							{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,67 +1,69 @@
-			<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
-				<div class=" pt-3 pb-2 mb-3 border-bottom">
-					<div class="text-center">
-						<h2>Tableau de bord</h2>
-					</div>
-				</div>
-        
-        <!-- Flash messages -->
-				{% for label, messages in app.flashes %}
-						{% for message in messages %}
-								<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-										{{ message }}
-										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-								</div>
-						{% endfor %}
-				{% endfor %}
+{% extends 'profile/admin.html.twig' %}
 
-				<!-- Stats Cards -->
-				<div class="row m-3">
-					<div class="col-xl-3 col-md-6 mb-4">
-						<div class="card shadow h-100 py-2">
-							<div class="card-body">
-								<div class="row no-gutters align-items-center">
-									<div class="col mr-2">
-										<div class="text-xs text-title mb-1">
-											Total Crédits Plateforme</div>
-										<div class="h5 mb-0 font-weight-bold text-gray-800">15,000</div>
-									</div>
-									<div class="col-auto">
-										<i class="fas fa-coins fa-2x text-gray-300"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Charts -->
-				<div class="row m-3">
-					<div class="col-xl-6">
-						<div class="card shadow mb-4">
-							<div class="card-header py-3">
-								<h6 class="m-0 text-title">Nombre de covoiturages par jour</h6>
-							</div>
-							<div class="card-body">
-								<div class="chart-area">
-									<canvas id="carpoolChart" height="300"></canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xl-6">
-						<div class="card shadow mb-4">
-							<div class="card-header py-3">
-								<h6 class="m-0 text-title">Crédits gagnés par jour</h6>
-							</div>
-							<div class="card-body">
-								<div class="chart-area">
-									<canvas id="creditsChart" height="300"></canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-
+{% block Main %}
+	<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
+		<div class=" pt-3 pb-2 mb-3 border-bottom">
+			<div class="text-center">
+				<h2>Tableau de bord</h2>
 			</div>
+		</div>
+
+		<!-- Flash messages -->
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% endfor %}
+		{% endfor %}
+
+		<!-- Stats Cards -->
+		<div class="row m-3">
+			<div class="col-xl-3 col-md-6 mb-4">
+				<div class="card shadow h-100 py-2">
+					<div class="card-body">
+						<div class="row no-gutters align-items-center">
+							<div class="col mr-2">
+								<div class="text-xs text-title mb-1">
+									Total Crédits Plateforme</div>
+								<div class="h5 mb-0 font-weight-bold text-gray-800">15,000</div>
+							</div>
+							<div class="col-auto">
+								<i class="fas fa-coins fa-2x text-gray-300"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Charts -->
+		<div class="row m-3">
+			<div class="col-xl-6">
+				<div class="card shadow mb-4">
+					<div class="card-header py-3">
+						<h6 class="m-0 text-title">Nombre de covoiturages par jour</h6>
+					</div>
+					<div class="card-body">
+						<div class="chart-area">
+							<canvas id="carpoolChart" height="300"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<div class="card shadow mb-4">
+					<div class="card-header py-3">
+						<h6 class="m-0 text-title">Crédits gagnés par jour</h6>
+					</div>
+					<div class="card-body">
+						<div class="chart-area">
+							<canvas id="creditsChart" height="300"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

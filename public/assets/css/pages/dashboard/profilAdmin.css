@@ -14,8 +14,32 @@
   font-weight: bold;
 }
 
+.btn.btn-blue {
+  color: #313A50;
+  background-color: #f3f3f3;
+  border: 2px solid #313A50;
+}
+
+.btn.btn-blue:hover {
+  color: #f3f3f3;
+  background-color: #313A50;
+}
+.btn.btn-green {
+  color: #3F7B6A;
+  background-color: #f3f3f3;
+  border: 2px solid #3F7B6A;
+  transition: opacity 0.3s ease;
+}
+.btn.btn-green:hover {
+  color: #f3f3f3;
+  background-color: #3F7B6A;
+}
+
 @media (min-width: 768px) {
   .profil-admin {
     padding-top: 120px;
+  }
+  .sidebar {
+    min-height: 87vh;
   }
 }

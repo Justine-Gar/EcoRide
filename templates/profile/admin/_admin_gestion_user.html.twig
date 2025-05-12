@@ -1,59 +1,110 @@
-			<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
-				<div class=" pt-3 pb-2 mb-3 border-bottom">
-					<div class="text-center">
-						<h2>Gestions Utilisateur</h2>
-					</div>
-				</div>
-        
-        <!-- Flash messages -->
-				{% for label, messages in app.flashes %}
-						{% for message in messages %}
-								<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-										{{ message }}
-										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-								</div>
-						{% endfor %}
-				{% endfor %}
+{% extends 'profile/admin.html.twig' %}
 
-				<!-- Users Management -->
-				<div class="card shadow m-3 mb-5">
-					<div class="card-header py-3">
-						<h6 class="m-0 text-title">Gestions des utilisateurs</h6>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-bordered">
-								<thead>
-									<tr>
-										<th>Nom</th>
-										<th>Email</th>
-										<th>Rôle</th>
-										<th>Statut</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>Dupont Jean</td>
-										<td>jean.dupont@example.com</td>
-										<td>Employé</td>
-										<td>
-											<span class="badge bg-success">Actif</span>
-										</td>
-
-									</tr>
-									<tr>
-										<td>Martin Sophie</td>
-										<td>sophie.martin@example.com</td>
-										<td>Utilisateur</td>
-										<td>
-											<span class="badge bg-danger">Suspendu</span>
-										</td>
-
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
+{% block Main %}
+	<div class="col-md-9 ms-sm-auto col-lg-10 profil-admin">
+		<div class=" pt-3 pb-2 mb-3 border-bottom">
+			<div class="text-center">
+				<h2>Gestions Utilisateur</h2>
 			</div>
+		</div>
+
+		<!-- Flash messages -->
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% endfor %}
+		{% endfor %}
+
+		<!-- Filtres utilisateurs -->
+    <div class="card shadow m-3 mb-5">
+        <div class="card-header py-3">
+            <h6 class="m-0 text-title">Filtres</h6>
+        </div>
+        <div class="card-body">
+            <form id="userFilterForm" class="row g-3">
+                <div class="col-md-4">
+                    <label for="roleFilter" class="form-label">Rôle</label>
+                    <select id="roleFilter" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="Conducteur">Conducteur</option>
+                        <option value="Passager">Passager</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="statusFilter" class="form-label">Statut</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="actif">Actif</option>
+                        <option value="inactif">Inactif</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+		<!-- Liste des utilisateur  -->
+		<div class="card shadow m-3 mb-5">
+			<div class="card-header py-3">
+				<h6 class="m-0 text-title">Gestions des utilisateurs</h6>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nom</th>
+								<th>Prénom</th>
+								<th>Email</th>
+								<th>Téléphone</th>
+								<th>Rôle principal</th>
+								<th>Note</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if utilisateurs is defined and utilisateurs|length > 0 %}
+								{% for utilisateur in utilisateurs %}
+									<tr>
+										<td>{{ utilisateur.idUser }}</td>
+										<td>{{ utilisateur.name }}</td>
+										<td>{{ utilisateur.firstname }}</td>
+										<td>{{ utilisateur.email }}</td>
+										<td>{{ utilisateur.phoneNumber }}</td>
+										<td>
+											{% if utilisateur.hasRoleByName('Conducteur') %}
+												Conducteur
+											{% else %}
+												Passager
+											{% endif %}
+										</td>
+										<td>{{ utilisateur.credits }}</td>
+										<td>{{ utilisateur.rating|default('N/A') }}</td>
+										<td>
+											<button class="btn btn-sm btn-info view-user" data-id="{{ utilisateur.idUser }}">
+												<i class="fas fa-eye"></i>
+											</button>
+											<button class="btn btn-sm btn-danger block-user" data-id="{{ utilisateur.idUser }}">
+												<i class="fas fa-ban"></i>
+											</button>
+										</td>
+									</tr>
+								{% endfor %}
+						{% else %}
+							<tr>
+								<td colspan="9" class="text-center">Aucun utilisateur trouvé</td>
+							</tr>
+						{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

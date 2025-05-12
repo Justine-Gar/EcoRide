@@ -180,6 +180,20 @@ class UserRepository extends ServiceEntityRepository
 
 
     /**
+     * Recupérer tout les utilisateur qui ont le role de staff
+     */
+    public function findAllStaffUser(): array
+    {
+        return $this->createQueryBuilder('u')
+        ->join('u.roles', 'r')
+        ->where('r.name_role = :roleName')
+        ->setParameter('roleName', 'Staff')
+        ->orderBy('u.id_user', 'ASC')
+        ->getQuery()
+        ->getResult();
+    }
+    
+    /**
      * Vérifie si l'utilisateur possède un rôle spécifique
      */
     public function hasRole(User $user, string $roleName): bool
