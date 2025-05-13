@@ -48,13 +48,18 @@ class AdminController extends AbstractController
   #[IsGranted('ROLE_ADMINISTRATEUR')]
   public function dashboard(UserRepository $userRepository): Response
   {
-      // Récupère l'administrateur connecté
-      $user = $userRepository->getUser($this->getUser());
+    // Récupère l'administrateur connecté
+    $user = $userRepository->getUser($this->getUser());
       
-      // Rend la vue admin
-      return $this->render('profile/admin/_admin_tableau.html.twig', [
-          'user' => $user
-      ]);
+    // Récupérer l'administrateur principal (id = 1)
+    $adminUser = $this->userRepository->findOneById(1);
+    $adminCredits = $adminUser ? $adminUser->getCredits() : 0;
+
+    // Rend la vue admin
+    return $this->render('profile/admin/_admin_tableau.html.twig', [
+        'user' => $user,
+        'adminCredits' => $adminCredits
+    ]);
   }
 
   //Route pour la gestion des employés
