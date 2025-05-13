@@ -55,10 +55,14 @@ class AdminController extends AbstractController
     $adminUser = $this->userRepository->findOneById(1);
     $adminCredits = $adminUser ? $adminUser->getCredits() : 0;
 
+    //Total crédits dans le systeme
+    $totalSystemCredits = $this->userRepository->getTotalSystemCredits();
+
     // Rend la vue admin
     return $this->render('profile/admin/_admin_tableau.html.twig', [
         'user' => $user,
-        'adminCredits' => $adminCredits
+        'adminCredits' => $adminCredits,
+        'totalSystemCredits' => $totalSystemCredits
     ]);
   }
 

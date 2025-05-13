@@ -134,4 +134,15 @@ class UserPreferenceRepository extends ServiceEntityRepository
         
         return $count > 0;
     }
+
+    /**
+     * Calcule total des crédit de tout les utilisateurs
+     */
+    public function getTotalSystemCredits(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('SUM(u.credits)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
