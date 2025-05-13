@@ -1,25 +1,102 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Récupération du formulaire d'ajout d'employé
-    const addEmployeeForm = document.getElementById('addEmployeeForm');
+    // === FONCTIONS UTILITAIRES ===
 
-    // Si le formulaire existe, on ajoute un gestionnaire d'événement
+    //Affiche un message d'erreur
+    function showModalError(message, modalId) {
+        //supprime tout le smessage existant
+        const existingAlert = document.querySelector(`#${modalId} .alert`);
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+    
+        //crée l'alerte danger
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mb-3';
+        errorDiv.textContent = message;
+    
+        //insère l'alerte au debut 
+        const modalBody = document.querySelector(`#${modalId} .modal-body`);
+        if (modalBody) {
+            modalBody.insertBefore(errorDiv, modalBody.firstChild);
+        }
+    
+        //timer sur l'alerte
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.classList.add('fade');
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, 300);
+            }
+        }, 10000);
+        
+        return errorDiv;
+    }
+    
+    //Affiche un message de succes
+    function showModalSuccess(message, modalId) {
+        const existingAlert = document.querySelector(`#${modalId} .alert`);
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+    
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alert alert-success mb-3';
+        successDiv.textContent = message;
+    
+        const modalBody = document.querySelector(`#${modalId} .modal-body`);
+        if (modalBody) {
+            modalBody.insertBefore(successDiv, modalBody.firstChild);
+        }
+    
+        setTimeout(() => {
+            if (successDiv.parentNode) {
+                successDiv.classList.add('fade');
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+        
+        return successDiv;
+    }
+    
+    //Masque tout les message alerte d'une modale
+    function hideModalMessages(modalId) {
+        const alertDivs = document.querySelectorAll(`#${modalId} .alert`);
+        alertDivs.forEach(alertDiv => {
+            alertDiv.classList.add('fade');
+            setTimeout(() => alertDiv.remove(), 300);
+        });
+    }
+
+
+    // ======== MODAL AJOUT EMPLOYÉ ========
+    
+    //Recupére le formu d'ajout employé
+    const addEmployeeForm = document.getElementById('addEmployeeForm');
+    //si form existe = evenement
     if (addEmployeeForm) {
         addEmployeeForm.addEventListener('submit', function (e) {
-            // Empêche le comportement par défaut (rechargement de la page)
+            // Empêche le rechargement de page
             e.preventDefault();
 
-            // Récupération du bouton de soumission pour le désactiver pendant la requête
+            // Récupéredu bouton pour le désactiver pendant la requête
             const submitButton = this.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Traitement...';
 
-            // Création d'un objet FormData à partir du formulaire
+            // Création d'un objet FormData
             const formData = new FormData(this);
 
-            // Récupération du token CSRF si présent dans la page
+            // Récupére le token CSRF si présent
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            // Configuration de la requête fetch
+            // Config de la requête
             const options = {
                 method: 'POST',
                 body: formData,
@@ -28,15 +105,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             };
 
-            // Ajout du token CSRF aux headers si disponible
+            // Ajoute le token CSRF aux headers 
             if (csrfToken) {
                 options.headers['X-CSRF-TOKEN'] = csrfToken;
             }
 
-            // Envoi de la requête AJAX
+            // Envoi de la requête 
             fetch(addEmployeeForm.action, options)
                 .then(response => {
-                    // Vérification du statut de la réponse
+                    // Vérifie du statut de la réponse
                     if (!response.ok) {
                         throw new Error('Erreur réseau');
                     }
@@ -45,30 +122,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     // Traitement des données reçues
                     if (data.success) {
-                        // Création d'une alerte de succès
-                        createAlert('success', data.message || 'Employé ajouté avec succès !');
+                        // Créeation de l'alerte de succès
+                        showModalSuccess(data.message || 'Employé ajouté avec succès !', 'addEmployeeModal');
 
-                        // Réinitialisation du formulaire
+                        // Réinit du form
                         addEmployeeForm.reset();
 
-                        // Fermeture de la modal après un court délai
+                        // Fermeture de la modal avec timer
                         setTimeout(() => {
                             const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
                             if (modal) {
                                 modal.hide();
                             }
 
-                            // Rechargement de la page pour afficher le nouvel employé
+                            // Rechargement de la page
                             window.location.reload();
                         }, 1500);
                     } else {
                         // Création d'une alerte d'erreur
-                        createAlert('danger', data.message || 'Une erreur est survenue');
+                        showModalError(data.message || 'Une erreur est survenue', 'addEmployeeModal');
                     }
                 })
                 .catch(error => {
-                    console.error('Erreur:', error);
-                    createAlert('danger', 'Une erreur est survenue lors de la communication avec le serveur');
+                    //console.error('Erreur:', error);
+                    showModalError('Une erreur est survenue lors de la communication avec le serveur', 'addEmployeeModal');
                 })
                 .finally(() => {
                     // Réactivation du bouton de soumission
@@ -78,65 +155,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Fonction pour créer une alerte dans la modal
-    function createAlert(type, message) {
-        // Suppression des alertes existantes
-        const existingAlerts = document.querySelectorAll('#addEmployeeModal .alert');
-        existingAlerts.forEach(alert => alert.remove());
 
-        // Création de la nouvelle alerte
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} mt-3 mb-0`;
-        alertDiv.textContent = message;
+    // ======== MODAL UPDATE EMPLOYÉ ========
 
-        // Ajout de l'alerte au début du formulaire
-        const form = document.getElementById('addEmployeeForm');
-        form.parentNode.insertBefore(alertDiv, form);
-
-        // Disparition automatique après 5 secondes
-        setTimeout(() => {
-            alertDiv.classList.add('fade');
-            setTimeout(() => alertDiv.remove(), 500);
-        }, 5000);
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Sélectionner les boutons d'édition et de suppression
+    //Le bouton update
     const updateButtons = document.querySelectorAll('.update-employee');
-    const deleteButtons = document.querySelectorAll('.delete-employee');
-
-    // Référencer les modales et formulaires
+    //modale et form
     const updateModal = new bootstrap.Modal(document.getElementById('updateEmployeeModal'));
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
     const updateForm = document.getElementById('updateEmployeeForm');
-    const deleteForm = document.getElementById('deleteEmployeeForm');
 
-    // Fonction pour afficher des alertes
-    function showAlert(container, type, message) {
-        // Supprimer les alertes existantes
-        const existingAlerts = container.querySelectorAll('.alert');
-        existingAlerts.forEach(alert => alert.remove());
-
-        // Créer la nouvelle alerte
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} mt-3`;
-        alertDiv.textContent = message;
-
-        // Ajouter l'alerte au conteneur
-        container.insertBefore(alertDiv, container.firstChild);
-
-        // Faire disparaître l'alerte après 5 secondes
-        setTimeout(() => {
-            alertDiv.classList.add('fade');
-            setTimeout(() => alertDiv.remove(), 500);
-        }, 5000);
-    }
-
-    // Gestion des clics sur les boutons d'édition
+    //click bouton update
     updateButtons.forEach(button => {
         button.addEventListener('click', function () {
             const employeeId = this.dataset.id;
+
+            const updateForm = document.getElementById('updateEmployeeForm');
+            const updateSpinner = document.getElementById('updateSpinner');
+
+            // Nettoyer les messages précédents
+            hideModalMessages('updateEmployeeModal');
+            
+            // Afficher le spinner et masquer le formulaire
+            updateSpinner.style.display = 'block';
+            updateForm.style.display = 'none';
+
+            // Afficher la modale
+            updateModal.show();
 
             // Récupérer les données de l'employé via AJAX
             fetch(`/admin/gestion-employes/${employeeId}`, {
@@ -144,13 +188,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => {
-                console.log('Statut de la réponse:', response.status);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log("Données reçues:", data);
                     // Remplir le formulaire avec les données de l'employé
                     document.getElementById('update_employee_id').value = data.employee.id;
                     document.getElementById('update_employee_name').value = data.employee.name;
@@ -162,44 +202,80 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Mettre à jour l'action du formulaire
                     updateForm.action = `/admin/gestion-employes/update/${employeeId}`;
 
-                    // Afficher la modale
-                    updateModal.show();
+                    // Masquer le spinner et afficher le formulaire
+                    updateSpinner.style.display = 'none';
+                    updateForm.style.display = 'block';
                 } else {
-                    // Afficher un message d'erreur
-                    alert(data.message || 'Erreur lors de la récupération des données');
+                    // Masquer le spinner
+                    updateSpinner.style.display = 'none';
+                    
+                    // Afficher l'erreur et ajouter un bouton pour réessayer
+                    const errorAlert = showModalError(data.message || 'Erreur lors de la récupération des données', 'updateEmployeeModal');
+                    
+                    // Ajouter un bouton pour réessayer
+                    const retryBtn = document.createElement('button');
+                    retryBtn.className = 'btn btn-primary mt-2';
+                    retryBtn.textContent = 'Réessayer';
+                    retryBtn.onclick = () => {
+                        // Supprimer l'alerte
+                        if (errorAlert.parentNode) {
+                            errorAlert.remove();
+                            retryBtn.remove();
+                        }
+                        
+                        // Réafficher le spinner
+                        updateSpinner.style.display = 'block';
+                        
+                        // Réessayer après un court délai
+                        setTimeout(() => button.click(), 300);
+                    };
+                    
+                    // Ajouter le bouton après l'alerte
+                    errorAlert.appendChild(document.createElement('br'));
+                    errorAlert.appendChild(retryBtn);
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Une erreur est survenue lors de la récupération des données');
+                
+                // Masquer le spinner
+                updateSpinner.style.display = 'none';
+                
+                // Afficher l'erreur
+                const errorAlert = showModalError('Une erreur est survenue lors de la récupération des données', 'updateEmployeeModal');
+                
+                // Ajouter un bouton pour réessayer
+                const retryBtn = document.createElement('button');
+                retryBtn.className = 'btn btn-primary mt-2';
+                retryBtn.textContent = 'Réessayer';
+                retryBtn.onclick = () => {
+                    // Supprimer l'alerte et le bouton
+                    if (errorAlert.parentNode) {
+                        errorAlert.remove();
+                        retryBtn.remove();
+                    }
+                    
+                    // Réessayer après un court délai
+                    setTimeout(() => button.click(), 300);
+                };
+                
+                // Ajouter le bouton après l'alerte
+                errorAlert.appendChild(document.createElement('br'));
+                errorAlert.appendChild(retryBtn);
             });
         });
     });
 
-    // Gestion des clics sur les boutons de suppression
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const employeeId = this.dataset.id;
-            const employeeName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
-
-            // Mettre à jour le texte de confirmation
-            document.getElementById('delete_employee_name').textContent = employeeName;
-
-            // Mettre à jour l'action du formulaire
-            deleteForm.action = `/admin/gestion-employes/delete/${employeeId}`;
-
-            // Afficher la modale de confirmation
-            deleteModal.show();
-        });
-    });
-
-    // Gestion de la soumission du formulaire de mise à jour
+    //envoie du form update
     if (updateForm) {
         updateForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
             const formData = new FormData(this);
             const submitButton = this.querySelector('button[type="submit"]');
+
+            // Nettoyer les messages précédents
+            hideModalMessages('updateEmployeeModal');
 
             // Désactiver le bouton pendant la soumission
             submitButton.disabled = true;
@@ -212,39 +288,68 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Afficher le message de succès
-                        showAlert(this.parentNode, 'success', data.message);
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Afficher le message de succès
+                    showModalSuccess(data.message || 'Employé mis à jour avec succès !', 'updateEmployeeModal');
 
-                        // Fermer la modale après un délai
-                        setTimeout(() => {
-                            updateModal.hide();
-                            // Recharger la page pour voir les modifications
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        // Afficher le message d'erreur
-                        showAlert(this.parentNode, 'danger', data.message);
-
-                        // Réactiver le bouton
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Mettre à jour';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    showAlert(this.parentNode, 'danger', 'Une erreur est survenue');
+                    // Fermer la modale après un délai
+                    setTimeout(() => {
+                        updateModal.hide();
+                        // Recharger la page pour voir les modifications
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    // Afficher le message d'erreur
+                    showModalError(data.message || 'Une erreur est survenue', 'updateEmployeeModal');
 
                     // Réactiver le bouton
                     submitButton.disabled = false;
                     submitButton.textContent = 'Mettre à jour';
-                });
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showModalError('Une erreur est survenue lors de la communication avec le serveur', 'updateEmployeeModal');
+
+                // Réactiver le bouton
+                submitButton.disabled = false;
+                submitButton.textContent = 'Mettre à jour';
+            });
         });
     }
 
-    // Gestion de la soumission du formulaire de suppression
+
+    // ======== MODAL SUPPRESSION EMPLOYÉ ========
+
+    //Le bouton delete
+    const deleteButtons = document.querySelectorAll('.delete-employee');
+    //modal et form
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+    const deleteForm = document.getElementById('deleteEmployeeForm');
+
+    //click bouton delete
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const employeeId = this.dataset.id;
+            const employeeName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
+
+            //Clean msg
+            hideModalMessages('deleteEmployeeModal');
+
+            //Update ltexte de confirmation
+            document.getElementById('delete_employee_name').textContent = employeeName;
+
+            // Update form
+            deleteForm.action = `/admin/gestion-employes/delete/${employeeId}`;
+
+            // Afficher la modale
+            deleteModal.show();
+        });
+    });
+
+    //envoie form delete
     if (deleteForm) {
         deleteForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -252,7 +357,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData(this);
             const submitButton = this.querySelector('button[type="submit"]');
 
-            // Désactiver le bouton pendant la soumission
+            hideModalMessages('deleteEmployeeModal');
+
+            //Désactiver le bouton 
             submitButton.disabled = true;
             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Suppression...';
 
@@ -263,54 +370,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Afficher le message de succès
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-success';
-                        alertDiv.textContent = data.message;
-                        this.parentNode.parentNode.querySelector('.modal-body').appendChild(alertDiv);
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    //Afficher le message de succès
+                    showModalSuccess(data.message || 'Employé supprimé avec succès !', 'deleteEmployeeModal');
 
-                        // Désactiver les boutons
-                        this.querySelector('button[type="button"]').disabled = true;
+                    //Désactive les boutons
+                    this.querySelector('button[type="button"]').disabled = true;
 
-                        // Fermer la modale après un délai
-                        setTimeout(() => {
-                            deleteModal.hide();
-                            // Recharger la page pour mettre à jour la liste
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        // Afficher le message d'erreur
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-danger';
-                        alertDiv.textContent = data.message;
-                        this.parentNode.parentNode.querySelector('.modal-body').appendChild(alertDiv);
+                    //Fermer la modale
+                    setTimeout(() => {
+                        deleteModal.hide();
+                        //Recharger la page
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    //Affiche le message d'erreur
+                    showModalError(data.message || 'Une erreur est survenue', 'deleteEmployeeModal');
 
-                        // Réactiver le bouton
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Supprimer';
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-danger';
-                    alertDiv.textContent = 'Une erreur est survenue';
-                    this.parentNode.parentNode.querySelector('.modal-body').appendChild(alertDiv);
-
-                    // Réactiver le bouton
+                    //Réactiv le bouton
                     submitButton.disabled = false;
                     submitButton.textContent = 'Supprimer';
-                });
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showModalError('Une erreur est survenue lors de la communication avec le serveur', 'deleteEmployeeModal');
+
+                //Réactiv le bouton
+                submitButton.disabled = false;
+                submitButton.textContent = 'Supprimer';
+            });
         });
     }
 
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Pour la modale d'ajout
+    // ======== GESTION DES MOTS DE PASSE ========
+
+    //Modal Add
     const toggleAddPassword = document.getElementById('toggleAddPassword');
     const addPassword = document.getElementById('add_employee_password');
 
@@ -325,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
-    // Pour la modale de mise à jour
+    //Modal update
     const toggleUpdatePassword = document.getElementById('toggleUpdatePassword');
     const updatePassword = document.getElementById('update_employee_password');
 

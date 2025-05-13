@@ -52,7 +52,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="updateEmployeeForm" action="" method="post">
+        <!-- Spinner en attendant le chargemebnt des donnée -->
+        <div id="updateSpinner" class="text-center py-4" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-2">Chargement des données...</p>
+        </div>
+        <!-- Formulaire caché en attendant les données -->
+        <form id="updateEmployeeForm" action="" method="post"  style="display: none;">
           <!-- Token CSRF -->
           <input type="hidden" name="_csrf_token" value="{{ csrf_token('update_employee') }}">
           <!-- ID employé caché -->
