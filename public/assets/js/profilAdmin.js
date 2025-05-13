@@ -324,13 +324,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // ======== MODAL SUPPRESSION EMPLOYÉ ========
 
     //Le bouton delete
-    const deleteButtons = document.querySelectorAll('.delete-employee');
+    const deleteEmpButtons = document.querySelectorAll('.delete-employee');
     //modal et form
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
-    const deleteForm = document.getElementById('deleteEmployeeForm');
+    const deleteEmpModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+    const deleteEmpForm = document.getElementById('deleteEmployeeForm');
 
     //click bouton delete
-    deleteButtons.forEach(button => {
+    deleteEmpButtons.forEach(button => {
         button.addEventListener('click', function () {
             const employeeId = this.dataset.id;
             const employeeName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
@@ -342,16 +342,16 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('delete_employee_name').textContent = employeeName;
 
             // Update form
-            deleteForm.action = `/admin/gestion-employes/delete/${employeeId}`;
+            deleteEmpForm.action = `/admin/gestion-employes/delete/${employeeId}`;
 
             // Afficher la modale
-            deleteModal.show();
+            deleteEmpModal.show();
         });
     });
 
     //envoie form delete
-    if (deleteForm) {
-        deleteForm.addEventListener('submit', function (e) {
+    if (deleteEmpForm) {
+        deleteEmpForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
             const formData = new FormData(this);
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     //Fermer la modale
                     setTimeout(() => {
-                        deleteModal.hide();
+                        deleteEmpModal.hide();
                         //Recharger la page
                         window.location.reload();
                     }, 1500);
@@ -437,4 +437,154 @@ document.addEventListener('DOMContentLoaded', function () {
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
     }
+
+
+    // ======== MODAL SUPPRESSION USER ========
+
+    //Le bouton delete
+    const deleteUserButtons = document.querySelectorAll('.delete-user');
+    //modal et form
+    const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    const deleteUserForm = document.getElementById('deleteUserForm');
+
+    //click bouton delete
+    deleteUserButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const employeeId = this.dataset.id;
+            const employeeName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
+
+            //Clean msg
+            hideModalMessages('deleteUserModal');
+
+            //Update ltexte de confirmation
+            document.getElementById('delete_user_name').textContent = employeeName;
+
+            // Update form
+            deleteUserForm.action = `/admin/gestion-utilisateurs/delete/${employeeId}`;
+
+            // Afficher la modale
+            deleteUserModal.show();
+        });
+    });
+
+    //envoie form delete
+    if (deleteUserForm) {
+        deleteUserForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+
+            hideModalMessages('deleteUserModal');
+
+            //Désactiver le bouton 
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Suppression...';
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    //Afficher le message de succès
+                    showModalSuccess(data.message || 'L\'utilisateur a été supprimé avec succès !', 'deleteUserModal');
+
+                    //Désactive les boutons
+                    this.querySelector('button[type="button"]').disabled = true;
+
+                    //Fermer la modale
+                    setTimeout(() => {
+                        deleteUserModal.hide();
+                        //Recharger la page
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    //Affiche le message d'erreur
+                    showModalError(data.message || 'Une erreur est survenue', 'deleteUserModal');
+
+                    //Réactiv le bouton
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Supprimer';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showModalError('Une erreur est survenue lors de la communication avec le serveur', 'deleteUserModal');
+
+                //Réactiv le bouton
+                submitButton.disabled = false;
+                submitButton.textContent = 'Supprimer';
+            });
+        });
+    }
+
+
+    // ======== MODAL DETAILS WARNING USER ========
+    
+    //click bouton details
+    const warningDetailButtons = document.querySelectorAll('.view-warning-details');
+
+    warningDetailButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            
+            const modalBody = document.querySelector('#warningDetailsModal .modal-body');
+            const modalSpinner = document.getElementById('warningDetailsSpinner');
+            const modalContent = document.getElementById('warningDetailsContent');
+
+            if (modalSpinner) modalSpinner.style.display = 'block';
+            if (modalContent) modalContent.style.display = 'none';
+
+            fetch(`/admin/gestion-utilisateurs/warnings/${userId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Masquer le spinner
+                if (modalSpinner) modalSpinner.style.display = 'none';
+                
+                // Si le conteneur de contenu existe, y afficher le HTML
+                if (modalContent) {
+                    modalContent.style.display = 'block';
+                    modalContent.innerHTML = html;
+                }
+                // Sinon, injecter directement dans le corps de la modal
+                else {
+                    modalBody.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des détails:', error);
+                
+                // Masquer le spinner
+                if (modalSpinner) modalSpinner.style.display = 'none';
+                
+                // Afficher un message d'erreur
+                const errorHtml = `<div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Erreur lors du chargement des détails: ${error.message}
+                    <button class="btn btn-sm btn-outline-danger mt-2" onclick="location.reload()">Réessayer</button>
+                </div>`;
+                
+                if (modalContent) {
+                    modalContent.style.display = 'block';
+                    modalContent.innerHTML = errorHtml;
+                } else {
+                    modalBody.innerHTML = errorHtml;
+                }
+            });
+        });
+    });
 });

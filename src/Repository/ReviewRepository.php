@@ -183,6 +183,34 @@ class ReviewRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupérer tout les signalements danger
+     */
+    public function findAllWarningUsers(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.statut = :status')
+            ->setParameter('status', 'danger')
+            ->orderBy('r.id_review', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupérer les signalements d'un utilisateur spécifique
+     */
+    public function findUserWarnings(User $user): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.recipient = :user')
+            ->andWhere('r.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', 'danger')
+            ->orderBy('r.id_review', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Récupérer les stats des avis user
      */
     public function getReviewStats(): array

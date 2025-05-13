@@ -18,36 +18,64 @@
 			{% endfor %}
 		{% endfor %}
 
-		<!-- Filtres utilisateurs -->
+		<!-- Signalements utilisateurs -->
     <div class="card shadow m-3 mb-5">
         <div class="card-header py-3">
-            <h6 class="m-0 text-title">Filtres</h6>
+            <h6 class="m-0 text-title">Utilisateurs signalés</h6>
         </div>
         <div class="card-body">
-            <form id="userFilterForm" class="row g-3">
-                <div class="col-md-4">
-                    <label for="roleFilter" class="form-label">Rôle</label>
-                    <select id="roleFilter" class="form-select">
-                        <option value="">Tous</option>
-                        <option value="Conducteur">Conducteur</option>
-                        <option value="Passager">Passager</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="statusFilter" class="form-label">Statut</label>
-                    <select id="statusFilter" class="form-select">
-                        <option value="">Tous</option>
-                        <option value="actif">Actif</option>
-                        <option value="inactif">Inactif</option>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-                </div>
-            </form>
+					{% if usersWithWarnings|length > 0 %}
+						<div class="table-responsive">
+							<table class="table table-striped table-hover">
+								<thead class="table-danger">
+									<tr>
+										<th>ID</th>
+										<th>Nom</th>
+										<th>Prénom</th>
+										<th>Email</th>
+										<th>Nombre de signalements</th>
+										<th>Dernier signalement</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for userData in usersWithWarnings %}
+										<tr>
+											<td>{{ userData.user.idUser }}</td>
+											<td>{{ userData.user.name }}</td>
+											<td>{{ userData.user.firstname }}</td>
+											<td>{{ userData.user.email }}</td>
+											<td>
+												<span class="badge bg-danger">{{ userData.count }}</span>
+											</td>
+											<td>
+												{% if userData.lastWarning %}
+													<span title="Date du covoiturage signalé">{{ userData.lastWarning|date('d/m/Y') }}</span>
+												{% else %}
+													N/A
+												{% endif %}
+											</td>
+											<td>
+												<button class="btn btn-sm btn-info view-warning-details" data-id="{{ userData.user.idUser }}" data-bs-toggle="modal" data-bs-target="#warningDetailsModal">
+													<i class="fas fa-eye"></i>
+												</button>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					{% else %}
+						<div class="alert alert-success">
+							<i class="fas fa-check-circle"></i>
+							Aucun utilisateur n'a de signalement "danger" pour le moment.
+						</div>
+					{% endif %}
+
         </div>
     </div>
-		<!-- Liste des utilisateur  -->
+
+		<!-- Listes des utilisateur  -->
 		<div class="card shadow m-3 mb-5">
 			<div class="card-header py-3">
 				<h6 class="m-0 text-title">Gestions des utilisateurs</h6>
@@ -63,6 +91,7 @@
 								<th>Email</th>
 								<th>Téléphone</th>
 								<th>Rôle principal</th>
+								<th>Crédits</th>
 								<th>Note</th>
 								<th>Actions</th>
 							</tr>
@@ -86,10 +115,7 @@
 										<td>{{ utilisateur.credits }}</td>
 										<td>{{ utilisateur.rating|default('N/A') }}</td>
 										<td>
-											<button class="btn btn-sm btn-info view-user" data-id="{{ utilisateur.idUser }}">
-												<i class="fas fa-eye"></i>
-											</button>
-											<button class="btn btn-sm btn-danger block-user" data-id="{{ utilisateur.idUser }}">
+											<button class="btn btn-sm btn-danger delete-user" data-id="{{ utilisateur.idUser }}" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
 												<i class="fas fa-ban"></i>
 											</button>
 										</td>

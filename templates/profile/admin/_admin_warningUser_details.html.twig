@@ -1,0 +1,53 @@
+<div class="user-info mb-4">
+	<h4>{{ user.firstname }} {{ user.name }}</h4>
+	<p><strong>Email :</strong> {{ user.email }}</p>
+	<p><strong>Téléphone :</strong>{{ user.phoneNumber }}</p>
+	<p><strong>Note :</strong>
+		{% if user.rating %}
+			{{ user.rating|number_format(1) }}
+			<i class="fas fa-star text-warning"></i>
+		{% else %}
+			<span class="text-muted">N/A</span>
+		{% endif %}
+	</p>
+</div>
+
+<div class="warnings">
+	<h5 class="border-bottom pb-2 mb-3">Signalements ({{ warnings|length }})</h5>
+
+	{% if warnings is empty %}
+		<div class="alert alert-info">Aucun signalement trouvé pour cet utilisateur.</div>
+	{% else %}
+		{% for warning in warnings %}
+			<div class="card mb-3 border-danger">
+				<div class="card-header bg-danger bg-opacity-25">
+					<div class="d-flex justify-content-between align-items-center">
+						<span>
+							<strong>Signalé le :</strong>
+							{% if userData.lastWarning %}
+                  <span title="Date du covoiturage signalé">{{ userData.lastWarning|date('d/m/Y') }}</span>
+              {% else %}
+                  N/A
+              {% endif %}
+						</span>
+						<span class="badge bg-danger">{{ warning.statut }}</span>
+					</div>
+				</div>
+				<div class="card-body">
+					<p class="mb-2"><strong>Signalé par : </strong>{{ warning.sender.firstname }} {{ warning.sender.name }}</p>
+					{% if warning.carpool %}
+						<p class="mb-2">
+							<strong>Trajet : </strong>De {{ warning.carpool.locationStart }} à {{ warning.carpool.locationReach }} le {{ warning.carpool.dateStart|date('d/m/Y') }}
+						</p>
+					{% endif %}
+					<p class="mb-2">
+						<strong>Description :</strong>{{ warning.comment }}
+					</p>
+					<p class="mb-0">
+						<strong>Gravité :</strong>{{ warning.note }}
+					</p>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
+</div>

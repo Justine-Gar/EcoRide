@@ -94,6 +94,8 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+
+
     /**
      * Calcule la note moyenne d'un User
      */
@@ -179,6 +181,7 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
+
     /**
      * Recupérer tout les utilisateur qui ont le role de staff
      */
@@ -192,6 +195,21 @@ class UserRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
     }
+    /**
+     * Recupérer tout les utilisateur qui n'ont pas pour role staff et admin
+     */
+    public function findRegularUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.roles', 'r')
+            ->where('r.name_role NOT IN (:adminRoles)')
+            ->setParameter('adminRoles', ['Administrateur', 'Staff'])
+            ->groupBy('u.id_user')
+            ->orderBy('u.id_user', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     
     /**
      * Vérifie si l'utilisateur possède un rôle spécifique

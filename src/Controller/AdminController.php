@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,12 +22,14 @@ class AdminController extends AbstractController
   public function __construct(
     private RoleRepository $roleRepository,
     private UserRepository $userRepository,
+    private ReviewRepository $reviewRepository,
     private EntityManagerInterface $entityManager,
     private UserPasswordHasherInterface $passwordHasher,
     private Security $security,
     private RequestStack $requestStack
   ) {
       $this->userRepository = $userRepository;
+      $this->reviewRepository = $reviewRepository;
       $this->security = $security;
       $this->requestStack = $requestStack;
       $this->entityManager = $entityManager;
@@ -458,17 +461,142 @@ class AdminController extends AbstractController
   // Route pour la gestion des utilisateurs
   #[Route('/admin/gestion-utilisateurs', name: 'app_admin_gestion_user')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function gestionUtilisateurs(UserRepository $userRepository): Response
+  public function gestionUtilisateurs(UserRepository $userRepository, ReviewRepository $reviewRepository): Response
   {
       $user = $userRepository->getUser($this->getUser());
       
-      // Récupérer tous les utilisateurs réguliers
-      //$utilisateurs = $this->userRepository->findRegularUsers();
+      //Recup^érer tout users qui ne sont pas staff et admin
+      $allUsers = $userRepository->findRegularUsers();
+      //Récupérer les user avec un signalement danger
+      $allWarningUsers = $reviewRepository->findAllWarningUsers();
+
+      // Organiser les données pour l'affichage
+      $usersWithWarnings = [];
       
+      foreach ($allWarningUsers as $review) {
+          $recipient = $review->getRecipient();
+          $userId = $recipient->getIdUser();
+          
+          if (!isset($usersWithWarnings[$userId])) {
+              $usersWithWarnings[$userId] = [
+                  'user' => $recipient,
+                  'reviews' => [],
+                  'count' => 0,
+                  'lastWarning' => null
+              ];
+          }
+          
+          $usersWithWarnings[$userId]['reviews'][] = $review;
+          $usersWithWarnings[$userId]['count']++;
+          
+          $carpool = $review->getCarpool();
+
+          if ($carpool) {
+            $carpoolDate = $carpool->getDateReach(); 
+            // Si c'est le premier signalement ou si ce covoiturage est plus récent
+            if ($usersWithWarnings[$userId]['lastWarning'] === null || 
+                ($carpoolDate !== null && $carpoolDate > $usersWithWarnings[$userId]['lastWarning'])) {
+                $usersWithWarnings[$userId]['lastWarning'] = $carpoolDate;
+            }
+          }
+      }
+
       return $this->render('profile/admin/_admin_gestion_user.html.twig', [
           'user' => $user,
-          //'utilisateurs' => $utilisateurs
+          'utilisateurs' => $allUsers,
+          'usersWithWarnings' => $usersWithWarnings
       ]);
+  }
+
+  //Route pour supprimer un utilisateurs
+  #[Route('/admin/gestion-utilisateurs/delete/{id}', name: 'app_admin_delete_user')]
+  #[IsGranted('ROLE_ADMINISTRATEUR')]
+  public function deleteUser(Request $request, int $id, UserRepository $userRepository): Response
+  {
+    $utilisateur = $userRepository->findOneById($id);
+    
+    if (!$utilisateur) {
+      if ($request->isXmlHttpRequest()) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Utilisateur non trouvé.'
+        ]);
+      }
+      $this->addFlash('error', 'Utilisateur non trouvé.');
+      return $this->redirectToRoute('app_admin_gestion_user');
+    }
+    
+    // Vérifier que l'utilisateur n'est pas admin ou staff
+    if ($utilisateur->hasRoleByName('Administrateur') || $utilisateur->hasRoleByName('Staff')) {
+      if ($request->isXmlHttpRequest()) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Vous ne pouvez pas supprimer un administrateur ou un membre du staff.'
+        ]);
+      }
+      $this->addFlash('error', 'Vous ne pouvez pas supprimer un administrateur ou un membre du staff.');
+      return $this->redirectToRoute('app_admin_gestion_user');
+    }
+    
+    try {
+      $userRepository->remove($utilisateur, true);
+
+      if ($request->isXmlHttpRequest()) {
+        return new JsonResponse([
+          'success' => true,
+          'message' => 'Utilisateur supprimé avec succès.'
+        ]);
+      }
+      $this->addFlash('success', 'Utilisateur supprimé avec succès.');
+
+    } catch (\Exception $e) {
+
+      if ($request->isXmlHttpRequest()) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage()
+        ]);
+      }
+      $this->addFlash('error', 'Erreur lors de la suppression de l\'utilisateur : ' . $e->getMessage());
+    }
+      
+    return $this->redirectToRoute('app_admin_gestion_user');
+  }
+
+  //Route pour détail d'un signalement
+  #[Route('/admin/gestion-utilisateurs/warnings/{id}', name: 'app_admin_user_warnings', methods: ['GET'])]
+  #[IsGranted('ROLE_ADMINISTRATEUR')]
+  public function getUserWarnings(Request $request, int $id, UserRepository $userRepository, ReviewRepository $reviewRepository): Response
+  {
+    $user = $userRepository->findOneById($id);
+
+    if (!$user) {
+      if ($request->isXmlHttpRequest()) {
+        return new JsonResponse([
+          'success' => false,
+          'message' => 'Utilisateur non trouvé'
+        ], 404);
+      }
+
+      $this->addFlash('error', 'Utilisateur non trouvé');
+      return $this->redirectToRoute('app_admin_gestion_user');
+    }
+
+    // Récupérer les signalements de l'utilisateur
+    $warnings = $reviewRepository->findUserWarnings($user);
+
+    if ($request->isXmlHttpRequest()) {
+      return $this->render('profile/admin/_admin_warningUser_details.html.twig', [
+        'user' => $user,
+        'warnings' => $warnings,
+        'userData' => [
+          'lastWarning' => !empty($warnings) ? $warnings[0]->getCarpool()->getDateReach() : null,
+          'count' => count($warnings)
+        ]
+      ]);
+    }
+
+    return $this->redirectToRoute('app_admin_gestion_user');
   }
 
 }

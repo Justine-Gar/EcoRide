@@ -123,4 +123,55 @@
 	</div>
 </div>
 
+<!-- Modal pour supprimer un User -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteUserModalLabel">Confirmation de suppression</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Êtes-vous sûr de vouloir supprimer l'utilisateur <span id="delete_user_name"></span>  ?</p>
+				<p class="text-danger"><strong>Attention :</strong> Cette action est irréversible.</p>
+			</div>
+			<div class="modal-footer">
+        <form id="deleteUserForm" action="" method="post">
+          <!--Token CSRF -->
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token('delete_user') }}">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal pour les détails des signalements -->
+<div class="modal fade" id="warningDetailsModal" tabindex="-1" aria-labelledby="warningDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white">
+                <h5 class="modal-title" id="warningDetailsModalLabel">Détails des signalements</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Spinner de chargement -->
+                <div id="warningDetailsSpinner" class="text-center py-4">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2">Chargement des détails...</p>
+                </div>
+                <!-- Contenu des signalements -->
+                <div id="warningDetailsContent" style="display: none;">
+                    <!-- Le contenu sera chargé dynamiquement -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
 
