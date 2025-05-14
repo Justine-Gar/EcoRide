@@ -3,48 +3,34 @@
 //Affiche un message d'erreur
 function showError(message) {
     // Supprime tout message existant
-    const existingAlert = document.querySelector('#loginModal .alert');
-    if (existingAlert) {
-        existingAlert.remove();
+    const errorDiv = document.getElementById('loginError');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('d-none');
+        errorDiv.classList.add('d-block');
     }
     
-    // Crée la nouvelle alerte d'erreur
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger mb-3';
-    errorDiv.textContent = message;
-    
-    // Trouve le modal-body et insère l'alerte au début
-    const loginModalBody = document.querySelector('#loginModal .modal-body');
-    if (loginModalBody) {
-        loginModalBody.insertBefore(errorDiv, loginModalBody.firstChild);
-    }
 }
 
 // Affiche un message de succès
 function showSuccess(message) {
     // Supprime tout message existant
-    const existingAlert = document.querySelector('#loginModal .alert');
-    if (existingAlert) {
-        existingAlert.remove();
-    }
-    
-    // Crée la nouvelle alerte de succès
-    const successDiv = document.createElement('div');
-    successDiv.className = 'alert alert-success mb-3';
-    successDiv.textContent = message;
-    
-    // Trouve le modal-body et insère l'alerte au début
-    const loginModalBody = document.querySelector('#loginModal .modal-body');
-    if (loginModalBody) {
-        loginModalBody.insertBefore(successDiv, loginModalBody.firstChild);
+    const errorDiv = document.getElementById('loginError');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('d-none', 'alert-danger');
+        errorDiv.classList.add('d-block', 'alert-success');
     }
 }
 
 //Masque le message erreur
 function hideMessages() {
-    const alertDiv = document.querySelector('#loginModal .alert');
-    if (alertDiv) {
-        alertDiv.remove();
+    const errorDiv = document.getElementById('loginError');
+    if (errorDiv) {
+        errorDiv.classList.add('d-none');
+        errorDiv.classList.remove('d-block', 'alert-success');
+        errorDiv.classList.add('alert-danger');
+        errorDiv.textContent = '';
     }
 }
 
@@ -79,13 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const password = formData.get('_password');
         const csrf = formData.get('_csrf_token');
         
-        //Affiche les données pour le débogage (sans les mots de passe)
-        /*console.log('Données du formulaire :', {
-            email: email,
-            password: password ? '[PRÉSENT]' : '[MANQUANT]',
-            csrf: csrf
-        });*/
-
         try {
             // == ETAPE 1: Envoi des données au serveur
             const response = await fetch('/login', {

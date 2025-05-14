@@ -87,23 +87,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * Détermine le chemin de redirection en fonction du rôle de l'utilisateur
-     */
-    private function getRedirectPath($user): string
-    {
-        // Récupère les rôles de l'utilisateur
-        $roles = $user->getRoles();
-
-        // Définit la redirection selon le rôle le plus élevé
-        if (in_array('ROLE_ADMINISTRATEUR', $roles)) {
-            return '/admin';
-        } elseif (in_array('ROLE_STAFF', $roles)) {
-            return '/staff';
-        } else {
-            return '/profile';  // Redirection par défaut pour ROLE_USER
-        }
-    }
-    /**
      * Appelé en cas d'échec de l'authentification
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
@@ -118,8 +101,9 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         }
 
         return new JsonResponse([
-            'succes' => false,
+            'success' => false,
             'message' =>$message
         ], Response::HTTP_UNAUTHORIZED);
     }
+    
 }
