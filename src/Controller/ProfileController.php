@@ -318,6 +318,8 @@ class ProfileController extends AbstractController
                 // Ajouter 4 crédits à l'administrateur
                 $this->userRepository->updateCredits($adminUser, 4);
             }
+            //Commissions
+            $this->userRepository->updateCredits($user, -4);
 
             $carpool = $carpoolRepository->createCarpool($user, $data);
 

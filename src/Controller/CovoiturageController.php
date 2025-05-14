@@ -470,7 +470,7 @@ class CovoiturageController extends AbstractController
 
     try {
       $carpoolRepository->startCarpool($carpool);
-      $this->addFlash('succes', 'le covoiturage a été démarré avec succes.');
+      $this->addFlash('success', 'le covoiturage a été démarré avec succes.');
     } catch (\Exception $e) {
       $this->addFlash('error', $e->getMessage());
     }
