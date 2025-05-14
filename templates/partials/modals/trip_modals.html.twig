@@ -1,5 +1,5 @@
 <!-- Modal de création de trajet -->
-<div class="modal modal-xl fade" id="createTripModal" tabindex"-1" aria-labelledby="createTripModalLabel" aria-hidden="true">
+<div class="modal modal-lg fade" id="createTripModal" tabindex"-1" aria-labelledby="createTripModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -7,19 +7,8 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<div
-					class="row g-0">
-
-					<!-- Carte à gauche -->
-					<div class="col-md-5">
-						<label class="form-label">Itinéraire</label>
-						<div id="mapPreview" style="height: 100%; min-height: 500px; border-radius: 8px 0 0 8px;"></div>
-					</div>
-
 					<!-- Formulaire à droite -->
-					<div class="col-md-7 p-4">
-						<form
-							id="createCarpoolForm" method="post" action="{{ path('app_profile_new_carpool')}}">
+						<form id="createCarpoolForm" method="post" action="{{ path('app_profile_new_carpool')}}">
 
 							<!-- Départ / Arrivée -->
 							<div class="row mb-3">
@@ -168,9 +157,7 @@
 							<input type="hidden" name="_csrf_token" value="{{ csrf_token('create_carpool') }}">
 
 						</form>
-					</div>
-
-				</div>
+					
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

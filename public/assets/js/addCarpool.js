@@ -1,21 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialisation de la carte
-    let mapPreview = L.map('mapPreview').setView([48.8566, 2.3522], 12); // Vue centrée sur Paris
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapPreview);
 
     // Variables pour stocker les marqueurs
-    let departMarker = null;
-    let arriveeMarker = null;
-    let routingControl = null;
+    let departCoords = null;
+    let arriveeCoords = null;
 
     // Géolocalisation pour le lieu de départ
     const departInput = document.getElementById('location_start');
     departInput.addEventListener('blur', function () {
         if (departInput.value.trim() !== '') {
-            geolocate(departInput.value, 'depart');
+            // Simuler des coordonnées (pour garder la compatibilité avec le backend)
+            document.getElementById('lat_start').value = "0";
+            document.getElementById('lng_start').value = "0";
+            updateTripSummary();
         }
     });
 
@@ -23,103 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const arriveeInput = document.getElementById('location_reach');
     arriveeInput.addEventListener('blur', function () {
         if (arriveeInput.value.trim() !== '') {
-            geolocate(arriveeInput.value, 'arrivee');
+            // Simuler des coordonnées (pour garder la compatibilité avec le backend)
+            document.getElementById('lat_reach').value = "0";
+            document.getElementById('lng_reach').value = "0";
+            updateTripSummary();
         }
     });
-
-    // Fonction de géolocalisation via Nominatim (OpenStreetMap)
-    function geolocate(address, type) {
-        const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    const result = data[0];
-                    const lat = parseFloat(result.lat);
-                    const lng = parseFloat(result.lon);
-
-                    if (type === 'depart') {
-                        // Mise à jour des champs cachés
-                        document.getElementById('lat_start').value = lat;
-                        document.getElementById('lng_start').value = lng;
-
-                        // Ajout/mise à jour du marqueur de départ
-                        if (departMarker) {
-                            departMarker.setLatLng([lat, lng]);
-                        } else {
-                            departMarker = L.marker([lat, lng], {
-                                icon: L.divIcon({
-                                    html: '<i class="fas fa-map-marker-alt fa-2x" style="color: #28a745;"></i>',
-                                    iconSize: [20, 20],
-                                    className: 'map-marker'
-                                })
-                            }).addTo(mapPreview);
-                        }
-
-                        mapPreview.setView([lat, lng], 10);
-                    } else if (type === 'arrivee') {
-                        // Mise à jour des champs cachés
-                        document.getElementById('lat_reach').value = lat;
-                        document.getElementById('lng_reach').value = lng;
-
-                        // Ajout/mise à jour du marqueur d'arrivée
-                        if (arriveeMarker) {
-                            arriveeMarker.setLatLng([lat, lng]);
-                        } else {
-                            arriveeMarker = L.marker([lat, lng], {
-                                icon: L.divIcon({
-                                    html: '<i class="fas fa-flag-checkered fa-2x" style="color: #dc3545;"></i>',
-                                    iconSize: [20, 20],
-                                    className: 'map-marker'
-                                })
-                            }).addTo(mapPreview);
-                        }
-                    }
-
-                    // Si les deux marqueurs sont présents, tracer l'itinéraire
-                    if (departMarker && arriveeMarker) {
-                        calculateRoute();
-                        updateTripSummary();
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Erreur de géolocalisation:', error);
-            });
-    }
-
-    // Fonction pour calculer l'itinéraire entre les deux points
-    function calculateRoute() {
-        const startLatLng = departMarker.getLatLng();
-        const endLatLng = arriveeMarker.getLatLng();
-
-        // Si un itinéraire est déjà affiché, le supprimer
-        if (routingControl) {
-            mapPreview.removeControl(routingControl);
-        }
-
-        // Ajout du contrôle d'itinéraire (nécessite le plugin Leaflet Routing Machine)
-        routingControl = L.Routing.control({
-            waypoints: [
-                L.latLng(startLatLng.lat, startLatLng.lng),
-                L.latLng(endLatLng.lat, endLatLng.lng)
-            ],
-            lineOptions: {
-                styles: [{ color: '#6FA1EC', weight: 4 }]
-            },
-            show: false,
-            addWaypoints: false,
-            routeWhileDragging: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            showAlternatives: false
-        }).addTo(mapPreview);
-
-        // Ajuster la vue pour montrer tout l'itinéraire
-        const bounds = L.latLngBounds([startLatLng, endLatLng]);
-        mapPreview.fitBounds(bounds, { padding: [50, 50] });
-    }
 
     // Fonction pour mettre à jour le résumé du trajet
     function updateTripSummary() {
@@ -145,11 +51,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Mise à jour du résumé
             document.getElementById('summaryText').innerHTML = `
-              <strong>De:</strong> ${departValue} <br>
-              <strong>À:</strong> ${arriveeValue} <br>
-              <strong>Le:</strong> ${dateFormatted} à ${timeFormatted} <br>
-              <strong>Places disponibles:</strong> ${placesValue}
-          `;
+                <strong>De:</strong> ${departValue} <br>
+                <strong>À:</strong> ${arriveeValue} <br>
+                <strong>Le:</strong> ${dateFormatted} à ${timeFormatted} <br>
+                <strong>Places disponibles:</strong> ${placesValue}
+            `;
 
             document.getElementById('summaryPrice').textContent = `Prix: ${creditsValue} crédits par personne`;
 
@@ -211,11 +117,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Préférences (optionnel)
         const preferences = [];
-        document.querySelectorAll('input[name="user_preferences[]"]:checked').forEach(checkbox => {
+        document.querySelectorAll('input[name="preferences[]"]:checked').forEach(checkbox => {
             preferences.push(checkbox.value);
         });
+
         if (preferences.length > 0) {
-            formData.append('commentaire', 'Préférences: ' + preferences.join(', '));
+            // Ajouter les préférences au formulaire
+            preferences.forEach((preference, index) => {
+                formData.append(`preferences[${index}]`, preference);
+            });
         }
 
         // Envoi des données
@@ -226,36 +136,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Fermer la modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('createTripModal'));
-                if (modal) {
-                    modal.hide();
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fermer la modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createTripModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Redirection ou rafraîchissement
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/profile';
+                    }, 2000);
+                } else {
+                    // Notification d'erreur précise
+                    alert('Erreur: ' + data.message);
                 }
-
-                // Redirection ou rafraîchissement
-                setTimeout(() => {
-                    window.location.href = data.redirect || '/profile';
-                }, 2000);
-            } else {
-                // Notification d'erreur précise
-                alert('Erreur: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur détaillée:', error);
-            alert('Erreur: ' + error.message);
-        });
-    });
-
-    // Réinitialisation de la carte à l'ouverture de la modal
-    document.getElementById('createTripModal').addEventListener('show.bs.modal', function () {
-        setTimeout(() => {
-            mapPreview.invalidateSize();
-            // Réinitialiser la vue de la carte
-            mapPreview.setView([46.603354, 1.888334], 6);
-        }, 100);
+            })
+            .catch(error => {
+                console.error('Erreur détaillée:', error);
+                alert('Erreur: ' + error.message);
+            });
     });
 });
