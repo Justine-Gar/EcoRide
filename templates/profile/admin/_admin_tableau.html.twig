@@ -67,3 +67,9 @@
 		</div>
 	</div>
 {% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="{{ asset('assets/js/graphicAdmin.js') }}"></script>
+{% endblock %}

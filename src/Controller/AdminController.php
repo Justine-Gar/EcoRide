@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use DateTime;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use App\Repository\ReviewRepository;
+use App\Repository\CarpoolRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,13 +25,16 @@ class AdminController extends AbstractController
     private RoleRepository $roleRepository,
     private UserRepository $userRepository,
     private ReviewRepository $reviewRepository,
+    private CarpoolRepository $carpoolRepository,
     private EntityManagerInterface $entityManager,
     private UserPasswordHasherInterface $passwordHasher,
     private Security $security,
     private RequestStack $requestStack
   ) {
+      $this->roleRepository = $roleRepository;
       $this->userRepository = $userRepository;
       $this->reviewRepository = $reviewRepository;
+      $this->carpoolRepository = $carpoolRepository;
       $this->security = $security;
       $this->requestStack = $requestStack;
       $this->entityManager = $entityManager;
@@ -52,11 +57,11 @@ class AdminController extends AbstractController
     $user = $userRepository->getUser($this->getUser());
       
     // Récupérer l'administrateur principal (id = 1)
-    $adminUser = $this->userRepository->findOneById(1);
+    $adminUser = $userRepository->findOneById(1);
     $adminCredits = $adminUser ? $adminUser->getCredits() : 0;
 
     //Total crédits dans le systeme
-    $totalSystemCredits = $this->userRepository->getTotalSystemCredits();
+    $totalSystemCredits = $userRepository->getTotalSystemCredits();
 
     // Rend la vue admin
     return $this->render('profile/admin/_admin_tableau.html.twig', [
@@ -65,6 +70,9 @@ class AdminController extends AbstractController
         'totalSystemCredits' => $totalSystemCredits
     ]);
   }
+
+
+  // ===== Gestion Staff
 
   //Route pour la gestion des employés
   #[Route('/admin/gestion-employes', name: 'app_admin_gestion_emp')]
@@ -467,6 +475,8 @@ class AdminController extends AbstractController
   }
 
 
+  //======= Gestion Users
+
   // Route pour la gestion des utilisateurs
   #[Route('/admin/gestion-utilisateurs', name: 'app_admin_gestion_user')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
@@ -606,6 +616,156 @@ class AdminController extends AbstractController
     }
 
     return $this->redirectToRoute('app_admin_gestion_user');
+  }
+
+
+  // ==== Credit et Carpool DATA 
+
+  //Methode pour donnée des crédits au graphique
+  #[Route('/admin/credits-data', name: 'app_admin_credits_data')]
+  #[IsGranted('ROLE_ADMINISTRATEUR')]
+  public function getCreditsData(CarpoolRepository $carpoolRepository): JsonResponse
+  {
+    //Date du jour
+    $today = new DateTime();
+    //Date de 30 jours
+    $thirtyDaysAgo = (new DateTime())->modify('-30 days');
+
+    //Recupération des covoitcréer ces 30 dernier jours
+    $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
+    //Insertion dans untableau
+    $dates = [];
+    $creditsByDay = [];
+
+    //Init tableau avec toutes les dates et 0 crédits
+    for ($i = 0; $i < 30; $i++) {
+      $date = clone $thirtyDaysAgo;
+      $date->modify("+$i days");
+
+      $dateStr = $date->format('Y-m-d');
+      $dates[] = $dateStr;
+      $creditsByDay[$dateStr] = 0;
+    }
+
+    //Calcule des crédits par jour (4 crédits / covoiturage créé)
+    foreach ($carpools as $carpool) {
+      $dateStr = $carpool->getDateStart()->format('Y-m-d');
+      if (isset($creditsByDay[$dateStr])) {
+        $creditsByDay[$dateStr] += 4;
+      }
+    }
+
+    //Conversion pour Chart.js
+    $labels = array_map(function($date) {
+        return (new DateTime($date))->format('d/m');
+    }, $dates);
+    $data = array_values($creditsByDay);
+
+    //Calcul statistique
+    $totalCredits = array_sum($data);
+    $averageCredits = count($data) > 0 ? $totalCredits / count($data) : 0;
+
+    //Return JSON
+    return new JsonResponse([
+      'labels' => $labels,
+      'datasets' => [
+        [
+          'label' => 'Crédits reçus',
+          'data' => $data,
+          'backgroundColor' => 'rgba(75, 192, 192, 0.6)',
+          'borderColor' => 'rgba(75, 192, 192, 1)',
+          'borderWidth' => 1
+        ]
+      ],
+      'stats' => [
+        'total' => $totalCredits,
+        'average' => round($averageCredits, 1)
+      ]
+    ]);
+  }
+
+  // Méthode pour fournir les données des covoiturages pour le graphique
+  #[Route('/admin/carpools-data', name: 'app_admin_carpools_data')]
+  #[IsGranted('ROLE_ADMINISTRATEUR')]
+  public function getCarpoolsData(CarpoolRepository $carpoolRepository): JsonResponse
+  {
+    // Date d'aujourd'hui
+    $today = new DateTime();
+
+    // Date d'il y a 30 jours
+    $thirtyDaysAgo = (new DateTime())->modify('-30 days');
+
+    // Récupération des covoiturages créés ces 30 derniers jours
+    $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
+
+    // Préparation des données pour le graphique
+    $dates = [];
+    $carpoolsPerDay = [];
+
+    // Initialisation du tableau avec toutes les dates et 0 covoiturage
+    for ($i = 0; $i < 30; $i++) {
+      $date = clone $thirtyDaysAgo;
+      $date->modify("+$i days");
+      $dateStr = $date->format('Y-m-d');
+      $dates[] = $dateStr;
+      $carpoolsPerDay[$dateStr] = 0;
+    }
+
+    // Comptage des covoiturages par jour
+    foreach ($carpools as $carpool) {
+      $dateStr = $carpool->getDateStart()->format('Y-m-d');
+      if (isset($carpoolsPerDay[$dateStr])) {
+        $carpoolsPerDay[$dateStr]++;
+      }
+    }
+
+    // Comptage par statut
+    $statusCounts = [
+      'terminé' => 0,
+      'annulé' => 0,
+      'en_attente' => 0,
+      'actif' => 0
+    ];
+
+    foreach ($carpools as $carpool) {
+      $status = $carpool->getStatut();
+      if (isset($statusCounts[$status])) {
+        $statusCounts[$status]++;
+      } else if ($status === 'waiting') {
+        $statusCounts['en_attente']++;
+      } else if ($status === 'active') {
+        $statusCounts['actif']++;
+      }
+    }
+
+    // Conversion en format adapté pour Chart.js
+    $labels = array_map(function ($date) {
+      return (new DateTime($date))->format('d/m');
+    }, $dates);
+
+    $data = array_values($carpoolsPerDay);
+
+    // Calcul des statistiques
+    $totalCarpools = array_sum($data);
+    $averageCarpools = count($data) > 0 ? $totalCarpools / count($data) : 0;
+
+    return new JsonResponse([
+      'labels' => $labels,
+      'datasets' => [
+        [
+          'label' => 'Covoiturages créés',
+          'data' => $data,
+          'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
+          'borderColor' => 'rgba(54, 162, 235, 1)',
+          'borderWidth' => 1
+        ]
+      ],
+      'stats' => [
+        'total' => $totalCarpools,
+        'average' => round($averageCarpools, 1),
+        'byStatus' => $statusCounts
+      ]
+    ]);
   }
 
 }

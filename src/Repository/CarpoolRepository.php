@@ -518,4 +518,20 @@ class CarpoolRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+    /**
+     * Trouve les covoiturages créés entre deux dates
+     */
+    public function findCarpoolsCreatedBetweenDates(\DateTime $startDate, \DateTime $endDate): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.date_start >= :startDate')
+            ->andWhere('c.date_start <= :endDate')
+            ->setParameter('startDate', $startDate->format('Y-m-d'))
+            ->setParameter('endDate', $endDate->format('Y-m-d'))
+            ->orderBy('c.date_start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
