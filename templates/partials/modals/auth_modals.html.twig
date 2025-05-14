@@ -7,6 +7,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				
 				<form id="loginForm" method="POST" action="{{ path('app_login') }}" class="needs-validation" novalidate>
 					<div class="mb-3">
 						<input type="email" class="form-control" id="loginEmail" name="_username" required placeholder="Entrez votre email" autocomplete="email">
@@ -15,7 +16,6 @@
 						<input type="password" class="form-control" id="loginPassword" name="_password" required placeholder="Entrez votre mot de passe" autocomplete="current-password">
 					</div>
 					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-					<div class="alert alert-danger d-none" id="loginError"></div>
 					<div class="modal-footer justify-content-center">
 						<button type="submit" class="btn btn-connexion">Se connecter</button>
 					</div>

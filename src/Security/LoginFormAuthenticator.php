@@ -78,6 +78,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'success' => true,
+                'message' => 'Connexion réussie ! Vous allez être redirigé...',
                 'redirect' => $redirectPath
             ]);
         }
@@ -102,7 +103,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
 
         return new JsonResponse([
             'success' => false,
-            'message' =>$message
+            'error' => $message
         ], Response::HTTP_UNAUTHORIZED);
     }
     
