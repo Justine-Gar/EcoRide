@@ -294,12 +294,9 @@
                         <div class="text-end">
                           <span class="badge bg-success mb-2">{{ car.energie }}</span>
                           <div>
-                            <form action="{{ path('app_profile_delete_car', { 'id': car.id }) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?');">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-danger btn-sm delete-car-btn" data-car-id="{{ car.id }}">
+															<i class="fas fa-trash"></i>
+														</button>
                           </div>
                         </div>
                       </div>

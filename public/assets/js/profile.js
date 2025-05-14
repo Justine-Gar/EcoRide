@@ -106,3 +106,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+//Ce script permet de supprimer une voiture
+document.addEventListener('DOMContentLoaded', function() {
+    // Sélectionner tous les boutons de suppression
+    const deleteButtons = document.querySelectorAll('.delete-car-btn');
+    
+    // Pour chaque bouton, ajouter un événement de clic
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Récupérer l'ID du véhicule à partir de l'attribut data
+            const carId = this.getAttribute('data-car-id');
+            
+            // Mettre à jour le lien de confirmation dans la modal
+            const confirmButton = document.getElementById('confirmDeleteCar');
+            confirmButton.href = `/profile/car/delete/${carId}`;
+            
+            // Afficher la modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteCarModal'));
+            deleteModal.show();
+        });
+    });
+});

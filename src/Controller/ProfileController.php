@@ -218,7 +218,7 @@ class ProfileController extends AbstractController
             $car->setUser($this->getUser());
             $this->carRepository->save($car, true);
 
-            $this->addFlash('succes', 'Véhicule ajouté avec succès !');
+            $this->addFlash('success', 'Véhicule ajouté avec succès !');
             return $this->redirectToRoute('app_profile');
         }
 
