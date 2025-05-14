@@ -180,6 +180,16 @@ class UserRepository extends ServiceEntityRepository
         $this->save($user, true);
     }
 
+    /**
+     * Calcule pour récupérer le total des crédits de tous les utilisateurs
+     */
+    public function getTotalSystemCredits(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('SUM(u.credits)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
 
     /**
