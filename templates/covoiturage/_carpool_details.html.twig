@@ -64,14 +64,6 @@
 					{{ carpool.getUser().getPhoneNumber() }}</li>
 			{% endif %}
 		</ul>
-
-		{% if app.user and app.user != carpool.getUser() and carpool.isWaitingCarpool() and not carpool.isFull() %}
-			<div class="d-grid gap-2 mt-3">
-				<a href="{{ path('app_covoiturage_join', {'id': carpool.getIdCarpool()}) }}" class="btn btn-success">
-					<i class="fas fa-sign-in-alt me-2"></i>Rejoindre ce trajet
-				</a>
-			</div>
-		{% endif %}
 	</div>
 </div>
 

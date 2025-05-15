@@ -71,9 +71,8 @@ function displayMessage(message, type = 'warning') {
 }
 
 function joinCarpool(carpoolId) {
+  //console.log('Fonction joinCarpool appelée avec ID:', carpoolId);
   displayMessage('Traitement en cours...', 'warning');
-
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
   const options = {
     method: 'POST',
@@ -83,13 +82,18 @@ function joinCarpool(carpoolId) {
     }
   };
 
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   if (csrfToken) {
     options.headers['X-CSRF-TOKEN'] = csrfToken;
   }
 
   fetch(`/covoiturage/${carpoolId}/join`, options)
-    .then(response => response.json())
+    .then(response => {
+      //console.log('Réponse reçue, statut:', response.status);
+      return response.json();
+    })
     .then(data => {
+      //console.log('Données reçues:', data);
       hideMessages();
 
       if (data.auth_required) {
@@ -135,6 +139,7 @@ function joinCarpool(carpoolId) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  //console.log('DOM chargé, initialisation des boutons');
   // Initialiser les boutons de participation
   const joinButtons = document.querySelectorAll('.join-carpool-btn');
   //console.log('Nombre de boutons de participation trouvés:', joinButtons.length);
@@ -142,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
     button.addEventListener('click', function (e) {
       e.preventDefault();
       const carpoolId = this.dataset.carpoolId;
-      //console.log('Click sur bouton participer, ID:', carpoolId);
+      console.log('Click sur bouton participer, ID:', carpoolId);
       joinCarpool(carpoolId);
     });
   });
