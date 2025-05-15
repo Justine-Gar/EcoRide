@@ -139,7 +139,6 @@ class ProfileController extends AbstractController
             
             $roleRepository->setUserMainRole($user, $roleName);
 
-            //Symfony ne garde pas le nouveau token dans la session, obliger de créer un nouveau est de le forcer a etre stocker a nouveau
             // Rafraîchit le token de sécurité
             $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
             $tokenStorage->setToken($token);

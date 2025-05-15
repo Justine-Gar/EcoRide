@@ -47,9 +47,9 @@
 /*Switch bouton profilUser*/
 .switch-container {
   position: relative;
-  width: 300px;
+  width: 270px;
   height: 50px;
-  border-radius: 15px;
+  border-radius: 10px;
   overflow: visible; 
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   background-color: #313A50;
@@ -83,7 +83,7 @@
   height: 100%;
   z-index: 2;
   opacity: 0;
-  border-radius: 12px;
+  border-radius: 8px;
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 .bg-conducteur {

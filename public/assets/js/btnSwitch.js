@@ -11,11 +11,11 @@ function activateOption(option) {
     }
   })
     .then(response => {
-      console.log('Réponse du serveur:', response.status);
+      //console.log('Réponse du serveur:', response.status);
       return response.json();
     })
     .then(data => {
-      console.log('Données reçues:', data);
+      //console.log('Données reçues:', data);
 
       if (data.success) {
         // Changement visuel seulement si le changement de rôle a réussi
