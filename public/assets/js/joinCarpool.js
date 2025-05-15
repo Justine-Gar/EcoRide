@@ -137,10 +137,12 @@ function joinCarpool(carpoolId) {
 document.addEventListener('DOMContentLoaded', function () {
   // Initialiser les boutons de participation
   const joinButtons = document.querySelectorAll('.join-carpool-btn');
+  //console.log('Nombre de boutons de participation trouvés:', joinButtons.length);
   joinButtons.forEach(button => {
     button.addEventListener('click', function (e) {
       e.preventDefault();
       const carpoolId = this.dataset.carpoolId;
+      //console.log('Click sur bouton participer, ID:', carpoolId);
       joinCarpool(carpoolId);
     });
   });

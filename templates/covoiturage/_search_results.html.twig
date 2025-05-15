@@ -157,9 +157,12 @@
 
 									<div class="detail-participer d-flex justify-content-between align-items-center p-2">
 										<span>{{ carpool.credits }} crédits</span>
-										<a class="btn-participer btn join-carpool-btn" data-carpool-id="{{ carpool.idCarpool }}">Participer</a>
+										{% if app.user %}
+												<a class="btn-participer btn join-carpool-btn" data-carpool-id="{{ carpool.idCarpool }}">Participer</a>
+										{% else %}
+												<a class="btn-participer btn" data-bs-toggle="modal" data-bs-target="#loginModal">Se connecter pour participer</a>
+										{% endif %}									
 									</div>
-
 								</div>
 							</div>
 

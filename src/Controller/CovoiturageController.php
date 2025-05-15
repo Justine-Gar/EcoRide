@@ -515,6 +515,12 @@ class CovoiturageController extends AbstractController
   {
       $user = $userRepository->findOneByEmail($this->security->getUser()->getUserIdentifier());
       
+      // Vérifier si l'utilisateur a le rôle de conducteur
+      if (!$userRepository->isDriver($user)) {
+          $this->addFlash('error', 'Vous devez être en mode conducteur pour terminer un covoiturage.');
+          return $this->redirectToRoute('app_profile', ['id' => $carpool->getIdCarpool()]);
+      }
+      
       // Vérifier si c'est bien le conducteur qui termine le trajet
       if ($carpool->getUser() !== $user) {
           $this->addFlash('error', 'Vous ne pouvez pas terminer un covoiturage dont vous n\'êtes pas le conducteur.');
@@ -530,9 +536,6 @@ class CovoiturageController extends AbstractController
       try {
 
         $carpoolRepository->finishCarpool($carpool);
-
-        // Envoyer un email aux passagers pour qu'ils puissent laisser un avis
-        // configuration d'envoi d'emails
         
         $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés apres modération des avis.');
 
