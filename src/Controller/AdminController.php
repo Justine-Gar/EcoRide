@@ -627,9 +627,11 @@ class AdminController extends AbstractController
   public function getCreditsData(CarpoolRepository $carpoolRepository): JsonResponse
   {
     //Date du jour
-    $today = new DateTime();
+    $today = new DateTime('now');
+    $today->setTime(23, 59, 59);
     //Date de 30 jours
-    $thirtyDaysAgo = (new DateTime())->modify('-30 days');
+    $thirtyDaysAgo = (new DateTime('now'))->modify('-29 days');
+    $thirtyDaysAgo->setTime(0, 0, 0);
 
     //Recupération des covoitcréer ces 30 dernier jours
     $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
@@ -649,9 +651,11 @@ class AdminController extends AbstractController
 
     //Calcule des crédits par jour (4 crédits / covoiturage créé)
     foreach ($carpools as $carpool) {
-      $dateStr = $carpool->getDateStart()->format('Y-m-d');
-      if (isset($creditsByDay[$dateStr])) {
-        $creditsByDay[$dateStr] += 4;
+      if ($carpool->getDateStart() instanceof DateTime) {
+        $dateStr = $carpool->getDateStart()->format('Y-m-d');
+        if (isset($creditsByDay[$dateStr])) {
+          $creditsByDay[$dateStr] += 4;
+        }
       }
     }
 
@@ -690,10 +694,11 @@ class AdminController extends AbstractController
   public function getCarpoolsData(CarpoolRepository $carpoolRepository): JsonResponse
   {
     // Date d'aujourd'hui
-    $today = new DateTime();
-
+    $today = new DateTime('now');
+    $today->setTime(23, 59, 59);
     // Date d'il y a 30 jours
-    $thirtyDaysAgo = (new DateTime())->modify('-30 days');
+    $thirtyDaysAgo = (new DateTime('now'))->modify('-29 days');
+    $thirtyDaysAgo->setTime(0, 0, 0);
 
     // Récupération des covoiturages créés ces 30 derniers jours
     $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
@@ -713,9 +718,11 @@ class AdminController extends AbstractController
 
     // Comptage des covoiturages par jour
     foreach ($carpools as $carpool) {
-      $dateStr = $carpool->getDateStart()->format('Y-m-d');
-      if (isset($carpoolsPerDay[$dateStr])) {
-        $carpoolsPerDay[$dateStr]++;
+      if ($carpool->getDateStart() instanceof DateTime) {
+        $dateStr = $carpool->getDateStart()->format('Y-m-d');
+        if (isset($carpoolsPerDay[$dateStr])) {
+          $carpoolsPerDay[$dateStr]++;
+        }
       }
     }
 
