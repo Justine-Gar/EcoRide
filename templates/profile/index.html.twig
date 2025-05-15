@@ -471,8 +471,8 @@
 																</p>
 															</div>
 															<div class="d-flex justify-content-end align-items-center">
-																<a href="{{ path('app_covoiturage', {'id': carpool.getIdCarpool() }) }}" class="btn btn-outline-primary">
-																	<i class="fas fa-info-circle"></i>Détails
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
+																	<i class="fas fa-info-circle me-2"></i>Détails
 																</a>
 																<form action="{{ path('app_covoiturage_leave', {'id': carpool.getIdCarpool() }) }}" method="POST">
 																		<button type="submit" class="btn btn-outline-danger">Quitter</button>
@@ -484,7 +484,6 @@
 											{% endfor %}
 										{% endif %}
 									</div>
-
 
 									<!--TRAJET EN COURS-->
 									<div class="mt-4">
@@ -562,7 +561,7 @@
 																</p>
 															</div>
 															<div class="text-end">
-																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
                                   <i class="fas fa-info-circle me-2"></i>Détails
                                 </a>
 															</div>
@@ -611,7 +610,7 @@
 																</div>
 															</div>
 															<div class="text-end">
-																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
                                   <i class="fas fa-info-circle me-2"></i>Détails
                                 </a>
 															</div>
@@ -662,7 +661,7 @@
 																{% endif %}
 															</div>
 															<div class="text-end">
-																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}}">
+																<a href="#" class="btn btn-outline-primary load-carpool-details" data-bs-toggle="modal" data-bs-target="#carpoolDetailModal" data-carpool-id="{{ carpool.getIdCarpool() }}">
 																	<i class="fas fa-info-circle me-2"></i>Détails
 																</a>
 															</div>
@@ -1083,8 +1082,6 @@
 												</div>
 											</div>
 										</div>
-
-
 									</div>
 
 									<!--Trajet en cours-->
