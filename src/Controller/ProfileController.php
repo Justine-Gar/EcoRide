@@ -283,10 +283,16 @@ class ProfileController extends AbstractController
             ], 403);
         }
 
-
-
         try {
-
+            // Vérifier si l'utilisateur a au moins 4 crédits
+            $completeUser = $this->userRepository->findOneByEmail($user->getUserIdentifier());
+            if ($completeUser->getCredits() < 4) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas assez de crédits pour créer un covoiturage. Minimum requis: 4 crédits.'
+                ], 400);
+            }
+            
              // Créer une date de départ
             $dateStart = $request->request->get('date_start');
             $hourStart = $request->request->get('hour_start');
