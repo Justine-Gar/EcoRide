@@ -38,7 +38,7 @@ class ReviewController extends AbstractController
   /**
     * Traite le formulaire d'avis 
    */
-  #[Route('/review/submit/{carpoolId}', name: 'app_review_submit', requirements: ['carpoolId' => '\d+'])]
+  #[Route('/review/submit/{carpoolId}', name: 'app_review_submit', requirements: ['carpoolId' => '\d+'], methods: ['POST'])]
   #[IsGranted('ROLE_USER')]
   public function submitReview(Request $request, int $carpoolId): Response
   {
@@ -66,7 +66,7 @@ class ReviewController extends AbstractController
         return new JsonResponse(['success' => false, 'message' => 'Vous avez déjà laissé un avis pour ce covoiturage'], 400);
     }
 
-    if (!$carpool->isCompleted()) {
+    if (!$carpool->isCompletedCarpool()) {
       return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez évaluer que des covoiturages terminés.'], 403);
     }
 
@@ -83,8 +83,13 @@ class ReviewController extends AbstractController
           ], 400);
         }
 
+        $token = $request->request->get('_token');
+        if ($token && !$this->isCsrfTokenValid('review_form', $request->request->get('_token'))) {
+          return new JsonResponse(['success' => false, 'message' => 'Token CSRF invalide'], 400);
+        }
+
         $commentValue = $reviewData['review']['comment'] ?? null;
-        $noteValue = $reviewData['review']['note'] ?? null;
+        $noteValue = isset($reviewData['review']['note']) ? floatval($reviewData['review']['note']) : null;
 
         if (!$commentValue || !$noteValue) {
           return new JsonResponse([

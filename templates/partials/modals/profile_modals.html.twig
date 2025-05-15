@@ -156,6 +156,7 @@
             </div>
             <div class="modal-body" id="reviewModalContent">
                 <form action="{{ path('app_review_submit', {'carpoolId': 0}) }}" method="post" id="review-form">
+									<input type="hidden" name="_token" value="{{ csrf_token('review_form') }}">
                     <div class="mb-3">
                         <label for="review_note" class="form-label">Note</label>
                         <select name="review[note]" id="review_note" class="form-select" required>

@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Vérifier si c'est un bouton d'avis (classe show-review-modal)
         if (e.target && e.target.classList.contains('show-review-modal')) {
             const carpoolId = e.target.dataset.carpoolId;
-            console.log('Ouverture de la modal pour le covoiturage:', carpoolId);
+            //console.log('Ouverture de la modal pour le covoiturage:', carpoolId);
             
             // Mettre à jour l'action du formulaire avec l'ID du covoiturage
             const form = document.getElementById('review-form');
             if (form) {
                 form.action = form.action.replace(/\/\d+$/, `/${carpoolId}`);
-                console.log('Action du formulaire mise à jour:', form.action);
+                //console.log('Action du formulaire mise à jour:', form.action);
                 
                 // Réinitialiser le formulaire
                 form.reset();
@@ -79,7 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitButton.innerHTML = 'Envoyer';
                 }
                 
-                alert('Une erreur est survenue lors de l\'envoi du formulaire.');
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-danger';
+                errorMessage.textContent = error.message || 'Une erreur est survenue lors de l\'envoi du formulaire.';
+                
+                const modal = document.getElementById('reviewModalContent');
+                modal.innerHTML = '';
+                modal.appendChild(errorMessage);
             });
         });
     }
@@ -92,13 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Vérifier si c'est un bouton de signalement
         if (e.target && e.target.classList.contains('show-report-modal')) {
             const carpoolId = e.target.dataset.carpoolId;
-            console.log('Ouverture de la modal pour le covoiturage:', carpoolId);
+            //console.log('Ouverture de la modal pour le covoiturage:', carpoolId);
             
             // Mettre à jour l'action du formulaire avec l'ID du covoiturage
             const form = document.getElementById('report-form');
             if (form) {
                 form.action = form.action.replace(/\/\d+$/, `/${carpoolId}`);
-                console.log('Action du formulaire mise à jour:', form.action);
+                //console.log('Action du formulaire mise à jour:', form.action);
                 
                 // Réinitialiser le formulaire
                 form.reset();
@@ -167,7 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitButton.innerHTML = 'Envoyer';
                 }
                 
-                alert('Une erreur est survenue lors de l\'envoi du formulaire.');
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-danger';
+                errorMessage.textContent = error.message || 'Une erreur est survenue lors de l\'envoi du formulaire.';
+                
+                const modal = document.getElementById('reportModalContent');
+                modal.innerHTML = '';
+                modal.appendChild(errorMessage);
             });
         });
     }
