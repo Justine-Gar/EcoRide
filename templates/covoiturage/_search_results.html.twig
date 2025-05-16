@@ -133,23 +133,36 @@
 									<div class="detail-avis border-bottom p-2">
 										<h6>Avis sur le conducteur</h6>
 										<div>
-											{% if carpool.user.recipientReviews is defined and carpool.user.recipientReviews|length > 0 %}
+											{% if carpool.user.recipientReviews is defined %}
+												{% set publishedDriverReviews = [] %}
 												{% for review in carpool.user.recipientReviews %}
-													<div class="{% if not loop.last %}border-bottom{% endif %} pt-3 pb-3">
-														<div>
-															<span>{{ review.sender.firstname }} {{ review.sender.name }}</span>
-															<span>{{ review.note }}</span>
-															<span class="etoile">★</span>
-														</div>
-														<div>
-															<p>{{ review.comment }}</p>
-														</div>
-													</div>
+													{% if review.statut == 'publié' %}
+														{% set publishedDriverReviews = publishedDriverReviews|merge([review]) %}
+													{% endif %}
 												{% endfor %}
-											{% else %}
+												
+												{% if publishedDriverReviews|length > 0 %}
+                					{% for review in publishedDriverReviews %}
+														<div class="{% if not loop.last %}border-bottom{% endif %} pt-3 pb-3">
+															<div>
+																<span>{{ review.sender.firstname }} {{ review.sender.name }}</span>
+																<span>{{ review.note }}</span>
+																<span class="etoile">★</span>
+															</div>
+															<div>
+																<p>{{ review.comment }}</p>
+															</div>
+														</div>
+													{% endfor %}
+												{% else %}
 													<div class="pt-3 pb-3">
-															<p>Aucun avis pour le moment.</p>
+														<p>Aucun avis pour le moment.</p>
 													</div>
+												{% endif %}
+											{% else %}
+												<div class="pt-3 pb-3">
+													<p>Aucun avis pour le moment.</p>
+												</div>
 											{% endif %}
 										</div>
 									</div>
