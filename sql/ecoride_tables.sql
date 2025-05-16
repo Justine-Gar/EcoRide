@@ -18,7 +18,7 @@ CREATE TABLE `users` (
   phone_number VARCHAR(20) NOT NULL,
   profil_picture VARCHAR(255) DEFAULT NULL,
   credits INT DEFAULT 100,
-  rating DECIMAL(3, 1) DEFAULT NULL
+  rating FLOAT DEFAULT NULL
 );
 
 --  Table liaison user_role --
@@ -81,7 +81,7 @@ CREATE TABLE `reviews` (
 );
 
 --  Table préférences_types --
-CREATE TABLE `preferences_types` (
+CREATE TABLE `preference_types` (
   id_preference_types INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
   is_systeme BOOLEAN NOT NULL DEFAULT FALSE,
@@ -92,6 +92,6 @@ CREATE TABLE `preferences_types` (
 CREATE TABLE `user_preferences` (
   id_user_preference INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   id_user INT NOT NULL,
-  id_preference_types INT NOT NULL,
+  id_preference_type INT NOT NULL,
   choose_value VARCHAR(50) NOT NULL
 );

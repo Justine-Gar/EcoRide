@@ -1,6 +1,6 @@
 USE ecoride;
 
--- Insert des rôles --
+
 INSERT INTO `roles` (`name_role`) VALUES 
 ('Administrateur'),
 ('Staff'),
@@ -10,7 +10,7 @@ INSERT INTO `roles` (`name_role`) VALUES
 --  Création d'un administrateur par défaut (mdp: password) --
 --  Création d'un staff par défaut (mdp: password)  --
 --  Création des utilisateurs par defaut (mdp: password)  --
--- Note: Le hash devrait être généré par Symfony en production  --
+
 INSERT INTO `users` (`name`, `firstname`, `email`, `password`, `phone_number`, `profil_picture`, `credits`, `rating`) VALUES
 ('Admin', 'System', 'admin@ecoride.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0600000000', NULL, 100, NULL),
 ('Baptiste', 'Novel', 'staff@ecoride.fr', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0600000001', NULL, 100, NULL),
@@ -22,8 +22,6 @@ INSERT INTO `users` (`name`, `firstname`, `email`, `password`, `phone_number`, `
 ('douk', 'madi', 'madi.douk@gmail.com', '$2y$13$orlX9EQuZNOvHxBBCFknQ.yUEs35KXGvavn4KTA8/WnQAxiUW1u6i', '0100000001', 'images-67d854e8bfe37.jpg', 20, 0),
 ('Bambina', 'Laura', 'laura.bambina@gmail.com', '$2y$13$fcWRrYJ9b3UweUdBFo4hbeuSoKK2Xz5AkL4MkbQVCBGv8nVotarR2', '0000007887', NULL, 24, 0);
 
-
---  Attribution des rôle  s--
 INSERT INTO `user_roles` (`id_user`, `id_role`) VALUES
 (1, 1),
 (2, 2),
@@ -35,16 +33,14 @@ INSERT INTO `user_roles` (`id_user`, `id_role`) VALUES
 (8, 4),
 (9, 4);
 
--- Insert des préférences systemes  --
-INSERT INTO `preferences_types` (`name`, `is_systeme`, `id_user`) VALUES
+
+INSERT INTO `preference_types` (`name`, `is_systeme`, `id_user`) VALUES
 ('non_fumeur', TRUE, NULL),
 ('animaux de compagnie', TRUE, NULL),
 ('discussion', TRUE, NULL),
-('silence', TRUE, NULL);
+('silence', TRUE, NULL),
+('musique', TRUE, NULL);
 
-
-
--- Insert de cars --
 INSERT INTO `cars` (`id_user`, `marque`, `modele`, `color`, `energie`, `nbr_places`, `license_plate`, `first_registration`) VALUES
 (3, 'Renault', 'Clio', 'Rouge', 'essence', 4, 'AB-123-CD', '2020-03-15'),
 (3, 'Telsa', 'Model 3', 'Blanc', 'electrique', 5, 'IJ-789-KL', '2021-11-22'),
@@ -54,12 +50,10 @@ INSERT INTO `cars` (`id_user`, `marque`, `modele`, `color`, `energie`, `nbr_plac
 (5, 'Hyundai', 'Kona', 'Noir', 'electrique', 5, 'XY-901-ZA', '2022-03-10'),
 (7, 'Peugeot', 'teste', 'teste', 'essence', 3, 'kj-0505-et', '2025-05-06');
 
---Insert user preferences --
-INSERT INTO `user_preferences` (`id_user`, `id_preference_types`, `choose_value`) VALUES
+INSERT INTO `user_preferences` (`id_user`, `id_preference_type`, `choose_value`) VALUES
 (5, 5, 'Rock'),
 (8, 1, 'oui');
 
--- Création de carpools --
 INSERT INTO `carpools` (`id_user`, `date_start`, `location_start`, `hour_start`, `date_reach`, `location_reach`, `hour_reach`, `statut`, `credits`, `nbr_places`, `preferences`, `lat_start`, `lng_start`, `lat_reach`, `lng_reach`) VALUES
 (3, '2025-03-18', 'Paris', '07:00:00', '2025-03-18', 'Nantes', '10:30:00', 'terminé', 22, 3, NULL, 48.86, 2.35, 47.22, -1.55),
 (3, '2025-02-08', 'Paris', '07:15:00', '2025-02-08', 'Lille', '09:45:00', 'annulé', 18, 4, NULL, 48.86, 2.35, 50.63, 3.07),
@@ -77,15 +71,12 @@ INSERT INTO `carpools` (`id_user`, `date_start`, `location_start`, `hour_start`,
 (4, '2025-05-15', 'Paris', '17:00:00', '2025-05-15', 'Blois', '19:00:00', 'attente', 5, 4, NULL, 0.00, 0.00, 0.00, 0.00),
 (5, '2025-05-15', 'Paris', '15:00:00', '2025-05-15', 'Blois', '17:00:00', 'attente', 8, 4, NULL, 0.00, 0.00, 0.00, 0.00);
 
---
--- Création de carpools avec passager --
 INSERT INTO `carpool_users` (`id_carpool`, `id_user`) VALUES
 (13, 6),
 (14, 7),
 (14, 8),
 (15, 9);
 
--- Création d'avis pour les utilisataires --
 INSERT INTO `reviews` (`id_user`, `id_sender`, `id_recipient`, `id_carpool`, `comment`, `note`, `statut`) VALUES
 (3, 6, 3, 1, 'Voyage très agréable, conducteur ponctuel et sympathique. La voiture était propre et confortable.', 4.5, 'publié'),
 (3, 7, 3, 3, 'Conducteur professionnel et aimable. Trajet très confortable, je recommande vivement !', 5.0, 'publié'),
