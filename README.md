@@ -1,53 +1,51 @@
-# Projet EcoRide :green_car:
-
-___
+<div align="center">
+  <h1>🌱 Projet EcoRide :car:</h1>
+</div>
 
 ## Description
 EcoRide est une application web de covoiturage avec système de géolocalisation et de réservation. 
 Elle permet aux utilisateurs de proposer des trajets ou de trouver des covoiturages existants, facilitant ainsi une mobilité plus écologique et économique.
 
-##### **Objectif du projet:**
+#####  **Objectif du projet :**
 - Developper une plateforme intuitive et conviviale pour facilité le covoiturage
 - Réduire l'empreinte carbone en favorisant le partage de trajets
 - Créer une communoté basé sur la confiance grâce à un système d'évalusation
 - Fournir une interface de recherche pour trouvé facilement des trajets
 - Mettre en place un système de crédits pour la gestion des paiements
 
-
 ___
 
 
 ## Technologie utilisées
 
-##### **Frontend**
+#### ***Frontend***
 - Bootstrap 5 (Framework CSS)
 - Twig (Moteur de templates)
 - Javascript
 - Leaflet (Bibliothèque JS pour carte intéractive)
 
-##### **Backend**
+#### ***Backend***
 - PHP 8.2
 - Symfony 6.4 (Framework PHP)
 - Doctrine ORM (ORM pour l'accès au données)
 - Nginx (Serveur web)
 
-##### **Base de données**
+#### ***Base de données***
 - MySQL 8.0 5 (Système de gestion de base de donnée relationnelle)
 
-##### **Service ecternes**
+#### ***Service externes***
 - OpenStreetMap (Données cartographique)
 - Nominatim (Service géocodage)
 
 ## Prérequis techniques
 
-##### **Envirronnement de developpement**
+#### ***Envirronnement de developpement***
 - Docker (Conteneurisation)
 - Docker Compose (Orchestration des conteneurs)
 - Git (Gestion de versions)
 
-##### **Dépendances**
+#### ***Dépendances***
 - Composer (Gestion de dépendances PHP)
-
 
 ___
 
@@ -81,28 +79,32 @@ ___
 
   # 3. Insertion des données initiales
   docker-compose exec -T database mysql -uroot -proot < sql/ecoride_insert.sql
-
-  Note importante: Le fichier ecoride_tables.sql contient déjà l'instruction CREATE DATABASE ecoride;, donc il n'est pas nécessaire d'exécuter la commande Symfony doctrine:database:create.
 ```
-
+> [!NOTE]
+> <ins>Note importante</ins>: Le fichier ecoride_tables.sql contient déjà l'instruction CREATE DATABASE ecoride;, donc il n'est pas nécessaire d'exécuter la commande Symfony doctrine:database:create.
 
 ___
 
 
 ## Guide d'utilisation
 
-##### **Accès à l'application**
--L'application est accessible à l'adresse : http://localhost:8080
+#### ***Accès à l'application***
+- L'application est accessible à l'adresse : [http://localhost:8080](http://localhost:8080)
 
-##### **Fonctionnalités principal**
-- Inscription/Connexion
-- Recherche de trajets
-- Projosition de trajet
-- Gestion de profil
-- Système de paiement
-- Système d'avis
+#### ***Fonctionnalités principal***
+- **Inscription/Connexion** : Créez votre compte ou connectez-vous
+- **Recherche de trajets** : Utilisez la recherche pour trouver des trajets
+- **Proposition de trajet** : Proposez vos propres trajets en tant que conducteur
+- **Gestion de profil** : Gérez vos informations personnelles et vos préférences 
+- **Système de paiement** : Gestion des crédits pour les trajets
+- **Système d'avis** : Evaluez les conducteurs après votre trajet
 
-##### **Structure du projet**
+#### ***API et Services***
+- <ins>API de Geolocalisation</ins>: Utilisateion d'OpenStretMap
+- <ins>Service d'authentification</ins>: Gestion des utilisateurs et des rôles
+- <ins>Service de notification</ins>: Alertes pour les réservation et annulations
+
+#### ***Structure du projet***
 ```bash
 Projet_EcoRide/
 ├── config/               # Configuration Symfony
@@ -122,23 +124,17 @@ Projet_EcoRide/
 └── README.mdr            # Documentation du projet
 ```
 
-##### **API et Services**
-- **API de Geolocalisation**: Utilisateion d'OpenStretMap
-- **Service d'authentification**: Gestion des utilisateurs et des rôles
-- **Service de notification**: Alertes pour les réservation et annulations
-
-
 ___
 
 
 ## Développement futurs
 Voici les amélioration prévue pour les prochaines versions du projet:
 
-**Teste automatisés**
+🧪**Teste automatisés**
 - Teste unitaire avec PHPUnit
 - Mise en place de tests fonctionnels pour les principales fonctionnalités
 
-**Autres amélioration prévues**
+🚀**Autres amélioration prévues**
 - Ajustement de la fonctionnalité de recherche de covoiturage
 - Webpack Bundler ajouter pour les script js
 - Amélioration de l'expérience User en notification 
@@ -146,4 +142,6 @@ Voici les amélioration prévue pour les prochaines versions du projet:
 
 ___
 
-*Projet développé dans le cadre d'un examen de fin d'étude*
+<div align="center">
+  *Projet développé dans le cadre d'un examen de fin d'étude*
+</div>
