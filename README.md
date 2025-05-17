@@ -88,8 +88,7 @@ ___
 
 <details>
   Voici un extrait du fichier docker-compose.yml pour référence :<summary>docker-compose.yml</summary>
-
-    ```yml
+  
     version: '3.8'
 
     services:
@@ -137,7 +136,7 @@ ___
           - ecoride_network
 
     # [Suite du fichier omis pour brevité]
-    ```
+    
 </details>
 
 3. Installer les dépendances
