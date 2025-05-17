@@ -16,6 +16,39 @@ Elle permet aux utilisateurs de proposer des trajets ou de trouver des covoitura
 ___
 
 
+## Prérequis système
+
+### Logiciels requis
+- **Docker** : version 20.10.0 ou supérieure
+  - Vérifiez avec `docker --version`
+  - [Instructions d'installation](https://docs.docker.com/get-docker/)
+
+- **Docker Compose** : version 2.0.0 ou supérieure (inclus avec Docker Desktop pour Windows/Mac)
+  - Vérifiez avec `docker-compose --version`
+  - [Instructions d'installation](https://docs.docker.com/compose/install/)
+
+- **Git** : version 2.25.0 ou supérieure
+  - Vérifiez avec `git --version`
+  - [Instructions d'installation](https://git-scm.com/downloads)
+
+### Configuration réseau
+- Les ports suivants doivent être disponibles sur votre machine :
+  - 8080 : Interface web de l'application
+  - 3306 : Base de données MySQL
+  - 9000 : PHP-FPM
+
+### Accès aux services externes
+- Connexion Internet requise pour :
+  - Téléchargement des dépendances Composer
+  - Accès aux tuiles et API d'OpenStreetMap
+
+> [!NOTE]
+> <ins>Note</ins> : Si certains de ces ports sont déjà utilisés sur votre système, vous devrez modifier le fichier `docker-compose.yml` avant de démarrer les conteneurs.
+
+
+___
+
+
 ## Technologie utilisées
 
 #### ***Frontend***
@@ -35,17 +68,6 @@ ___
 
 #### ***Service externes***
 - OpenStreetMap (Données cartographique)
-- Nominatim (Service géocodage)
-
-## Prérequis techniques
-
-#### ***Envirronnement de developpement***
-- Docker (Conteneurisation)
-- Docker Compose (Orchestration des conteneurs)
-- Git (Gestion de versions)
-
-#### ***Dépendances***
-- Composer (Gestion de dépendances PHP)
 
 ___
 
@@ -53,7 +75,7 @@ ___
 ## Installation
 1. Cloner le projet
 ```bash
-  git clone [URL_DU_REPO]
+  git clone https://github.com/Justine-Gar/EcoRide.git
   cd Projet_EcoRide
 ```
 2. Lancer Docker
@@ -63,6 +85,61 @@ ___
   # Démarrer les conteneurs
   docker-compose up -d
 ```
+
+<details>
+  Voici un extrait du fichier docker-compose.yml pour référence :<summary>docker-compose.yml</summary>
+
+    ```yml
+    version: '3.8'
+
+    services:
+      # Serveur web NGINX
+      nginx:
+        image: nginx:1.21-alpine
+        container_name: ecoride_nginx
+        ports:
+          - "8080:80"
+        volumes:
+          - ./public:/var/www/html/public:ro
+          - ./docker/nginx/conf.d:/etc/nginx/conf.d
+        depends_on:
+          - php
+        networks:
+          - ecoride_network
+
+      # Service PHP pour Symfony
+      php:
+        build:
+          context: ./docker/php
+        container_name: ecoride_php
+        volumes:
+          - .:/var/www/html
+        environment:
+          - APP_ENV=dev
+          - DATABASE_URL=mysql://root:root@database:3306/ecoride
+        depends_on:
+          - database
+        networks:
+          - ecoride_network
+
+      # Base de données MySQL
+      database:
+        image: mysql:8.0
+        container_name: ecoride_database
+        ports:
+          - "3306:3306"
+        environment:
+          - MYSQL_ROOT_PASSWORD=root
+          - MYSQL_DATABASE=ecoride
+        volumes:
+          - ecoride_database_data:/var/lib/mysql
+        networks:
+          - ecoride_network
+
+    # [Suite du fichier omis pour brevité]
+    ```
+</details>
+
 3. Installer les dépendances
 ```bash
   # Installation des dépendances Symfony
@@ -83,6 +160,13 @@ ___
 > [!NOTE]
 > <ins>Note importante</ins>: Le fichier ecoride_tables.sql contient déjà l'instruction CREATE DATABASE ecoride;, donc il n'est pas nécessaire d'exécuter la commande Symfony doctrine:database:create.
 
+5. Vérifier l'installation
+```bash
+  #Vérifier que tous les conteneurs sont en cours d'exécution
+  docker-compose ps
+  #Vérifier que le site est accessible
+  curl http://localhost:8080
+```
 ___
 
 
