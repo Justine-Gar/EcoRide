@@ -219,6 +219,7 @@ Voici les amélioration prévue pour les prochaines versions du projet:
 
 🚀**Autres amélioration prévues**
 - Ajustement de la fonctionnalité de recherche de covoiturage
+- Ajout d'une base de données "non relationnelle" : NoSQL
 - Webpack Bundler ajouter pour les script js
 - Amélioration de l'expérience User en notification 
 
