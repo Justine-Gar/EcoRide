@@ -13,6 +13,10 @@ RUN docker-php-ext-install \
     pdo_mysql \
     intl \
     zip
+#installetion de mongodb
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+    
 #installation de composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 #Installation de symfony CLI pour les commande de synfony

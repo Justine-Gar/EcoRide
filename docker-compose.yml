@@ -9,6 +9,7 @@ services:
       - .:/var/www/symfony
     depends_on: #Dépend du service database
       - database
+      - mongoDB
     networks: #Resaux paratgé
       - symfony
     environment:
@@ -63,16 +64,33 @@ services:
         - database
     networks:
         - symfony
-        
+  
+  #Service mongoDB
+  mongoDB:
+    image: mongo:6.0
+    container_name: ecoride_mongodb
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=ecoride_analytics
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - symfony
+
+
 #Définision des réseaux
-
-
 networks:
   symfony:  #réseau isolé pour les conteneurs
-  
+
 #Définition des volumes persistants
 volumes:
   db-data:  #volume pour les données MySQL
+  mongodb_data: #volume pour les données NoSQL
+    driver: local 
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###
