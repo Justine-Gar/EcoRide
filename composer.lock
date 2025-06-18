@@ -1171,16 +1171,16 @@
         },
         {
             "name": "doctrine/mongodb-odm-bundle",
-            "version": "5.3.0",
+            "version": "5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineMongoDBBundle.git",
-                "reference": "e0a1b4342fb5f82abceef0098302b398ec2f67d7"
+                "reference": "af0fe776facb5a1761d2dc55f4902e0c40cd763d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineMongoDBBundle/zipball/e0a1b4342fb5f82abceef0098302b398ec2f67d7",
-                "reference": "e0a1b4342fb5f82abceef0098302b398ec2f67d7",
+                "url": "https://api.github.com/repos/doctrine/DoctrineMongoDBBundle/zipball/af0fe776facb5a1761d2dc55f4902e0c40cd763d",
+                "reference": "af0fe776facb5a1761d2dc55f4902e0c40cd763d",
                 "shasum": ""
             },
             "require": {
@@ -1251,9 +1251,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/DoctrineMongoDBBundle/issues",
-                "source": "https://github.com/doctrine/DoctrineMongoDBBundle/tree/5.3.0"
+                "source": "https://github.com/doctrine/DoctrineMongoDBBundle/tree/5.3.1"
             },
-            "time": "2025-04-08T16:32:24+00:00"
+            "time": "2025-06-12T22:11:53+00:00"
         },
         {
             "name": "doctrine/orm",

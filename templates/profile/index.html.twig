@@ -369,7 +369,8 @@
 									<!--TRAJET EN ATTENTE-->
 									<div class="mt-4">
 										<h6 class="mb-3 text-muted">Trajets en attente</h6>
-										{% if waitingCarpoolAsDriver|length == 0 and waitingCarpoolAsPassenger|length == 0 %}											<div class="text-center py-4">
+										{% if waitingCarpoolAsDriver|length == 0 and waitingCarpoolAsPassenger|length == 0 %}											
+											<div class="text-center py-4">
 												<i class="fas fa-info-circle me-2"></i>Vous n'avez pas de trajet en attente
 											</div>
 										{% else %}

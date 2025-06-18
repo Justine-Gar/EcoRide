@@ -18,14 +18,7 @@ CREATE TABLE `users` (
   phone_number VARCHAR(20) NOT NULL,
   profil_picture VARCHAR(255) DEFAULT NULL,
   credits INT DEFAULT 100,
-  rating FLOAT DEFAULT NULL
-);
-
---  Table liaison user_role --
-CREATE TABLE `user_roles` (
-  id_user INT NOT NULL,
-  id_role INT NOT NULL,
-  PRIMARY KEY (id_user, id_role)
+  rating DECIMAL(3, 1) DEFAULT NULL
 );
 
 --  Table voitures  --
@@ -61,13 +54,6 @@ CREATE TABLE `carpools` (
   lng_reach DECIMAL(11,8) DEFAULT NULL
 );
 
--- Table liaison carpool_users  --
-CREATE TABLE `carpool_users` (
-  id_carpool INT NOT NULL,
-  id_user INT NOT NULL,
-  PRIMARY KEY (id_carpool, id_user)
-);
-
 --  Table avis  --
 CREATE TABLE `reviews` (
   id_review INT NOT NULL PRIMARY KEY AUTO_INCREMENT,  
@@ -94,4 +80,18 @@ CREATE TABLE `user_preferences` (
   id_user INT NOT NULL,
   id_preference_type INT NOT NULL,
   choose_value VARCHAR(50) NOT NULL
+);
+
+--  Table liaison user_role --
+CREATE TABLE `user_roles` (
+  id_user INT NOT NULL,
+  id_role INT NOT NULL,
+  PRIMARY KEY (id_user, id_role)
+);
+
+-- Table liaison carpool_users  --
+CREATE TABLE `carpool_users` (
+  id_carpool INT NOT NULL,
+  id_user INT NOT NULL,
+  PRIMARY KEY (id_carpool, id_user)
 );
