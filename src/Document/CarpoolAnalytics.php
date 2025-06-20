@@ -4,7 +4,7 @@ namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-#[MongoDB/Document(collection: "carpool_analytics")]
+#[MongoDB\Document(collection: "carpool_analytics")]
 class CarpoolAnalytics
 {
   #[MongoDB\Id]
@@ -58,7 +58,7 @@ class CarpoolAnalytics
   }
 
 
-  
+
   public function getCarpoolId(): ?int
   {
     return $this->carpoolId;
