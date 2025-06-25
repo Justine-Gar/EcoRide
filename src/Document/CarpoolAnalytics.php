@@ -29,7 +29,7 @@ class CarpoolAnalytics
   private int $commissionCredits  = 0; //commision plateforme + 4cdts
 
   #[MongoDB\Field(type: "int")]
-  private int $passagerCount = 0;
+  private int $passengerCount = 0;
 
   #[MongoDB\Field(type: "string")]
   private ?string $departLocation = null;
@@ -44,12 +44,12 @@ class CarpoolAnalytics
   private ?\DateTime $createdAt = null;
 
   #[MongoDB\Field(type: "date")]
-  private ?\DateTime $updateAt = null;
+  private ?\DateTime $updatedAt = null;
 
   public function __construct()
   {
     $this->createdAt = new \DateTime();
-    $this->updateAt = new \DateTime();
+    $this->updatedAt = new \DateTime();
   }
 
   public function getId(): ?string

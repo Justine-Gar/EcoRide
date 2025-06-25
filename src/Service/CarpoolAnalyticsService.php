@@ -309,4 +309,43 @@ class CarpoolAnalyticsService
     }
   }
 
+  /**
+   * Migre les données existantes vers MongoDB (à exécuter une seule fois)
+   */
+  public function migrateExistingData(array $carpools): int
+  {
+    $migrated = 0;
+
+    try {
+      foreach ($carpools as $carpool) {
+        // Vérifier si déjà migré
+        $repository = $this->documentManager->getRepository(CarpoolAnalytics::class);
+        $existing = $repository->findOneBy(['carpoolId' => $carpool->getIdCarpool()]);
+
+        if (!$existing) {
+          $analytics = new CarpoolAnalytics();
+          $analytics->setCarpoolId($carpool->getIdCarpool())
+            ->setUserId($carpool->getUser()->getIdUser())
+            ->setAction('created')
+            ->setStatus($carpool->getStatut())
+            ->setCredits($carpool->getCredits())
+            ->setCommissionCredits(4)
+            ->setPassengerCount($carpool->getPassengers()->count())
+            ->setDepartLocation($carpool->getLocationStart())
+            ->setArrivalLocation($carpool->getLocationReach())
+            ->setCarpoolDate($carpool->getDateStart())
+            ->setCreatedAt($carpool->getDateStart()); // Utiliser la date du covoiturage comme date de création
+
+          $this->documentManager->persist($analytics);
+          $migrated++;
+        }
+      }
+
+      $this->documentManager->flush();
+    } catch (\Exception $e) {
+      error_log('Erreur Migration Analytics: ' . $e->getMessage());
+    }
+
+    return $migrated;
+  }
 }
