@@ -669,7 +669,7 @@ class AdminController extends AbstractController
    */
   #[Route('/admin/migrate-carpool-data', name: 'app_admin_migrate_carpool_data')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function migrateCarpoolData(): JsonResponse
+  /*public function migrateCarpoolData(): JsonResponse
   {
     try {
       // Récupérer tous les covoiturages existants
@@ -691,7 +691,7 @@ class AdminController extends AbstractController
         'message' => 'Erreur lors de la migration : ' . $e->getMessage()
       ], 500);
     }
-  }
+  }*/
 
   /**
    * Route pour vérifier l'état des données MongoDB
@@ -704,9 +704,10 @@ class AdminController extends AbstractController
       // Compter les covoiturages dans MySQL
       $mysqlCount = $this->carpoolRepository->count([]);
       
-      // Compter les analytics dans MongoDB
-      $mongoData = $this->carpoolAnalyticsService->getCarpoolsData();
-      $mongoCount = $mongoData['stats']['total'] ?? 0;
+      // Compter les analytics dans MongoDB avec la nouvelle méthode
+      $mongoCount = $this->carpoolAnalyticsService->countAnalytics();
+      
+      error_log('MONGODB STATUS: MySQL=' . $mysqlCount . ', MongoDB=' . $mongoCount);
       
       // Vérifier si migration nécessaire
       $needsMigration = $mongoCount < $mysqlCount;
@@ -720,6 +721,7 @@ class AdminController extends AbstractController
       ]);
       
     } catch (\Exception $e) {
+      error_log('DEBUG MONGODB STATUS ERROR: ' . $e->getMessage());
       return new JsonResponse([
         'success' => false,
         'message' => 'Erreur lors de la vérification MongoDB : ' . $e->getMessage()

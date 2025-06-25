@@ -15,6 +15,19 @@ class CarpoolAnalyticsService
     $this->documentManager = $documentManager;
   }
 
+  /**
+   * Teste la connexion MongoDB
+   */
+  public function testConnection(): bool
+  {
+    try {
+      $this->documentManager->getClient()->selectDatabase('ecoride_analytics')->command(['ping' => 1]);
+      return true;
+    } catch (\Exception $e) {
+      error_log('MongoDB connection failed: ' . $e->getMessage());
+      return false;
+    }
+  }
 
   /**
    * Enregistre la création d'un covoiturage
@@ -22,13 +35,17 @@ class CarpoolAnalyticsService
   public function logCarpoolCreated(Carpool $carpool): void
   {
     try {
+      if (!$this->testConnection()) {
+        return;
+      }
+
       $analytics = new CarpoolAnalytics();
       $analytics->setCarpoolId($carpool->getIdCarpool())
         ->setUserId($carpool->getUser()->getIdUser())
         ->setAction('created')
         ->setStatus($carpool->getStatut())
         ->setCredits($carpool->getCredits())
-        ->setCommissionCredits(4) // Commission fixe de 4 crédits
+        ->setCommissionCredits(4)
         ->setPassengerCount($carpool->getPassengers()->count())
         ->setDepartLocation($carpool->getLocationStart())
         ->setArrivalLocation($carpool->getLocationReach())
@@ -36,10 +53,8 @@ class CarpoolAnalyticsService
 
       $this->documentManager->persist($analytics);
       $this->documentManager->flush();
-
-    } catch (\Exception $e)
-    {
-      error_log('Erreur analytics lors de la création d\'un covoiturage: ' . $e->getMessage());
+    } catch (\Exception $e) {
+      error_log('Erreur lors de la création d\'analytics pour le covoiturage ' . $carpool->getIdCarpool() . ': ' . $e->getMessage());
     }
   }
 
@@ -50,7 +65,10 @@ class CarpoolAnalyticsService
   public function logCarpoolStatusUpdate(Carpool $carpool, string $action): void
   {
     try {
-      // Récupérer l'analytics existant
+      if (!$this->testConnection()) {
+        return;
+      }
+
       $repository = $this->documentManager->getRepository(CarpoolAnalytics::class);
       $analytics = $repository->findOneBy(['carpoolId' => $carpool->getIdCarpool()]);
 
@@ -59,7 +77,6 @@ class CarpoolAnalyticsService
           ->setStatus($carpool->getStatut())
           ->setPassengerCount($carpool->getPassengers()->count());
       } else {
-        // Si pas trouvé, créer un nouveau (cas de fallback)
         $analytics = new CarpoolAnalytics();
         $analytics->setCarpoolId($carpool->getIdCarpool())
           ->setUserId($carpool->getUser()->getIdUser())
@@ -77,87 +94,69 @@ class CarpoolAnalyticsService
 
       $this->documentManager->flush();
     } catch (\Exception $e) {
-      error_log('Erreur analytics lors de l\'updates d\'un covoiturage: ' . $e->getMessage());
+      error_log('Erreur lors de la mise à jour d\'analytics pour le covoiturage ' . $carpool->getIdCarpool() . ' (action: ' . $action . '): ' . $e->getMessage());
     }
   }
 
 
   /**
-   * Récupération des stats des covoiturage des 30 derniers jours
+   * Compte les analytics
+   */
+  public function countAnalytics(): int
+  {
+    try {
+      if (!$this->testConnection()) {
+        return 0;
+      }
+      
+      $collection = $this->documentManager->getDocumentCollection(CarpoolAnalytics::class);
+      return $collection->countDocuments([]);
+    } catch (\Exception $e) {
+      error_log('Erreur lors du comptage des analytics: ' . $e->getMessage());
+      return 0;
+    }
+  }
+
+  /**
+   * Récupération des stats des covoiturage par mois
    */
   public function getCarpoolsData(): array
   {
     try {
-      $collection = $this->documentManager->getDocumentCollection(CarpoolAnalytics::class);
-
-      // Date d'aujourd'hui
-      $today = new \DateTime('now');
-      $today->setTime(23, 59, 59);
-
-      // Date d'il y a 30 jours
-      $thirtyDaysAgo = (new \DateTime('now'))->modify('-29 days');
-      $thirtyDaysAgo->setTime(0, 0, 0);
-
-      // Initialisation du tableau avec toutes les dates et 0 covoiturage
-      $dates = [];
-      $carpoolsPerDay = [];
-
-      for ($i = 0; $i < 30; $i++) {
-        $date = clone $thirtyDaysAgo;
-        $date->modify("+$i days");
-        $dateStr = $date->format('Y-m-d');
-        $dates[] = $dateStr;
-        $carpoolsPerDay[$dateStr] = 0;
+      if (!$this->testConnection()) {
+        throw new \Exception('MongoDB non disponible');
       }
 
-      // Agrégation MongoDB pour compter les covoiturages créés par jour
+      $collection = $this->documentManager->getDocumentCollection(CarpoolAnalytics::class);
+      
+      // Covoiturages par mois
       $pipeline = [
         [
           '$match' => [
-            'action' => 'created',
-            'createdAt' => [
-              '$gte' => $thirtyDaysAgo,
-              '$lte' => $today
-            ]
+            'action' => 'created'
           ]
         ],
         [
           '$group' => [
             '_id' => [
-              'year' => ['$year' => '$createdAt'],
-              'month' => ['$month' => '$createdAt'],
-              'day' => ['$dayOfMonth' => '$createdAt']
+              'year' => ['$year' => '$carpoolDate'],
+              'month' => ['$month' => '$carpoolDate']
             ],
             'count' => ['$sum' => 1]
+          ]
+        ],
+        [
+          '$sort' => [
+            '_id.year' => 1,
+            '_id.month' => 1
           ]
         ]
       ];
 
       $results = $collection->aggregate($pipeline)->toArray();
 
-      // Remplir le tableau avec les vraies données
-      foreach ($results as $result) {
-        $date = sprintf(
-          '%04d-%02d-%02d',
-          $result['_id']['year'],
-          $result['_id']['month'],
-          $result['_id']['day']
-        );
-        if (isset($carpoolsPerDay[$date])) {
-          $carpoolsPerDay[$date] = $result['count'];
-        }
-      }
-
       // Statistiques par statut
       $statusPipeline = [
-        [
-          '$match' => [
-            'createdAt' => [
-              '$gte' => $thirtyDaysAgo,
-              '$lte' => $today
-            ]
-          ]
-        ],
         [
           '$group' => [
             '_id' => '$status',
@@ -181,20 +180,32 @@ class CarpoolAnalyticsService
         }
       }
 
-      // Conversion pour Chart.js
-      $labels = array_map(function ($date) {
-        return (new \DateTime($date))->format('d/m');
-      }, $dates);
+      // Formatage des données pour le graphique
+      $labels = [];
+      $data = [];
+      
+      $moisNoms = [
+        1 => 'Jan', 2 => 'Fév', 3 => 'Mar', 4 => 'Avr', 
+        5 => 'Mai', 6 => 'Juin', 7 => 'Juil', 8 => 'Août',
+        9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc'
+      ];
 
-      $data = array_values($carpoolsPerDay);
+      foreach ($results as $result) {
+        $moisNom = $moisNoms[$result['_id']['month']];
+        $annee = $result['_id']['year'];
+        $label = $moisNom . ' ' . $annee;
+        
+        $labels[] = $label;
+        $data[] = $result['count'];
+      }
+
       $totalCarpools = array_sum($data);
-      $averageCarpools = count($data) > 0 ? $totalCarpools / count($data) : 0;
 
       return [
         'labels' => $labels,
         'datasets' => [
           [
-            'label' => 'Covoiturages créés',
+            'label' => 'Covoiturages créés par mois',
             'data' => $data,
             'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
             'borderColor' => 'rgba(54, 162, 235, 1)',
@@ -203,7 +214,7 @@ class CarpoolAnalyticsService
         ],
         'stats' => [
           'total' => $totalCarpools,
-          'average' => round($averageCarpools, 1),
+          'average' => count($data) > 0 ? round($totalCarpools / count($data), 1) : 0,
           'byStatus' => $statusCounts
         ]
       ];
@@ -214,85 +225,67 @@ class CarpoolAnalyticsService
 
 
   /**
-   * Récupération des stats des crédits des 30 derniers jours
+   * Récupération des stats des crédits par mois
    */
   public function getCreditsData(): array
   {
     try {
-      $collection = $this->documentManager->getDocumentCollection(CarpoolAnalytics::class);
-
-      // Date d'aujourd'hui
-      $today = new \DateTime('now');
-      $today->setTime(23, 59, 59);
-
-      // Date d'il y a 30 jours
-      $thirtyDaysAgo = (new \DateTime('now'))->modify('-29 days');
-      $thirtyDaysAgo->setTime(0, 0, 0);
-
-      // Initialisation du tableau avec toutes les dates et 0 crédit
-      $dates = [];
-      $creditsByDay = [];
-
-      for ($i = 0; $i < 30; $i++) {
-        $date = clone $thirtyDaysAgo;
-        $date->modify("+$i days");
-        $dateStr = $date->format('Y-m-d');
-        $dates[] = $dateStr;
-        $creditsByDay[$dateStr] = 0;
+      if (!$this->testConnection()) {
+        throw new \Exception('MongoDB non disponible');
       }
 
-      // Agrégation MongoDB pour calculer les crédits gagnés par jour (commission)
+      $collection = $this->documentManager->getDocumentCollection(CarpoolAnalytics::class);
+
       $pipeline = [
         [
           '$match' => [
-            'action' => 'created',
-            'createdAt' => [
-              '$gte' => $thirtyDaysAgo,
-              '$lte' => $today
-            ]
+            'action' => 'created'
           ]
         ],
         [
           '$group' => [
             '_id' => [
-              'year' => ['$year' => '$createdAt'],
-              'month' => ['$month' => '$createdAt'],
-              'day' => ['$dayOfMonth' => '$createdAt']
+              'year' => ['$year' => '$carpoolDate'],
+              'month' => ['$month' => '$carpoolDate']
             ],
             'totalCredits' => ['$sum' => '$commissionCredits']
+          ]
+        ],
+        [
+          '$sort' => [
+            '_id.year' => 1,
+            '_id.month' => 1
           ]
         ]
       ];
 
       $results = $collection->aggregate($pipeline)->toArray();
 
-      // Remplir le tableau avec les vraies données
+      $labels = [];
+      $data = [];
+      
+      $moisNoms = [
+        1 => 'Jan', 2 => 'Fév', 3 => 'Mar', 4 => 'Avr', 
+        5 => 'Mai', 6 => 'Juin', 7 => 'Juil', 8 => 'Août',
+        9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc'
+      ];
+      
       foreach ($results as $result) {
-        $date = sprintf(
-          '%04d-%02d-%02d',
-          $result['_id']['year'],
-          $result['_id']['month'],
-          $result['_id']['day']
-        );
-        if (isset($creditsByDay[$date])) {
-          $creditsByDay[$date] = $result['totalCredits'];
-        }
+        $moisNom = $moisNoms[$result['_id']['month']];
+        $annee = $result['_id']['year'];
+        $label = $moisNom . ' ' . $annee;
+        
+        $labels[] = $label;
+        $data[] = $result['totalCredits'];
       }
 
-      // Conversion pour Chart.js
-      $labels = array_map(function ($date) {
-        return (new \DateTime($date))->format('d/m');
-      }, $dates);
-
-      $data = array_values($creditsByDay);
       $totalCredits = array_sum($data);
-      $averageCredits = count($data) > 0 ? $totalCredits / count($data) : 0;
 
       return [
         'labels' => $labels,
         'datasets' => [
           [
-            'label' => 'Crédits reçus',
+            'label' => 'Crédits de commission par mois',
             'data' => $data,
             'backgroundColor' => 'rgba(75, 192, 192, 0.6)',
             'borderColor' => 'rgba(75, 192, 192, 1)',
@@ -301,7 +294,7 @@ class CarpoolAnalyticsService
         ],
         'stats' => [
           'total' => $totalCredits,
-          'average' => round($averageCredits, 1)
+          'average' => count($data) > 0 ? round($totalCredits / count($data), 1) : 0
         ]
       ];
     } catch (\Exception $e) {
@@ -309,20 +302,32 @@ class CarpoolAnalyticsService
     }
   }
 
+  public function getDocumentManager(): DocumentManager
+  {
+    return $this->documentManager;
+  }
   /**
    * Migre les données existantes vers MongoDB (à exécuter une seule fois)
    */
-  public function migrateExistingData(array $carpools): int
+  /*public function migrateExistingData(array $carpools): int
   {
+
     $migrated = 0;
+    $errors = [];
+    error_log('MIGRATION START: ' . count($carpools) . ' covoiturages à migrer');
 
     try {
       foreach ($carpools as $carpool) {
+        try {
         // Vérifier si déjà migré
-        $repository = $this->documentManager->getRepository(CarpoolAnalytics::class);
-        $existing = $repository->findOneBy(['carpoolId' => $carpool->getIdCarpool()]);
+          $repository = $this->documentManager->getRepository(CarpoolAnalytics::class);
+          $existing = $repository->findOneBy(['carpoolId' => $carpool->getIdCarpool()]);
+          if ($existing) {
+              error_log('MIGRATION SKIP: Covoiturage ' . $carpool->getIdCarpool() . ' déjà migré');
+              continue;
+          }
+          error_log('MIGRATION PROCESS: Covoiturage ' . $carpool->getIdCarpool());
 
-        if (!$existing) {
           $analytics = new CarpoolAnalytics();
           $analytics->setCarpoolId($carpool->getIdCarpool())
             ->setUserId($carpool->getUser()->getIdUser())
@@ -337,15 +342,35 @@ class CarpoolAnalyticsService
             ->setCreatedAt($carpool->getDateStart()); // Utiliser la date du covoiturage comme date de création
 
           $this->documentManager->persist($analytics);
+          error_log('MIGRATION PERSIST: Covoiturage ' . $carpool->getIdCarpool() . ' persisté');
+          
           $migrated++;
+        } catch (\Exception $e) {
+          $error = 'Erreur migration covoiturage ' . $carpool->getIdCarpool() . ': ' . $e->getMessage();
+          error_log('MIGRATION ERROR: ' . $error);
+          $errors[] = $error;
         }
       }
 
-      $this->documentManager->flush();
+      // FLUSH EN UNE SEULE FOIS
+      if ($migrated > 0) {
+        error_log('MIGRATION FLUSH: Tentative de flush de ' . $migrated . ' éléments');
+        $this->documentManager->flush();
+        error_log('MIGRATION SUCCESS: Flush réussi pour ' . $migrated . ' éléments');
+      } else {
+        error_log('MIGRATION WARNING: Aucun élément à flusher');
+      }
+
     } catch (\Exception $e) {
-      error_log('Erreur Migration Analytics: ' . $e->getMessage());
+      error_log('MIGRATION FATAL ERROR: ' . $e->getMessage());
+      throw new \Exception('Erreur Migration Analytics: ' . $e->getMessage());
     }
 
+    if (!empty($errors)) {
+      error_log('MIGRATION ERRORS: ' . implode(', ', $errors));
+    }
+
+    error_log('MIGRATION END: ' . $migrated . ' covoiturages migrés avec succès');
     return $migrated;
-  }
+  }*/
 }

@@ -38,54 +38,13 @@
 			</div>
 		</div>
 
-		<!-- ===== AJOUT : Section MongoDB ===== -->
-		<div class="row m-3">
-			<div class="col-12">
-				<div class="card shadow mb-4">
-					<div class="card-header py-3">
-						<h6 class="m-0 text-title">
-							<i class="fas fa-database me-2"></i>Gestion MongoDB Analytics
-						</h6>
-					</div>
-					<div class="card-body">
-						<div class="row">
-							<div class="col-md-8">
-								<h6>Migration des données vers MongoDB</h6>
-								<p class="text-muted small">
-									MongoDB est utilisé pour les analytics avancés. Cette migration synchronise vos données existantes pour améliorer les performances des graphiques.
-								</p>
-								
-								<!-- Status de la migration -->
-								<div id="migration-status" class="alert alert-info">
-									<div class="d-flex align-items-center">
-										<div class="spinner-border spinner-border-sm me-2" role="status">
-											<span class="visually-hidden">Vérification...</span>
-										</div>
-										Vérification du statut MongoDB...
-									</div>
-								</div>
-							</div>
-							<div class="col-md-4 text-end">
-								<button id="check-mongodb-btn" class="btn btn-outline-info me-2">
-									<i class="fas fa-sync-alt"></i> Vérifier
-								</button>
-								<button id="migrate-btn" class="btn btn-primary" disabled>
-									<i class="fas fa-database"></i> Migrer
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- ===== FIN AJOUT ===== -->
 
 		<!-- Charts -->
 		<div class="row m-3">
 			<div class="col-xl-6">
 				<div class="card shadow mb-4">
 					<div class="card-header py-3">
-						<h6 class="m-0 text-title">Nombre de covoiturages par jour</h6>
+						<h6 class="m-0 text-title">Nombre de covoiturages par mois</h6>
 					</div>
 					<div class="card-body">
 						<div class="chart-area">
@@ -97,7 +56,7 @@
 			<div class="col-xl-6">
 				<div class="card shadow mb-4">
 					<div class="card-header py-3">
-						<h6 class="m-0 text-title">Crédits gagnés par jour</h6>
+						<h6 class="m-0 text-title">Crédits gagnés par mois</h6>
 					</div>
 					<div class="card-body">
 						<div class="chart-area">
@@ -248,5 +207,5 @@
 	});
 	</script>
 	<!-- ===== FIN AJOUT ===== -->
-	
+
 {% endblock %}
