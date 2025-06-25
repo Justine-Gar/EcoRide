@@ -14,6 +14,7 @@ use App\Repository\PreferenceTypeRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserPreferenceRepository;
 use App\Service\FileUploader;           // Recupere les images uploader
+use App\Service\CarpoolAnalyticsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -34,6 +35,7 @@ class ProfileController extends AbstractController
 {
     private $requestStack;
     private $security;
+    private CarpoolAnalyticsService $carpoolAnalyticsService;
 
     // Injection de dépendance 
     public function __construct(
@@ -43,10 +45,12 @@ class ProfileController extends AbstractController
         private ReviewRepository $reviewRepository,
         private CarpoolRepository $carpoolRepository,
         RequestStack $requestStack,
-        Security $security
+        Security $security,
+        CarpoolAnalyticsService $carpoolAnalyticsService
     ) {
         $this->security = $security;
         $this->requestStack = $requestStack;
+        $this->carpoolAnalyticsService = $carpoolAnalyticsService;
     }
 
     // Route pour afficher le profil utilisateur
@@ -336,6 +340,9 @@ class ProfileController extends AbstractController
                 $carpool->setPreferences(json_encode($selectedPreferences));
                 $carpoolRepository->save($carpool, true);
             }
+
+            //Logger dans MongoDB
+            $this->carpoolAnalyticsService->logCarpoolCreated($carpool);
 
             $this->addFlash('success', 'Votre covoiturage a été créé avec succès ! Une commission de 4 crédits a été prélevée pour la plateforme.');
 
