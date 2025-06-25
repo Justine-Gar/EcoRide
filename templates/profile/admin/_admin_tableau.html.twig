@@ -38,6 +38,48 @@
 			</div>
 		</div>
 
+		<!-- ===== AJOUT : Section MongoDB ===== -->
+		<div class="row m-3">
+			<div class="col-12">
+				<div class="card shadow mb-4">
+					<div class="card-header py-3">
+						<h6 class="m-0 text-title">
+							<i class="fas fa-database me-2"></i>Gestion MongoDB Analytics
+						</h6>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-8">
+								<h6>Migration des données vers MongoDB</h6>
+								<p class="text-muted small">
+									MongoDB est utilisé pour les analytics avancés. Cette migration synchronise vos données existantes pour améliorer les performances des graphiques.
+								</p>
+								
+								<!-- Status de la migration -->
+								<div id="migration-status" class="alert alert-info">
+									<div class="d-flex align-items-center">
+										<div class="spinner-border spinner-border-sm me-2" role="status">
+											<span class="visually-hidden">Vérification...</span>
+										</div>
+										Vérification du statut MongoDB...
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4 text-end">
+								<button id="check-mongodb-btn" class="btn btn-outline-info me-2">
+									<i class="fas fa-sync-alt"></i> Vérifier
+								</button>
+								<button id="migrate-btn" class="btn btn-primary" disabled>
+									<i class="fas fa-database"></i> Migrer
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- ===== FIN AJOUT ===== -->
+
 		<!-- Charts -->
 		<div class="row m-3">
 			<div class="col-xl-6">
@@ -71,5 +113,140 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script src="{{ asset('assets/js/graphicAdmin.js') }}"></script>
+	<script src="{{ asset('assets/js/graphicAdmin.js') }}"></script>
+	
+	<!-- ===== AJOUT : Script MongoDB ===== -->
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const checkBtn = document.getElementById('check-mongodb-btn');
+		const migrateBtn = document.getElementById('migrate-btn');
+		const statusDiv = document.getElementById('migration-status');
+
+		// Vérifier le statut automatiquement au chargement
+		checkMongoDBStatus();
+
+		// Événement pour vérifier le statut
+		checkBtn.addEventListener('click', checkMongoDBStatus);
+
+		// Événement pour migrer
+		migrateBtn.addEventListener('click', function() {
+			if (confirm('Êtes-vous sûr de vouloir migrer les données vers MongoDB ? Cette opération peut prendre quelques minutes.')) {
+				migrateCarpoolData();
+			}
+		});
+
+		function checkMongoDBStatus() {
+			checkBtn.disabled = true;
+			checkBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Vérification...';
+
+			fetch('/admin/mongodb-status')
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						updateStatusDisplay(data);
+					} else {
+						showError('Erreur lors de la vérification : ' + data.message);
+					}
+				})
+				.catch(error => {
+					showError('Erreur de connexion : ' + error.message);
+				})
+				.finally(() => {
+					checkBtn.disabled = false;
+					checkBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Vérifier';
+				});
+		}
+
+		function migrateCarpoolData() {
+			migrateBtn.disabled = true;
+			migrateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Migration...';
+
+			fetch('/admin/migrate-carpool-data')
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						statusDiv.className = 'alert alert-success';
+						statusDiv.innerHTML = `
+							<div class="d-flex align-items-center">
+								<i class="fas fa-check-circle me-2"></i>
+								<div>
+									<strong>Migration terminée !</strong><br>
+									<small>${data.migrated} covoiturages migrés sur ${data.total} total</small>
+								</div>
+							</div>
+						`;
+						migrateBtn.disabled = true;
+						migrateBtn.innerHTML = '<i class="fas fa-check"></i> Migré';
+						
+						// Recharger les graphiques
+						if (typeof fetchCarpoolsData === 'function') {
+							fetchCarpoolsData();
+						}
+						if (typeof fetchCreditsData === 'function') {
+							fetchCreditsData();
+						}
+					} else {
+						showError('Erreur lors de la migration : ' + data.message);
+					}
+				})
+				.catch(error => {
+					showError('Erreur de connexion : ' + error.message);
+				})
+				.finally(() => {
+					migrateBtn.disabled = false;
+					migrateBtn.innerHTML = '<i class="fas fa-database"></i> Migrer';
+				});
+		}
+
+		function updateStatusDisplay(data) {
+			const percentage = data.migration_percentage || 0;
+			
+			if (data.needs_migration) {
+				statusDiv.className = 'alert alert-warning';
+				statusDiv.innerHTML = `
+					<div class="d-flex justify-content-between align-items-center">
+						<div>
+							<i class="fas fa-exclamation-triangle me-2"></i>
+							<strong>Migration recommandée</strong><br>
+							<small>MySQL: ${data.mysql_carpools} covoiturages | MongoDB: ${data.mongodb_analytics} analytics (${percentage}%)</small>
+						</div>
+						<div class="progress" style="width: 100px; height: 20px;">
+							<div class="progress-bar bg-warning" style="width: ${percentage}%"></div>
+						</div>
+					</div>
+				`;
+				migrateBtn.disabled = false;
+			} else {
+				statusDiv.className = 'alert alert-success';
+				statusDiv.innerHTML = `
+					<div class="d-flex align-items-center">
+						<i class="fas fa-check-circle me-2"></i>
+						<div>
+							<strong>MongoDB synchronisé !</strong><br>
+							<small>${data.mongodb_analytics} analytics disponibles</small>
+						</div>
+					</div>
+				`;
+				migrateBtn.disabled = true;
+				migrateBtn.innerHTML = '<i class="fas fa-check"></i> À jour';
+			}
+		}
+
+		function showError(message) {
+			statusDiv.className = 'alert alert-danger';
+			statusDiv.innerHTML = `
+				<div class="d-flex align-items-center">
+					<i class="fas fa-exclamation-circle me-2"></i>
+					<div>
+						<strong>Erreur</strong><br>
+						<small>${message}</small>
+					</div>
+				</div>
+			`;
+			migrateBtn.disabled = true;
+		}
+	});
+	</script>
+	<!-- ===== FIN AJOUT ===== -->
+	
 {% endblock %}
