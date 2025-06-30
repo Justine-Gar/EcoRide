@@ -664,36 +664,6 @@ class AdminController extends AbstractController
   }
 
   /**
-   * Route pour migrer les données existantes vers MongoDB
-   * (À exécuter une seule fois via l'interface admin)
-   */
-  /*#[Route('/admin/migrate-carpool-data', name: 'app_admin_migrate_carpool_data')]
-  #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function migrateCarpoolData(): JsonResponse
-  {
-    try {
-      // Récupérer tous les covoiturages existants
-      $carpools = $this->carpoolRepository->findAll();
-      
-      // Migrer vers MongoDB
-      $migrated = $this->carpoolAnalyticsService->migrateExistingData($carpools);
-      
-      return new JsonResponse([
-        'success' => true,
-        'message' => "Migration terminée : {$migrated} covoiturages migrés vers MongoDB",
-        'migrated' => $migrated,
-        'total' => count($carpools)
-      ]);
-      
-    } catch (\Exception $e) {
-      return new JsonResponse([
-        'success' => false,
-        'message' => 'Erreur lors de la migration : ' . $e->getMessage()
-      ], 500);
-    }
-  }*/
-
-  /**
    * Route pour vérifier l'état des données MongoDB
    */
   #[Route('/admin/mongodb-status', name: 'app_admin_mongodb_status')]
@@ -729,26 +699,4 @@ class AdminController extends AbstractController
     }
   }
 
-  // #[Route('/admin/test-mongodb', name: 'app_admin_test_mongodb')]
-  // public function testMongoDB(): JsonResponse
-  // {
-  //     try {
-  //         // Test simple de connexion
-  //         $result = $this->carpoolAnalyticsService->testConnection();
-          
-  //         // Test de comptage
-  //         $count = $this->carpoolAnalyticsService->countAnalytics();
-          
-  //         return new JsonResponse([
-  //             'connection' => $result,
-  //             'count' => $count,
-  //             'message' => 'MongoDB OK'
-  //         ]);
-  //     } catch (\Exception $e) {
-  //         return new JsonResponse([
-  //             'error' => true,
-  //             'message' => $e->getMessage()
-  //         ], 500);
-  //     }
-  // }
 }

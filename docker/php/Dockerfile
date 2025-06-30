@@ -14,7 +14,10 @@ RUN docker-php-ext-install \
     intl \
     zip
 #installetion de mongodb
-RUN pecl install mongodb \
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    libsasl2-dev \
+    && pecl install mongodb \
     && docker-php-ext-enable mongodb
     
 #installation de composer

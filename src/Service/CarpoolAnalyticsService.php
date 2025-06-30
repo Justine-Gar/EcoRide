@@ -21,10 +21,18 @@ class CarpoolAnalyticsService
   public function testConnection(): bool
   {
     try {
-      $this->documentManager->getClient()->selectDatabase('ecoride_analytics')->command(['ping' => 1]);
+      error_log('TEST: Tentative de connexion MongoDB...');
+      error_log('URL: ' . $_ENV['MONGODB_URL'] ?? 'URL non définie');
+        
+      $result = $this->documentManager->getClient()
+          ->selectDatabase('ecoride_analytics')
+          ->command(['ping' => 1]);
+        
+      error_log('MongoDB ping success: ' . json_encode($result->toArray()));
       return true;
     } catch (\Exception $e) {
       error_log('MongoDB connection failed: ' . $e->getMessage());
+      error_log('Stack trace: ' . $e->getTraceAsString());
       return false;
     }
   }
@@ -131,11 +139,13 @@ class CarpoolAnalyticsService
       
       // Covoiturages par mois
       $pipeline = [
+        // Étape 1 : Filtrage
         [
           '$match' => [
             'action' => 'created'
           ]
         ],
+        // Étape 2 : Groupement par année/mois
         [
           '$group' => [
             '_id' => [
@@ -145,6 +155,7 @@ class CarpoolAnalyticsService
             'count' => ['$sum' => 1]
           ]
         ],
+        // Étape 3 : Tri
         [
           '$sort' => [
             '_id.year' => 1,
@@ -309,7 +320,7 @@ class CarpoolAnalyticsService
   /**
    * Migre les données existantes vers MongoDB (à exécuter une seule fois)
    */
-  /*public function migrateExistingData(array $carpools): int
+  public function migrateExistingData(array $carpools): int
   {
 
     $migrated = 0;
@@ -372,5 +383,5 @@ class CarpoolAnalyticsService
 
     error_log('MIGRATION END: ' . $migrated . ' covoiturages migrés avec succès');
     return $migrated;
-  }*/
+  }
 }
