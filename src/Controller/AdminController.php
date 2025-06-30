@@ -667,9 +667,9 @@ class AdminController extends AbstractController
    * Route pour migrer les données existantes vers MongoDB
    * (À exécuter une seule fois via l'interface admin)
    */
-  #[Route('/admin/migrate-carpool-data', name: 'app_admin_migrate_carpool_data')]
+  /*#[Route('/admin/migrate-carpool-data', name: 'app_admin_migrate_carpool_data')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
-  /*public function migrateCarpoolData(): JsonResponse
+  public function migrateCarpoolData(): JsonResponse
   {
     try {
       // Récupérer tous les covoiturages existants
@@ -728,4 +728,27 @@ class AdminController extends AbstractController
       ], 500);
     }
   }
+
+  // #[Route('/admin/test-mongodb', name: 'app_admin_test_mongodb')]
+  // public function testMongoDB(): JsonResponse
+  // {
+  //     try {
+  //         // Test simple de connexion
+  //         $result = $this->carpoolAnalyticsService->testConnection();
+          
+  //         // Test de comptage
+  //         $count = $this->carpoolAnalyticsService->countAnalytics();
+          
+  //         return new JsonResponse([
+  //             'connection' => $result,
+  //             'count' => $count,
+  //             'message' => 'MongoDB OK'
+  //         ]);
+  //     } catch (\Exception $e) {
+  //         return new JsonResponse([
+  //             'error' => true,
+  //             'message' => $e->getMessage()
+  //         ], 500);
+  //     }
+  // }
 }
