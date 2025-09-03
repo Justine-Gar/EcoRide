@@ -16,39 +16,6 @@ Elle permet aux utilisateurs de proposer des trajets ou de trouver des covoitura
 ___
 
 
-## Prérequis système
-
-### Logiciels requis
-- **Docker** : version 20.10.0 ou supérieure
-  - Vérifiez avec `docker --version`
-  - [Instructions d'installation](https://docs.docker.com/get-docker/)
-
-- **Docker Compose** : version 2.0.0 ou supérieure (inclus avec Docker Desktop pour Windows/Mac)
-  - Vérifiez avec `docker-compose --version`
-  - [Instructions d'installation](https://docs.docker.com/compose/install/)
-
-- **Git** : version 2.25.0 ou supérieure
-  - Vérifiez avec `git --version`
-  - [Instructions d'installation](https://git-scm.com/downloads)
-
-### Configuration réseau
-- Les ports suivants doivent être disponibles sur votre machine :
-  - 8080 : Interface web de l'application
-  - 3306 : Base de données MySQL
-  - 9000 : PHP-FPM
-
-### Accès aux services externes
-- Connexion Internet requise pour :
-  - Téléchargement des dépendances Composer
-  - Accès aux tuiles et API d'OpenStreetMap
-
-> [!NOTE]
-> <ins>Note</ins> : Si certains de ces ports sont déjà utilisés sur votre système, vous devrez modifier le fichier `docker-compose.yml` avant de démarrer les conteneurs.
-
-
-___
-
-
 ## Technologie utilisées
 
 #### ***Frontend***
@@ -68,6 +35,17 @@ ___
 
 #### ***Service externes***
 - OpenStreetMap (Données cartographique)
+- Nominatim (Service géocodage)
+
+## Prérequis techniques
+
+#### ***Envirronnement de developpement***
+- Docker (Conteneurisation)
+- Docker Compose (Orchestration des conteneurs)
+- Git (Gestion de versions)
+
+#### ***Dépendances***
+- Composer (Gestion de dépendances PHP)
 
 ___
 
@@ -75,7 +53,7 @@ ___
 ## Installation
 1. Cloner le projet
 ```bash
-  git clone https://github.com/Justine-Gar/EcoRide.git
+  git clone [URL_DU_REPO]
   cd Projet_EcoRide
 ```
 2. Lancer Docker
@@ -85,6 +63,7 @@ ___
   # Démarrer les conteneurs
   docker-compose up -d
 ```
+<<<<<<< HEAD
 
 <details>
   Voici un extrait du fichier docker-compose.yml pour référence :<summary>docker-compose.yml</summary>
@@ -139,6 +118,8 @@ ___
     
 </details>
 
+=======
+>>>>>>> dev
 3. Installer les dépendances
 ```bash
   # Installation des dépendances Symfony
@@ -159,13 +140,6 @@ ___
 > [!NOTE]
 > <ins>Note importante</ins>: Le fichier ecoride_tables.sql contient déjà l'instruction CREATE DATABASE ecoride;, donc il n'est pas nécessaire d'exécuter la commande Symfony doctrine:database:create.
 
-5. Vérifier l'installation
-```bash
-  #Vérifier que tous les conteneurs sont en cours d'exécution
-  docker-compose ps
-  #Vérifier que le site est accessible
-  curl http://localhost:8080
-```
 ___
 
 

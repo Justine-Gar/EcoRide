@@ -10,6 +10,7 @@ use App\Form\CarpoolType;
 use App\Repository\CarpoolRepository;
 use App\Repository\UserPreferenceRepository;
 use App\Repository\PreferenceTypeRepository;
+use App\Service\CarpoolAnalyticsService; 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,11 +25,13 @@ class CovoiturageController extends AbstractController
 {
   private $security;
   private $entityManager;
+  private CarpoolAnalyticsService $carpoolAnalyticsService;
 
-  public function __construct(Security $security, EntityManagerInterface $entityManager)
+  public function __construct(Security $security, EntityManagerInterface $entityManager, CarpoolAnalyticsService $carpoolAnalyticsService)
   {
     $this->security = $security;
     $this->entityManager = $entityManager;
+    $this->carpoolAnalyticsService = $carpoolAnalyticsService;
   }
 
   #[Route('/', name: 'app_covoiturage')]
@@ -445,8 +448,9 @@ class CovoiturageController extends AbstractController
     
     return $this->redirectToRoute('app_profile');
   }
+  
 
-
+// ====== Vie d'un covoiturage ====== //
   
   //Route pour démarer un covoiturage
   #[Route('/{id}/start', name: 'app_covoiturage_start', requirements: ['id' => '\d+'])]
@@ -470,6 +474,10 @@ class CovoiturageController extends AbstractController
 
     try {
       $carpoolRepository->startCarpool($carpool);
+
+      //changement statut dans mongoDB
+      $this->carpoolAnalyticsService->logCarpoolStatusUpdate($carpool, 'started');
+
       $this->addFlash('success', 'le covoiturage a été démarré avec succes.');
     } catch (\Exception $e) {
       $this->addFlash('error', $e->getMessage());
@@ -499,6 +507,10 @@ class CovoiturageController extends AbstractController
         }
 
         $carpoolRepository->cancelCarpool($carpool);
+
+        //changement de statut dans mongoDB
+        $this->carpoolAnalyticsService->logCarpoolStatusUpdate($carpool, 'cancelled');
+
         $this->addFlash('success', 'Le covoiturage à été annulé et les passager ont été remboursés.');
 
       } catch (\Exception $e) {
@@ -536,7 +548,9 @@ class CovoiturageController extends AbstractController
       try {
 
         $carpoolRepository->finishCarpool($carpool);
-        
+
+        //changement status dans mongoDB
+        $this->carpoolAnalyticsService->logCarpoolStatusUpdate($carpool, 'completed');
         $this->addFlash('success', 'Le covoiturage a été marqué comme terminé et vos crédits ont été ajoutés apres modération des avis.');
 
       } catch (\Exception $e) {

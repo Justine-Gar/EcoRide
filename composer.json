@@ -11,6 +11,7 @@
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/mongodb-odm-bundle": "*",
         "doctrine/orm": "^3.3",
         "symfony/asset": "6.4.*",
         "symfony/console": "6.4.*",

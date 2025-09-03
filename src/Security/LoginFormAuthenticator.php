@@ -43,13 +43,31 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $password = $request->request->get('_password');
         $csrfToken = $request->request->get('_csrf_token');
 
+        if (!$email || !$password) {
+            throw new AuthenticationException('Email et mot de passe requis');
+        }
         // Débogage
         if (!$csrfToken) {
             throw new AuthenticationException('CSRF token manquant');
         }
 
         return new Passport(
-            new UserBadge($email),
+            new UserBadge($email, function($userIdentifier) {
+                // CRITIQUE: Récupérer l'utilisateur complet avec son ID
+                $user = $this->entityManager->getRepository(User::class)
+                    ->findOneBy(['email' => $userIdentifier]);
+                
+                if (!$user) {
+                    throw new UserNotFoundException('Utilisateur non trouvé');
+                }
+                
+                // VERIFICATION: L'utilisateur a bien un ID
+                if (!$user->getIdUser()) {
+                    throw new AuthenticationException('Utilisateur invalide');
+                }
+                
+                return $user;
+            }),
             new PasswordCredentials($password),
             [
                 new CsrfTokenBadge('authenticate', $csrfToken)
@@ -92,19 +110,21 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $message = 'Identifiant ou mot de passe incorrect';
+        error_log("ERREUR DE CONNEXION: " . get_class($exception) . " - " . $exception->getMessage());
+    
+        $message = match(get_class($exception)) {
+            UserNotFoundException::class => 'Identifiants ou Mots de passe incorrects',
+            default => 'Erreur de connexion: ' . $exception->getMessage()
+        };
 
-        //messages plus spécifique selon type erreur
-        if ($exception instanceof InvalidCsrfTokenException) {
-            $message = 'Session expirée, veuillez réessayer.';
-        } elseif ($exception instanceof UserNotFoundException) {
-            $message = 'Identifiant ou mot de passe incorrect';
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => $message
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
-        return new JsonResponse([
-            'success' => false,
-            'error' => $message
-        ], Response::HTTP_UNAUTHORIZED);
+        return new RedirectResponse('/login?error=1');
     }
     
 }
