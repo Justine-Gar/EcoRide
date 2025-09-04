@@ -38,12 +38,14 @@ security:
                 path: app_logout      # Route pour se déconnecter
                 target: app_home      # Page de redirection après déconnexion
                 invalidate_session: true
+                clear_site_data: 
+                    - cookies
+                    - storage
 
             # Option "Se souvenir de moi"
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800    # 1 semaine
-                always_remember_me: false
 
     # Contrôle d'accès global
     # Définit les restrictions d'accès aux différentes parties du site

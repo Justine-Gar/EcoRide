@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
- // Chargement des graphiques uniquement
+  // Graphique des covoiturages par jour
   fetchCarpoolsData();
+
+  // Graphique des crédits par jour
   fetchCreditsData();
+
+  //bouton de rafraichissement manuel
   addRefreshButton();
 
-
-  
-// === FONCTIONS PRINCIPALES ===
   // Fonction pour récupérer et afficher les données des covoiturages
   function fetchCarpoolsData() {
 
@@ -174,10 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
         showErrorMessage('carpoolChart');
       });
   }
-
-
-
-// === FONCTIONS UTILITAIRES ===
 
   // Mise à jour des statistiques
   function updateStats(id, value) {

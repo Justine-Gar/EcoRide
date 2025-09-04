@@ -2,14 +2,12 @@
 
 namespace App\Controller;
 
-use App\Document\CarpoolAnalytics;
 use App\Entity\User;
 use DateTime;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\CarpoolRepository;
-use App\Service\CarpoolAnalyticsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,8 +21,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AdminController extends AbstractController 
 {
-  private CarpoolAnalyticsService $carpoolAnalyticsService;
-
   public function __construct(
     private RoleRepository $roleRepository,
     private UserRepository $userRepository,
@@ -33,8 +29,7 @@ class AdminController extends AbstractController
     private EntityManagerInterface $entityManager,
     private UserPasswordHasherInterface $passwordHasher,
     private Security $security,
-    private RequestStack $requestStack,
-    CarpoolAnalyticsService $carpoolAnalyticsService
+    private RequestStack $requestStack
   ) {
       $this->roleRepository = $roleRepository;
       $this->userRepository = $userRepository;
@@ -43,7 +38,6 @@ class AdminController extends AbstractController
       $this->security = $security;
       $this->requestStack = $requestStack;
       $this->entityManager = $entityManager;
-      $this->carpoolAnalyticsService = $carpoolAnalyticsService;
   }
 
   // Route pour l'interface administrateur
@@ -624,79 +618,161 @@ class AdminController extends AbstractController
     return $this->redirectToRoute('app_admin_gestion_user');
   }
 
-  // ====== MongoDB ======
+
   // ==== Credit et Carpool DATA 
 
-  /**
-   * Route pour les données crédits
-   */
+  //Methode pour donnée des crédits au graphique
   #[Route('/admin/credits-data', name: 'app_admin_credits_data')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function getCreditsData(): JsonResponse
+  public function getCreditsData(CarpoolRepository $carpoolRepository): JsonResponse
   {
-    try {
-      $data = $this->carpoolAnalyticsService->getCreditsData();
-      return new JsonResponse($data);
-    } catch (\Exception $e) {
-      return new JsonResponse ([
-        'error' => true,
-        'message' => $e->getMessage()
-      ], 500);
+    //Date du jour
+    $today = new DateTime('now');
+    $today->setTime(23, 59, 59);
+    //Date de 30 jours
+    $thirtyDaysAgo = (new DateTime('now'))->modify('-29 days');
+    $thirtyDaysAgo->setTime(0, 0, 0);
+
+    //Recupération des covoitcréer ces 30 dernier jours
+    $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
+    //Insertion dans untableau
+    $dates = [];
+    $creditsByDay = [];
+
+    //Init tableau avec toutes les dates et 0 crédits
+    for ($i = 0; $i < 30; $i++) {
+      $date = clone $thirtyDaysAgo;
+      $date->modify("+$i days");
+
+      $dateStr = $date->format('Y-m-d');
+      $dates[] = $dateStr;
+      $creditsByDay[$dateStr] = 0;
     }
+
+    //Calcule des crédits par jour (4 crédits / covoiturage créé)
+    foreach ($carpools as $carpool) {
+      if ($carpool->getDateStart() instanceof DateTime) {
+        $dateStr = $carpool->getDateStart()->format('Y-m-d');
+        if (isset($creditsByDay[$dateStr])) {
+          $creditsByDay[$dateStr] += 4;
+        }
+      }
+    }
+
+    //Conversion pour Chart.js
+    $labels = array_map(function($date) {
+        return (new DateTime($date))->format('d/m');
+    }, $dates);
+    $data = array_values($creditsByDay);
+
+    //Calcul statistique
+    $totalCredits = array_sum($data);
+    $averageCredits = count($data) > 0 ? $totalCredits / count($data) : 0;
+
+    //Return JSON
+    return new JsonResponse([
+      'labels' => $labels,
+      'datasets' => [
+        [
+          'label' => 'Crédits reçus',
+          'data' => $data,
+          'backgroundColor' => 'rgba(75, 192, 192, 0.6)',
+          'borderColor' => 'rgba(75, 192, 192, 1)',
+          'borderWidth' => 1
+        ]
+      ],
+      'stats' => [
+        'total' => $totalCredits,
+        'average' => round($averageCredits, 1)
+      ]
+    ]);
   }
 
-  /**
-   * Route pour les données de covoiturage
-   */
+  // Méthode pour fournir les données des covoiturages pour le graphique
   #[Route('/admin/carpools-data', name: 'app_admin_carpools_data')]
   #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function getCarpoolsData(): JsonResponse
+  public function getCarpoolsData(CarpoolRepository $carpoolRepository): JsonResponse
   {
-    try {
-      $data = $this->carpoolAnalyticsService->getCarpoolsData();
-      return new JsonResponse($data);
-    } catch (\Exception $e) {
-      return new JsonResponse([
-        'error' => true,
-        'message' => $e->getMessage()
-      ], 500);
-    }
-  }
+    // Date d'aujourd'hui
+    $today = new DateTime('now');
+    $today->setTime(23, 59, 59);
+    // Date d'il y a 30 jours
+    $thirtyDaysAgo = (new DateTime('now'))->modify('-29 days');
+    $thirtyDaysAgo->setTime(0, 0, 0);
 
-  /**
-   * Route pour vérifier l'état des données MongoDB
-   */
-  #[Route('/admin/mongodb-status', name: 'app_admin_mongodb_status')]
-  #[IsGranted('ROLE_ADMINISTRATEUR')]
-  public function getMongoDBStatus(): JsonResponse
-  {
-    try {
-      // Compter les covoiturages dans MySQL
-      $mysqlCount = $this->carpoolRepository->count([]);
-      
-      // Compter les analytics dans MongoDB avec la nouvelle méthode
-      $mongoCount = $this->carpoolAnalyticsService->countAnalytics();
-      
-      error_log('MONGODB STATUS: MySQL=' . $mysqlCount . ', MongoDB=' . $mongoCount);
-      
-      // Vérifier si migration nécessaire
-      $needsMigration = $mongoCount < $mysqlCount;
-      
-      return new JsonResponse([
-        'success' => true,
-        'mysql_carpools' => $mysqlCount,
-        'mongodb_analytics' => $mongoCount,
-        'needs_migration' => $needsMigration,
-        'migration_percentage' => $mysqlCount > 0 ? round(($mongoCount / $mysqlCount) * 100, 1) : 0
-      ]);
-      
-    } catch (\Exception $e) {
-      error_log('DEBUG MONGODB STATUS ERROR: ' . $e->getMessage());
-      return new JsonResponse([
-        'success' => false,
-        'message' => 'Erreur lors de la vérification MongoDB : ' . $e->getMessage()
-      ], 500);
+    // Récupération des covoiturages créés ces 30 derniers jours
+    $carpools = $carpoolRepository->findCarpoolsCreatedBetweenDates($thirtyDaysAgo, $today);
+
+    // Préparation des données pour le graphique
+    $dates = [];
+    $carpoolsPerDay = [];
+
+    // Initialisation du tableau avec toutes les dates et 0 covoiturage
+    for ($i = 0; $i < 30; $i++) {
+      $date = clone $thirtyDaysAgo;
+      $date->modify("+$i days");
+      $dateStr = $date->format('Y-m-d');
+      $dates[] = $dateStr;
+      $carpoolsPerDay[$dateStr] = 0;
     }
+
+    // Comptage des covoiturages par jour
+    foreach ($carpools as $carpool) {
+      if ($carpool->getDateStart() instanceof DateTime) {
+        $dateStr = $carpool->getDateStart()->format('Y-m-d');
+        if (isset($carpoolsPerDay[$dateStr])) {
+          $carpoolsPerDay[$dateStr]++;
+        }
+      }
+    }
+
+    // Comptage par statut
+    $statusCounts = [
+      'terminé' => 0,
+      'annulé' => 0,
+      'en_attente' => 0,
+      'actif' => 0
+    ];
+
+    foreach ($carpools as $carpool) {
+      $status = $carpool->getStatut();
+      if (isset($statusCounts[$status])) {
+        $statusCounts[$status]++;
+      } else if ($status === 'waiting') {
+        $statusCounts['en_attente']++;
+      } else if ($status === 'active') {
+        $statusCounts['actif']++;
+      }
+    }
+
+    // Conversion en format adapté pour Chart.js
+    $labels = array_map(function ($date) {
+      return (new DateTime($date))->format('d/m');
+    }, $dates);
+
+    $data = array_values($carpoolsPerDay);
+
+    // Calcul des statistiques
+    $totalCarpools = array_sum($data);
+    $averageCarpools = count($data) > 0 ? $totalCarpools / count($data) : 0;
+
+    return new JsonResponse([
+      'labels' => $labels,
+      'datasets' => [
+        [
+          'label' => 'Covoiturages créés',
+          'data' => $data,
+          'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
+          'borderColor' => 'rgba(54, 162, 235, 1)',
+          'borderWidth' => 1
+        ]
+      ],
+      'stats' => [
+        'total' => $totalCarpools,
+        'average' => round($averageCarpools, 1),
+        'byStatus' => $statusCounts
+      ]
+    ]);
   }
 
 }

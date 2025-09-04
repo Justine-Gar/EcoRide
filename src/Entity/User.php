@@ -106,15 +106,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->recipientReviews = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id_user;
-    }
     public function getIdUser(): ?int
     {
         return $this->id_user;
     }
-
 
     public function setIdUser(int $id_user): self
     {
@@ -157,7 +152,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 
     public function getPassword(): ?string
     {
@@ -500,41 +494,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-
-    public function __serialize(): array
-    {
-        return [
-            'id_user' => $this->id_user,
-            'email' => $this->email,
-            'password' => $this->password,
-        ];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->id_user = $data['id_user'];
-        $this->email = $data['email'];
-        $this->password = $data['password'];
-    }
-
-    /**
-     * Support pour anciennes versions de Symfony
-     */
-    public function serialize(): string
-    {
-        return serialize([
-            $this->id_user,
-            $this->email,
-            $this->password,
-        ]);
-    }
-
-    public function unserialize(string $data): void
-    {
-        [
-            $this->id_user,
-            $this->email,
-            $this->password,
-        ] = unserialize($data);
-    }
 }

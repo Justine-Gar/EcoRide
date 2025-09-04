@@ -5,12 +5,10 @@ services:
     build:
       context: .  #Répertoire racine
       dockerfile: docker/php/Dockerfile #Chemin vers le dockerfil
-    working_dir: /var/www/symfony
     volumes: #Montage du code source
       - .:/var/www/symfony
     depends_on: #Dépend du service database
       - database
-      - mongodb
     networks: #Resaux paratgé
       - symfony
     environment:
@@ -18,27 +16,13 @@ services:
     image: php:fpm
     ports:
       - "9000:9000"
-    command: >
-      bash -c "
-        chown -R www-data:www-data /var/www/symfony/var &&
-        chmod -R 775 /var/www/symfony/var &&
-        php-fpm
-      "
-
-  # Service Composer séparé
-  composer:
-    image: composer:latest
-    volumes:
-      - .:/app
-    working_dir: /app
-    networks:
-      - symfony
 
   #Serveur Web Nginx
   nginx:
     image: nginx:alpine
     ports:
       - "8080:80"  #Port(conteneur local)
+      - "443:443"
     volumes:
       - .:/var/www/symfony  #Montage CS
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf  #config Nginx
@@ -65,7 +49,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
 
-  ##Use phpADMIN
+    ##Use phpADMIN
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
@@ -79,45 +63,16 @@ services:
         - database
     networks:
         - symfony
-  
-  #Service mongoDB
-  mongodb:
-    image: mongo:6.0
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ecoride_analytics
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - symfony
-
-
-  # Interface MongoDB (Mongo Express)
-  # mongo-express:
-  #   image: mongo-express:latest
-  #   container_name: ecoride_mongo_express
-  #   restart: always
-  #   ports:
-  #     - "8082:8081"  # Changé le port pour éviter le conflit avec phpMyAdmin
-  #   environment:
-  #     ME_CONFIG_MONGODB_URL: mongodb://@mongodb:27017/
-  #   depends_on:
-  #     - mongodb
-  #   networks:
-  #     - symfony
-
+        
 #Définision des réseaux
+
+
 networks:
   symfony:  #réseau isolé pour les conteneurs
-
+  
 #Définition des volumes persistants
 volumes:
   db-data:  #volume pour les données MySQL
-  mongodb_data: #volume pour les données NoSQL
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###
